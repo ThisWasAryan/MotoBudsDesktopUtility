@@ -6,13 +6,13 @@ An open-source desktop utility for configuring and controlling Motorola Moto Bud
 
 We have successfully reverse-engineered the communication transport layer and the strict Protocol Data Unit (PDU) framing.
 
-1. **Python SPP Backend (`backend/moto_control.py`)**
+1. **Python SPP Daemon Backend (`backend/moto_control.py`)**
    - We discovered that the Moto Buds **do not use GATT over BLE** for primary control. Instead, they use **Classic Bluetooth SPP (RFCOMM)** over Port 16.
-   - The backend constructs perfectly framed byte packets (HEAD, length, Opcode, payload, Little-Endian CRC32) and executes the strict initialization handshake required by the earbuds.
+   - The backend runs as a permanent, long-lived multi-threaded daemon. The main thread continuously polls the active socket and instantly streams hardware events (like Battery Case states) to `stdout` as JSON. A background listener thread reads UI commands from `stdin` and routes them seamlessly through the active socket with zero latency, entirely eliminating any Bluetooth port contention.
    
 2. **Electron / React Frontend**
    - A modern React application utilizing Vite, Electron IPC, and a mature, robust UI design. 
-   - The UI securely bridges to the Node.js main process, which seamlessly executes the Python backend and parses the JSON output to display real-time status.
+   - The UI spawns the Python daemon via Node's `child_process.spawn()` upon connection. WebContents IPC dynamically routes the JSON stream directly into a Zustand store that drives the UI, meaning the application faithfully updates only upon guaranteed hardware notification.
 
 ## How to Run
 
