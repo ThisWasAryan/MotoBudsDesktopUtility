@@ -11,7 +11,7 @@ The following functionalities are confirmed to be 100% working:
 * **Battery Levels**: 
   * Granular battery reporting for individual earbuds (Left/Right).
   * Accurate Case battery reporting (even when only one earbud is inside the case).
-* **Charging Status**: Granular tracking. If both earbuds are in the case, both show charging status. If one is full, it correctly reports as not charging.
+* **Charging Status**: Real-time tracking. Earbuds show a charging indicator when placed inside the case, and the case accurately reports its own charging status when plugged in.
 * **Active Noise Cancellation (ANC)**: Verified working across all states.
 * **Fit Test**: Accurately tests the seal quality and provides distinct, independent pass/fail results for the left and right earbuds.
 * **Game Mode**: Verified working. Automatically handles mutual exclusivity with Hi-Res Audio via custom UI dialogs.
@@ -30,7 +30,7 @@ Here is exactly what happens under the hood when you use the app:
 ### 1. Opening the App & Clicking Connect
 1. You run `npm run dev`, which compiles the frontend and launches the Electron window.
 2. The app starts on the "Unconnected" screen.
-3. When you click **Power On** (Connect), the React app sends an IPC (Inter-Process Communication) message to Electron's `main.ts` file.
+3. When you click **Connect**, the React app sends an IPC (Inter-Process Communication) message to Electron's `main.ts` file.
 4. `main.ts` uses Node's `child_process.spawn()` to silently boot up `backend/moto_control.py` in daemon mode.
 5. The Python daemon opens a Classic Bluetooth RFCOMM socket (Port 16) directly to your earbuds and negotiates the initialization handshake. 
 6. Upon success, the Python daemon prints `{"type": "status", "status": "connected"}` to its standard output.
@@ -38,14 +38,14 @@ Here is exactly what happens under the hood when you use the app:
 8. The React app immediately requests a full state synchronization (Battery, ANC, Hi-Res, etc.).
 
 ### 2. Performing an Action (e.g., Toggling ANC)
-1. You click the "ANC" slider on the Main Dashboard.
+1. You click the "ANC" control on the Main Dashboard.
 2. The React UI **does not** optimistically change the slider position. Instead, it fires an IPC command: `window.api.motoCommand({ op: 'anc', mode: 1 })`.
 3. Electron receives this command and pipes it into the `stdin` (Standard Input) of the running Python daemon.
 4. The Python daemon reads the input, formats the proprietary Protocol Data Unit (PDU) packet for Opcode `513`, and writes it to the Bluetooth RFCOMM socket.
 5. The earbuds receive the packet, physically enable Active Noise Cancellation, and immediately broadcast a confirmation PDU packet back to the host.
 6. The Python daemon's asynchronous polling loop reads the raw hex response from the socket and prints it as a JSON event to `stdout`.
 7. Electron captures the `stdout`, pipes it back to React, and the Zustand state manager (`useDeviceStore.ts`) parses the packet.
-8. The Zustand state updates `ancMode` to `1`, which triggers React to re-render the Dashboard, finally sliding the UI toggle to the "ANC" position.
+8. The Zustand state updates `ancMode` to `1`, which triggers React to re-render the Dashboard, finally updating the ANC segment in the UI.
 
 *This entire round-trip takes milliseconds. Because the UI only updates upon guaranteed hardware broadcast, the interface represents the absolute physical truth of the earbuds.*
 
@@ -69,7 +69,7 @@ Simply run:
 npm run dev
 ```
 
-This will launch the Electron desktop window. From the beautiful skeuomorphic interface, you can seamlessly connect to your earbuds and control ANC, Game Mode, Volume Boost, Hi-Res Audio, and In-Ear Detection.
+This will launch the Electron desktop window. From the beautiful premium two-column desktop interface, you can seamlessly connect to your earbuds and control ANC, Game Mode, Volume Boost, Hi-Res Audio, and In-Ear Detection.
 
 ## Documentation
 

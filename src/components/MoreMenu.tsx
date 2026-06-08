@@ -1,71 +1,54 @@
 import { useDeviceStore } from '../store/useDeviceStore';
-import { Ear, ArrowLeft, Download, Headphones } from 'lucide-react';
+import { Ear, Headphones } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const MoreMenu = () => {
-  const { setCurrentView, modelId, inEarFeatureEnabled, setInEarFeature } = useDeviceStore();
+  const { modelId, inEarFeatureEnabled, setInEarFeature } = useDeviceStore();
 
   return (
     <motion.div 
-      className="hero-container submenu-container"
-      initial={{ x: 50, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: -50, opacity: 0 }}
+      className="right-content"
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -12 }}
+      transition={{ duration: 0.25 }}
     >
-      <div className="hero-header">
-        <button className="skeuo-icon-btn" onClick={() => setCurrentView('main')}>
-          <ArrowLeft size={22} className="metal-icon" />
-        </button>
-        <h2 className="embossed-text">More</h2>
-        <div style={{width: 44}}></div> {/* Spacer */}
+      <div className="page-header">
+        <h1 className="page-title">Settings</h1>
+        <p className="page-subtitle">Device preferences and diagnostics</p>
       </div>
 
-      <div className="settings-list" style={{ marginTop: '20px' }}>
-        <div className="skeuo-toggle-row">
-          <div className="row-info">
-            <Ear size={20} className="metal-icon" />
-            <div>
-              <div className="embossed-text sm">In-ear detection</div>
-              <div className="engraved-text xs">Automatically play audio when earbuds are in</div>
+      <div className="settings-group">
+        {/* In-Ear Detection */}
+        <div className="setting-row">
+          <div className="setting-info">
+            <div className={`setting-icon ${inEarFeatureEnabled ? 'accent' : ''}`}>
+              <Ear size={18} />
+            </div>
+            <div className="setting-text">
+              <span className="setting-title">In-Ear Detection</span>
+              <span className="setting-desc">Auto-pause when earbuds are removed</span>
             </div>
           </div>
-          <button className={`skeuo-toggle ${inEarFeatureEnabled ? 'on' : 'off'}`} onClick={() => setInEarFeature(!inEarFeatureEnabled)}>
-            <div className="thumb"></div>
+          <button className={`toggle ${inEarFeatureEnabled ? 'on' : 'off'}`} onClick={() => setInEarFeature(!inEarFeatureEnabled)}>
+            <div className="toggle-thumb" />
           </button>
         </div>
 
+        {/* Spatial Audio — only for Moto Buds+ */}
         {modelId === 'XT2441-1' && (
-          <>
-            <div className="skeuo-toggle-row">
-              <div className="row-info">
-                <Headphones size={20} className="metal-icon" />
-                <div>
-                  <div className="embossed-text sm">Spatial Audio</div>
-                </div>
+          <div className="setting-row">
+            <div className="setting-info">
+              <div className="setting-icon">
+                <Headphones size={18} />
               </div>
-            </div>
-            
-            <div className="skeuo-toggle-row">
-              <div className="row-info">
-                <Download size={20} className="metal-icon" />
-                <div>
-                  <div className="embossed-text sm">Firmware update</div>
-                </div>
+              <div className="setting-text">
+                <span className="setting-title">Spatial Audio</span>
+                <span className="setting-desc">Available on Moto Buds+ only</span>
               </div>
-            </div>
-          </>
-        )}
-
-
-        <div className="skeuo-toggle-row interactive" style={{ cursor: 'pointer' }} onClick={() => setCurrentView('fit-test')}>
-          <div className="row-info">
-            <Headphones size={20} className="metal-icon" />
-            <div>
-              <div className="embossed-text sm">Fit test</div>
-              <div className="engraved-text xs">Ensure an excellent earbud fit</div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </motion.div>
   );

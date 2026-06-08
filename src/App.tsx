@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useDeviceStore } from './store/useDeviceStore';
-import { Headphones, Radio, Loader2 } from 'lucide-react';
-import { AnimatePresence } from 'framer-motion';
+import { Loader2 } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 
 import { MainDashboard } from './components/MainDashboard';
 import { SoundMenu } from './components/SoundMenu';
@@ -9,7 +9,7 @@ import { MoreMenu } from './components/MoreMenu';
 import { FitTest } from './components/FitTest';
 import { Equalizer } from './components/Equalizer';
 
-import './App.css'; 
+import budsWithCase from './assets/buds_with_case.png';
 
 declare global {
   interface Window {
@@ -28,7 +28,7 @@ function App() {
   } = useDeviceStore();
   
   const [isInitializing, setIsInitializing] = useState(false);
-  const [statusMsg, setStatusMsg] = useState('Connect your earbuds to begin.');
+  const [statusMsg, setStatusMsg] = useState('Connect your earbuds to begin');
 
   const parseAndInjectPDU = (hexStr: string) => {
     try {
@@ -55,11 +55,11 @@ function App() {
 
   const connectDevice = async () => {
     if (!window.api || !window.api.startDaemon) {
-      setStatusMsg("Electron API missing or outdated. Please restart 'npm run dev'.");
+      setStatusMsg("Electron API missing. Please restart the app.");
       return;
     }
     setIsInitializing(true);
-    setStatusMsg('Starting background Bluetooth daemon...');
+    setStatusMsg('Connecting...');
 
     try {
       const daemonRes = await window.api.startDaemon();
@@ -71,9 +71,7 @@ function App() {
           battery: { left: null, right: null, case: null, chargingL: false, chargingR: false, chargingCase: false, inCaseL: false, inCaseR: false }
         });
         
-        setStatusMsg('Syncing hardware state...');
-        
-        // Request initial state synchronization from the daemon
+        setStatusMsg('Syncing...');
         await window.api.motoCommand({ op: "info" });
         await window.api.motoCommand({ op: "sync" });
         await window.api.motoCommand({ op: "battery" });
@@ -105,12 +103,10 @@ function App() {
           } else if (payload.type === 'error') {
              console.error("Daemon error:", payload.message);
              if (payload.message && payload.message.includes('attempting to reconnect')) {
-                // Do not disconnect the UI, let the daemon handle the auto-reconnect loop
                 console.warn("Device is temporarily unavailable (codec renegotiation). Reconnecting...");
              } else if (payload.message && payload.message.includes('Connection dropped')) {
                 console.warn("Daemon reported a connection drop. Waiting for background reconnect...");
                 setStatusMsg("Device rebooting to switch codecs. Please wait...");
-                // Do not call disconnect(). The daemon will automatically reconnect!
              } else {
                 setStatusMsg(`Connection error: ${payload.message}`);
                 disconnect();
@@ -141,33 +137,63 @@ function App() {
     };
   }, []);
 
+  /* ─── Connection Screen ─── */
   if (!connected) {
     return (
-      <div className="unconnected-container">
-        <div className="skeuo-orb">
-          <Headphones size={64} className="metal-icon" />
-        </div>
-        <h1 className="embossed-text">Moto Buds</h1>
-        <p className="engraved-text">{statusMsg}</p>
+      <div className="connect-screen">
+        <img src={budsWithCase} alt="Moto Buds" className="connect-hero-image" />
+        <h1 className="connect-title">Moto Buds</h1>
+        <p className="connect-subtitle">{statusMsg}</p>
         
-        <button className="skeuo-btn connect-btn" onClick={connectDevice} disabled={isInitializing}>
-          {isInitializing ? <Loader2 className="loading spinner" size={20} /> : <Radio size={20} />}
-          <span>{isInitializing ? 'Connecting...' : 'Power On'}</span>
+        <button className="connect-btn" onClick={connectDevice} disabled={isInitializing}>
+          {isInitializing ? <Loader2 size={18} className="spinner" /> : null}
+          <span>{isInitializing ? 'Connecting' : 'Connect'}</span>
         </button>
       </div>
     );
   }
 
+  /* ─── Connected: Two-Column Layout ─── */
+  const rightPanelContent = () => {
+    switch (currentView) {
+      case 'sound': return <SoundMenu key="sound" />;
+      case 'equalizer': return <Equalizer key="equalizer" />;
+      case 'fit-test': return <FitTest key="fit-test" />;
+      case 'more': return <MoreMenu key="more" />;
+      default: return <WelcomePanel key="welcome" />;
+    }
+  };
+
   return (
-    <div style={{ position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden' }}>
-      <AnimatePresence mode="wait">
-        {currentView === 'main' && <MainDashboard key="main" />}
-        {currentView === 'sound' && <SoundMenu key="sound" />}
-        {currentView === 'more' && <MoreMenu key="more" />}
-        {currentView === 'fit-test' && <FitTest key="fit-test" />}
-        {currentView === 'equalizer' && <Equalizer key="equalizer" />}
-      </AnimatePresence>
+    <div className="app-layout">
+      <div className="left-panel">
+        <MainDashboard />
+      </div>
+      <div className="right-panel">
+        <AnimatePresence mode="wait">
+          {rightPanelContent()}
+        </AnimatePresence>
+      </div>
     </div>
+  );
+}
+
+/* ─── Welcome/Default Right Panel ─── */
+function WelcomePanel() {
+  return (
+    <motion.div 
+      className="welcome-panel"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.25 }}
+    >
+      <img src={budsWithCase} alt="Moto Buds" className="welcome-image" />
+      <h2 className="welcome-title">Ready to go</h2>
+      <p className="welcome-subtitle">
+        Select a category from the panel to configure your earbuds
+      </p>
+    </motion.div>
   );
 }
 

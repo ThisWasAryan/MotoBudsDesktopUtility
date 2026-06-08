@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useDeviceStore } from '../store/useDeviceStore';
-import { Gamepad2, Volume2, Activity, ArrowLeft, Radio, SlidersHorizontal, AlertTriangle } from 'lucide-react';
+import { Gamepad2, Volume2, Activity, Radio, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const SoundMenu = () => {
-  const { setCurrentView, name, gameMode, setGameMode, volBoost, setVolBoost, hiRes, setHiRes } = useDeviceStore();
+  const { name, gameMode, setGameMode, volBoost, setVolBoost, hiRes, setHiRes, setCurrentView } = useDeviceStore();
   
   const [conflictDialog, setConflictDialog] = useState<'game' | 'hires' | null>(null);
 
@@ -38,114 +38,127 @@ export const SoundMenu = () => {
   return (
     <>
       <motion.div 
-        className="hero-container submenu-container"
-        initial={{ x: 50, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        exit={{ x: -50, opacity: 0 }}
+        className="right-content"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -12 }}
+        transition={{ duration: 0.25 }}
       >
-        <div className="hero-header">
-          <button className="skeuo-icon-btn" onClick={() => setCurrentView('main')}>
-            <ArrowLeft size={22} className="metal-icon" />
-          </button>
-          <h2 className="embossed-text">Sound</h2>
-          <div style={{width: 44}}></div> {/* Spacer */}
+        <div className="page-header">
+          <h1 className="page-title">Sound</h1>
+          <p className="page-subtitle">Audio modes and enhancements</p>
         </div>
 
-        <div className="settings-list" style={{ marginTop: '20px' }}>
+        <div className="settings-group">
+          {/* Spatial Audio — Only for Moto Buds+ */}
           {name === 'Moto Buds+' && (
-            <div className="skeuo-toggle-row">
-              <div className="row-info">
-                <Radio size={20} className="metal-icon" />
-                <div>
-                  <div className="embossed-text sm">Spatial audio</div>
-                  <div className="engraved-text xs">Hear immersive, three-dimensional audio</div>
+            <div className="setting-row">
+              <div className="setting-info">
+                <div className="setting-icon">
+                  <Radio size={18} />
+                </div>
+                <div className="setting-text">
+                  <span className="setting-title">Spatial Audio</span>
+                  <span className="setting-desc">Immersive three-dimensional audio</span>
                 </div>
               </div>
             </div>
           )}
 
-          <div className="skeuo-toggle-row interactive" style={{ cursor: 'pointer' }} onClick={() => setCurrentView('equalizer')}>
-            <div className="row-info">
-              <SlidersHorizontal size={20} className="metal-icon" />
-              <div>
-                <div className="embossed-text sm">Equaliser</div>
-                <div className="engraved-text xs">Custom</div>
+          {/* Hi-Res Mode */}
+          <div className="setting-row">
+            <div className="setting-info">
+              <div className={`setting-icon ${hiRes ? 'accent' : ''}`}>
+                <Activity size={18} />
+              </div>
+              <div className="setting-text">
+                <span className="setting-title">Hi-Res Audio</span>
+                <span className="setting-desc">LDAC high-resolution codec</span>
               </div>
             </div>
-          </div>
-
-          <div className="skeuo-toggle-row">
-            <div className="row-info">
-              <Activity size={20} className="metal-icon" />
-              <div>
-                <div className="embossed-text sm">Hi-res mode</div>
-                <div className="engraved-text xs">Play audio in high resolution</div>
-              </div>
-            </div>
-            <button className={`skeuo-toggle ${hiRes ? 'on' : 'off'}`} onClick={handleToggleHiRes}>
-              <div className="thumb"></div>
+            <button className={`toggle ${hiRes ? 'on' : 'off'}`} onClick={handleToggleHiRes}>
+              <div className="toggle-thumb" />
             </button>
           </div>
 
-          <div className="skeuo-toggle-row">
-            <div className="row-info">
-              <Gamepad2 size={20} className="metal-icon" />
-              <div>
-                <div className="embossed-text sm">Gaming mode</div>
-                <div className="engraved-text xs">Minimise latency for improved gaming</div>
+          {/* Gaming Mode */}
+          <div className="setting-row">
+            <div className="setting-info">
+              <div className={`setting-icon ${gameMode ? 'accent' : ''}`}>
+                <Gamepad2 size={18} />
+              </div>
+              <div className="setting-text">
+                <span className="setting-title">Game Mode</span>
+                <span className="setting-desc">Minimise audio latency</span>
               </div>
             </div>
-            <button className={`skeuo-toggle ${gameMode ? 'on' : 'off'}`} onClick={handleToggleGameMode}>
-              <div className="thumb"></div>
+            <button className={`toggle ${gameMode ? 'on' : 'off'}`} onClick={handleToggleGameMode}>
+              <div className="toggle-thumb" />
             </button>
           </div>
 
-          <div className="skeuo-toggle-row">
-            <div className="row-info">
-              <Volume2 size={20} className="metal-icon" />
-              <div>
-                <div className="embossed-text sm">Volume boost</div>
-                <div className="engraved-text xs">Increase the maximum volume</div>
+          {/* Volume Booster */}
+          <div className="setting-row">
+            <div className="setting-info">
+              <div className={`setting-icon ${volBoost ? 'accent' : ''}`}>
+                <Volume2 size={18} />
+              </div>
+              <div className="setting-text">
+                <span className="setting-title">Volume Boost</span>
+                <span className="setting-desc">Increase maximum volume</span>
               </div>
             </div>
-            <button className={`skeuo-toggle ${volBoost ? 'on' : 'off'}`} onClick={() => setVolBoost(!volBoost)}>
-              <div className="thumb"></div>
+            <button className={`toggle ${volBoost ? 'on' : 'off'}`} onClick={() => setVolBoost(!volBoost)}>
+              <div className="toggle-thumb" />
             </button>
+          </div>
+
+          {/* Equalizer Link */}
+          <div className="setting-row interactive" onClick={() => setCurrentView('equalizer')}>
+            <div className="setting-info">
+              <div className="setting-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="4" y1="21" x2="4" y2="14" /><line x1="4" y1="10" x2="4" y2="3" /><line x1="12" y1="21" x2="12" y2="12" /><line x1="12" y1="8" x2="12" y2="3" /><line x1="20" y1="21" x2="20" y2="16" /><line x1="20" y1="12" x2="20" y2="3" /></svg>
+              </div>
+              <div className="setting-text">
+                <span className="setting-title">Equalizer</span>
+                <span className="setting-desc">Custom 10-band tuning</span>
+              </div>
+            </div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ color: 'var(--text-3)' }}><polyline points="9 18 15 12 9 6" /></svg>
           </div>
         </div>
       </motion.div>
 
-      {/* Modal Dialog */}
+      {/* ─── Conflict Dialog ─── */}
       <AnimatePresence>
         {conflictDialog && (
           <motion.div 
+            className="dialog-overlay"
             initial={{ opacity: 0 }} 
             animate={{ opacity: 1 }} 
-            exit={{ opacity: 0 }} 
-            style={{
-              position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
-              backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 100,
-              display: 'flex', justifyContent: 'center', alignItems: 'center'
-            }}
+            exit={{ opacity: 0 }}
           >
             <motion.div 
-              className="skeuo-panel" 
-              initial={{ scale: 0.9, y: 20 }} 
-              animate={{ scale: 1, y: 0 }} 
-              exit={{ scale: 0.9, y: 20 }}
-              style={{ width: '85%', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}
+              className="dialog-card"
+              initial={{ scale: 0.95, opacity: 0 }} 
+              animate={{ scale: 1, opacity: 1 }} 
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ duration: 0.2 }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <AlertTriangle className="metal-icon" size={24} style={{ color: 'var(--accent-red)' }} />
-                <div className="embossed-text">Conflict Detected</div>
+              <div className="dialog-header">
+                <div className="dialog-icon">
+                  <AlertTriangle size={20} />
+                </div>
+                <span className="dialog-title">Mode Conflict</span>
               </div>
-              <div className="engraved-text sm" style={{ lineHeight: '1.5' }}>
-                Hi-Res Audio and Gaming Mode cannot be active simultaneously. 
-                Activating {conflictDialog === 'hires' ? 'Hi-Res Audio' : 'Gaming Mode'} will disable {conflictDialog === 'hires' ? 'Gaming Mode' : 'Hi-Res Audio'}. Proceed?
-              </div>
-              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '8px' }}>
-                <button className="skeuo-btn" onClick={() => setConflictDialog(null)}>Cancel</button>
-                <button className="skeuo-btn" onClick={confirmConflict} style={{ color: 'var(--accent-blue)' }}>Proceed</button>
+              <p className="dialog-body">
+                Hi-Res Audio and Game Mode cannot be active simultaneously. 
+                Enabling {conflictDialog === 'hires' ? 'Hi-Res Audio' : 'Game Mode'} will 
+                disable {conflictDialog === 'hires' ? 'Game Mode' : 'Hi-Res Audio'}.
+              </p>
+              <div className="dialog-actions">
+                <button className="dialog-btn dialog-btn-secondary" onClick={() => setConflictDialog(null)}>Cancel</button>
+                <button className="dialog-btn dialog-btn-primary" onClick={confirmConflict}>Proceed</button>
               </div>
             </motion.div>
           </motion.div>
