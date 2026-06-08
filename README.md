@@ -13,9 +13,10 @@ The following functionalities are confirmed to be 100% working:
   * Accurate Case battery reporting (even when only one earbud is inside the case).
 * **Charging Status**: Granular tracking. If both earbuds are in the case, both show charging status. If one is full, it correctly reports as not charging.
 * **Active Noise Cancellation (ANC)**: Verified working across all states.
+* **Fit Test**: Accurately tests the seal quality and provides distinct, independent pass/fail results for the left and right earbuds.
 * **Hi-Res Audio (LDAC)**: Successfully implemented codec negotiation from the desktop client, entirely replicating the functionality that was previously restricted to the Android app.
 
-*Note: Additional features (Equalizer, Spatial Audio, Fit Test) are currently under active development and reverse-engineering.*
+*Note: Additional features (Equalizer, Spatial Audio) are currently under active development and reverse-engineering.*
 
 ## How It Works: Step-by-Step
 

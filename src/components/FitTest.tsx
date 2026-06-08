@@ -3,13 +3,13 @@ import { ArrowLeft, Play, Loader2, CheckCircle2, XCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const FitTest = () => {
-  const { setCurrentView, physicallyInEarL, physicallyInEarR, fitTestRunning, fitTestResult } = useDeviceStore();
+  const { setCurrentView, physicallyInEarL, physicallyInEarR, fitTestRunning, fitTestResultL, fitTestResultR } = useDeviceStore();
 
   const startTest = async () => {
     if (!physicallyInEarL || !physicallyInEarR) return;
     
     // Dispatch local state
-    useDeviceStore.setState({ fitTestRunning: true, fitTestResult: null });
+    useDeviceStore.setState({ fitTestRunning: true, fitTestResultL: null, fitTestResultR: null });
 
     if (window.api && window.api.motoCommand) {
       await window.api.motoCommand({ op: 'fit', enabled: 1 });
@@ -34,17 +34,26 @@ export const FitTest = () => {
 
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexGrow: 1, gap: '32px' }}>
         
-        <div className="skeuo-orb" style={{ width: 140, height: 140 }}>
-           {fitTestRunning ? (
-              <Loader2 size={64} className="metal-icon spinner" color="var(--accent-blue)" />
-           ) : fitTestResult === 0 ? (
-              <CheckCircle2 size={64} className="metal-icon" color="var(--success)" />
-           ) : fitTestResult === 1 || fitTestResult === 2 ? (
-              <XCircle size={64} className="metal-icon" color="var(--danger)" />
-           ) : (
-              <Play size={64} className="metal-icon" style={{ marginLeft: 10 }} />
-           )}
-        </div>
+        {fitTestRunning || (fitTestResultL === null && fitTestResultR === null) ? (
+          <div className="skeuo-orb" style={{ width: 140, height: 140 }}>
+             {fitTestRunning ? (
+                <Loader2 size={64} className="metal-icon spinner" color="var(--accent-blue)" />
+             ) : (
+                <Play size={64} className="metal-icon" style={{ marginLeft: 10 }} />
+             )}
+          </div>
+        ) : (
+          <div style={{ display: 'flex', gap: '24px' }}>
+             <div className="skeuo-orb" style={{ width: 100, height: 100, flexDirection: 'column', gap: '8px' }}>
+                {fitTestResultL === 1 ? <CheckCircle2 size={36} className="metal-icon" color="var(--success)" /> : <XCircle size={36} className="metal-icon" color="var(--danger)" />}
+                <span className="embossed-text xs">Left</span>
+             </div>
+             <div className="skeuo-orb" style={{ width: 100, height: 100, flexDirection: 'column', gap: '8px' }}>
+                {fitTestResultR === 1 ? <CheckCircle2 size={36} className="metal-icon" color="var(--success)" /> : <XCircle size={36} className="metal-icon" color="var(--danger)" />}
+                <span className="embossed-text xs">Right</span>
+             </div>
+          </div>
+        )}
 
         <div style={{ textAlign: 'center', padding: '0 20px' }}>
           {fitTestRunning ? (
@@ -52,11 +61,17 @@ export const FitTest = () => {
               <h3 className="embossed-text">Testing fit...</h3>
               <p className="engraved-text sm" style={{ marginTop: '12px' }}>Please remain quiet and keep still while the test completes.</p>
             </>
-          ) : fitTestResult !== null ? (
+          ) : fitTestResultL !== null && fitTestResultR !== null ? (
             <>
-              <h3 className="embossed-text">{fitTestResult === 0 ? 'Good fit' : 'Adjust fit'}</h3>
+              <h3 className="embossed-text">
+                 {fitTestResultL === 1 && fitTestResultR === 1 ? 'Good fit' : 
+                  fitTestResultL !== 1 && fitTestResultR !== 1 ? 'Adjust both earbuds' :
+                  fitTestResultL !== 1 ? 'Adjust left earbud' : 'Adjust right earbud'}
+              </h3>
               <p className="engraved-text sm" style={{ marginTop: '12px' }}>
-                 {fitTestResult === 0 ? 'Your earbuds are providing a good seal.' : 'Try adjusting the earbuds or using a different tip size for a better seal.'}
+                 {fitTestResultL === 1 && fitTestResultR === 1 
+                   ? 'Your earbuds are providing a good seal.' 
+                   : 'Try adjusting the earbuds or using a different tip size for a better seal.'}
               </p>
             </>
           ) : (
@@ -67,7 +82,7 @@ export const FitTest = () => {
           )}
         </div>
 
-        {(!physicallyInEarL || !physicallyInEarR) && !fitTestRunning && fitTestResult === null && (
+        {(!physicallyInEarL || !physicallyInEarR) && !fitTestRunning && fitTestResultL === null && (
           <div style={{ padding: '12px 24px', background: 'rgba(255, 77, 79, 0.1)', borderRadius: '12px', border: '1px solid var(--danger)' }}>
              <span className="embossed-text sm" style={{ color: 'var(--danger)' }}>Make sure both earbuds are inserted</span>
           </div>

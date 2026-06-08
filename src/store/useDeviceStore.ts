@@ -25,7 +25,8 @@ export interface DeviceState {
   physicallyInEarR: boolean;
   volBoost: boolean;
   fitTestRunning: boolean;
-  fitTestResult: number | null;
+  fitTestResultL: number | null;
+  fitTestResultR: number | null;
   currentView: 'main' | 'sound' | 'gestures' | 'more' | 'fit-test' | 'ring-earbuds' | 'equalizer';
   
   // Actions
@@ -57,7 +58,8 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
   physicallyInEarR: true,
   volBoost: false,
   fitTestRunning: false,
-  fitTestResult: null,
+  fitTestResultL: null,
+  fitTestResultR: null,
   currentView: 'main',
 
   setCurrentView: (view) => set({ currentView: view }),
@@ -166,8 +168,11 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
            };
         }
         break;
+      case 1024: // Fit Test Start/Stop
+        if (pdu.payload.length >= 1) return { fitTestRunning: pdu.payload[0] === 1, fitTestResultL: null, fitTestResultR: null };
+        break;
       case 1025: // Fit Test Result
-        if (pdu.payload.length >= 1) return { fitTestResult: pdu.payload[0], fitTestRunning: false };
+        if (pdu.payload.length >= 2) return { fitTestResultL: pdu.payload[0], fitTestResultR: pdu.payload[1], fitTestRunning: false };
         break;
     }
     return {};

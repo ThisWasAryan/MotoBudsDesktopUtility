@@ -29,6 +29,8 @@ Any new or modified UI components must bind to the values exported by `useDevice
 * `hiRes` (boolean): LDAC / LHDC Hi-Res audio toggle.
 * `volBoost` (boolean): Artificial volume booster.
 * `physicallyInEarL` & `physicallyInEarR` (boolean): In-Ear Detection hardware sensors.
+* `fitTestRunning` (boolean): Whether the Fit Test audio sequence is currently actively playing.
+* `fitTestResultL` & `fitTestResultR` (number | null): The result of the Fit Test for each earbud independently (1 = Good Fit).
 
 ### Available Action Functions
 When binding click handlers in your UI components, use these exposed setters. Note that these setters internally trigger the IPC `window.api.motoCommand` calls; you do not need to call the IPC layer manually from the UI components.

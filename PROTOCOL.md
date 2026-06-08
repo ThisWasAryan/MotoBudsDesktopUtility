@@ -140,7 +140,9 @@ All communication is structured into structured Protocol Data Units (PDUs) encap
 * **Supported Devices:** Feature ID 117
 * **Start:** Opcode 1024 (Payload `[0x01]`). **Stop:** Opcode 1024 (Payload `[0x00]`).
 * **Workflow:** The app sends the Start command. It monitors Opcode 1028 (In-Ear Status) to ensure earbuds remain seated. The earbuds calculate seal quality and asynchronously push the result via Opcode 1025.
-* **Results Payload:** The view model parses it to: `0` (Left Fail), `1` (Right Fail), `2` (Both Pass), `3` (Both Fail).
+* **Results Payload:** 2 Bytes `[Left_Result, Right_Result]`.
+  * `0x01`: Good Fit (Pass)
+  * `0x00` (or other values): Adjust Fit (Fail)
 
 ### Gesture Configuration
 * **Supported Devices:** Varies by variant configuration.
