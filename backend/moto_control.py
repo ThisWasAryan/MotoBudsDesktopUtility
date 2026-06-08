@@ -24,8 +24,11 @@ class MotoBudsController:
             print(msg)
 
     def connect(self):
-        self.log(f"[*] Connecting to {self.mac_address} on RFCOMM Port {self.port}...")
-        self.sock = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
+        self.log(f"[*] Connecting to {self.mac_address} on Port {self.port}...")
+        if self.mac_address == "127.0.0.1":
+            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        else:
+            self.sock = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
         self.sock.settimeout(3.0)
         try:
             self.sock.connect((self.mac_address, self.port))
@@ -73,8 +76,21 @@ class MotoBudsController:
         try:
             self.sock.send(packet)
             if wait_for_response:
-                resp = self.sock.recv(1024)
-                return resp
+                self.sock.settimeout(0.5)
+                all_data = bytearray()
+                chunk = self.sock.recv(4096)
+                if chunk:
+                    all_data.extend(chunk)
+                    self.sock.settimeout(0.2)
+                    while True:
+                        try:
+                            more = self.sock.recv(4096)
+                            if not more: break
+                            all_data.extend(more)
+                        except socket.timeout:
+                            break
+                self.sock.settimeout(3.0)
+                return bytes(all_data) if all_data else None
             return None
         except socket.timeout:
             self.log(f"[-] Timeout waiting for response to opcode {hex(opcode)}")
@@ -120,6 +136,8 @@ def main():
     parser.add_argument("--info", action="store_true", help="Read hardware info")
     parser.add_argument("--anc", type=int, choices=[0, 1, 2], help="Set ANC Mode (0=Off, 1=ANC, 2=Transparency)")
     parser.add_argument("--json", action="store_true", help="Output results in JSON format")
+    parser.add_argument("--mac", type=str, default=CLASSIC_MAC, help="MAC address or 127.0.0.1 for mock")
+    parser.add_argument("--port", type=int, default=RFCOMM_PORT, help="Port")
     
     args = parser.parse_args()
     
@@ -127,7 +145,7 @@ def main():
         parser.print_help()
         sys.exit(1)
 
-    controller = MotoBudsController(output_json=args.json)
+    controller = MotoBudsController(mac_address=args.mac, port=args.port, output_json=args.json)
     
     results = {"status": "success", "data": {}}
     

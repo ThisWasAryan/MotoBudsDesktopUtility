@@ -22,23 +22,27 @@ function App() {
   const [statusMsg, setStatusMsg] = useState('Connect your earbuds to begin.');
 
   const parseAndInjectPDU = (hexStr: string) => {
-    // If the python script returned a raw HEX string response, we inject it into the zustand store!
     try {
-      if (hexStr.length < 16) return;
-      // Convert HEX string to byte array
+      if (!hexStr || hexStr.length < 16) return;
       const bytes = new Uint8Array(hexStr.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
       
-      // Basic extraction mimicking the python backend structure
-      // Head (4) + TotalLen (2) + Opcode (2) + Type (1) + Result (1) + PayloadLen (2) + Seq (2) + Payload + CRC (4) + TAIL (4)
-      if (bytes.length < 22) return;
-      
-      const opcode = (bytes[6] << 8) | bytes[7];
-// Little endian in python, but wait it's little endian: bytes[11]<<8 | bytes[10]
-      const actualPayloadLen = bytes[10] | (bytes[11] << 8);
-      
-      const payload = Array.from(bytes.slice(14, 14 + actualPayloadLen));
-      
-      updateStateFromPdu({ opcode, payload });
+      let offset = 0;
+      while (offset + 22 <= bytes.length) {
+        if (bytes[offset] !== 0x48 || bytes[offset+1] !== 0x45 || bytes[offset+2] !== 0x41 || bytes[offset+3] !== 0x44) {
+          offset++;
+          continue;
+        }
+        
+        const opcode = (bytes[offset+6] << 8) | bytes[offset+7];
+        const actualPayloadLen = bytes[offset+10] | (bytes[offset+11] << 8);
+        
+        if (offset + 22 + actualPayloadLen > bytes.length) break;
+        
+        const payload = Array.from(bytes.slice(offset+14, offset+14 + actualPayloadLen));
+        updateStateFromPdu({ opcode, payload });
+        
+        offset += 22 + actualPayloadLen;
+      }
     } catch (e) {
       console.error("Failed to parse mock PDU:", e);
     }
