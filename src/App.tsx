@@ -92,7 +92,11 @@ function App() {
                }
             }
           } catch (e) {
-            console.error("Polling error:", e);
+            console.error("Polling error (likely killed by a UI command):", e);
+            // Wait 1 second before restarting the poll loop to give the UI command 
+            // plenty of time to grab the socket, send its payload, and exit.
+            setTimeout(pollDevice, 1000);
+            return;
           }
           // Immediately trigger the next poll to minimize socket downtime
           setTimeout(pollDevice, 0);

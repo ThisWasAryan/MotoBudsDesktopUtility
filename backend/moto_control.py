@@ -31,15 +31,20 @@ class MotoBudsController:
         else:
             self.sock = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
         self.sock.settimeout(3.0)
-        try:
-            self.sock.connect((self.mac_address, self.port))
-            self.log("[+] Connected successfully!")
-            self._initialization_handshake()
-            return True
-        except Exception as e:
-            self.log(f"[-] Connection failed: {e}")
-            self.sock = None
-            return False
+        
+        for attempt in range(5):
+            try:
+                self.sock.connect((self.mac_address, self.port))
+                self.log("[+] Connected successfully!")
+                self._initialization_handshake()
+                return True
+            except Exception as e:
+                self.log(f"[-] Connection attempt {attempt+1} failed: {e}")
+                time.sleep(0.5)
+                
+        self.log("[-] Failed to connect after all attempts.")
+        self.sock = None
+        return False
 
     def disconnect(self):
         if self.sock:
@@ -197,6 +202,18 @@ def main():
     if not any([args.battery, args.info, args.anc is not None, args.game is not None, args.inear is not None, args.volboost is not None, args.hires is not None, args.fit is not None, args.fmd is not None, args.sync]):
         parser.print_help()
         sys.exit(1)
+
+    # If this is a UI command (not a keepalive polling script), we must preemptively 
+    # kill the background keepalive script, otherwise the RFCOMM socket is locked 
+    # and we'll get a 'Device or resource busy' error.
+    if args.keepalive is None:
+        try:
+            import subprocess
+            # Kill any running moto_control.py that has --keepalive
+            subprocess.run(["pkill", "-f", "moto_control.py.*--keepalive"], stderr=subprocess.DEVNULL)
+            time.sleep(0.2) # Give the OS a tiny moment to release the RFCOMM port
+        except Exception:
+            pass
 
     controller = MotoBudsController(mac_address=args.mac, port=args.port, output_json=args.json)
     
