@@ -18,10 +18,13 @@ We have successfully reverse-engineered the communication transport layer and th
 
 Running the entire full-stack application (Frontend + Backend) has been unified into a single command!
 
-### Prerequisites
+### Prerequisites & Setup
 1. Ensure your Moto Buds are paired to your Linux machine via Classic Bluetooth (not LE).
-2. Ensure you have installed the Node modules (`npm install`).
-3. Ensure the Python virtual environment has its dependencies (if any).
+2. Install the necessary Node modules for the Electron frontend:
+   ```bash
+   npm install
+   ```
+3. The Python backend scripts rely purely on standard libraries (`socket`, `struct`, `binascii`), so no external pip packages (`requirements.txt`) are necessary to run the desktop app.
 
 ### Start the Application
 
@@ -31,7 +34,7 @@ Simply run:
 npm run dev
 ```
 
-This will concurrently compile the TypeScript backend, spin up the Vite React server, and launch the Electron desktop window. From the beautiful glass panel interface, you can immediately click **Read Battery**, **Read Hardware Info**, or click the **Noise Control** toggles.
+This will concurrently compile the TypeScript backend, spin up the Vite React server, and launch the Electron desktop window. From the beautiful skeuomorphic interface, you can seamlessly connect to your earbuds and control ANC, Game Mode, Volume Boost, and In-Ear Detection!
 
 ## Protocol Documentation
 
