@@ -14,11 +14,12 @@ HEAD = b"HEAD"
 TAIL = b"TAIL"
 
 class MotoBudsController:
-    def __init__(self, mac_address=CLASSIC_MAC, port=RFCOMM_PORT, output_json=False):
+    def __init__(self, mac_address=CLASSIC_MAC, port=RFCOMM_PORT, output_json=False, is_daemon=False):
         self.mac_address = mac_address
         self.port = port
         self.sock = None
         self.output_json = output_json
+        self.is_daemon = is_daemon
         
     def log(self, msg):
         if not self.output_json:
@@ -81,6 +82,8 @@ class MotoBudsController:
         packet = self._create_packet(opcode, payload)
         try:
             self.sock.send(packet)
+            if self.is_daemon:
+                return None
             if wait_for_response:
                 self.sock.settimeout(0.5)
                 all_data = bytearray()
@@ -191,6 +194,7 @@ def main():
     parser.add_argument("--hires", type=int, choices=[0, 1], help="Set Hi-Res/LDAC")
     parser.add_argument("--fit", type=int, choices=[0, 1], help="Set Fit Test (0=Stop, 1=Start)")
     parser.add_argument("--fmd", type=int, choices=[0, 1, 2, 3], help="Set Find My Device Mode")
+    parser.add_argument("--daemon", action="store_true", help="Run as a long-lived bidirectional daemon using stdin/stdout")
     parser.add_argument("--keepalive", type=int, help="Keep SPP connection alive for N seconds to capture async events")
     parser.add_argument("--sync", action="store_true", help="Sync startup states (ANC, HiRes, Game, InEar)")
     parser.add_argument("--json", action="store_true", help="Output results in JSON format")
@@ -199,7 +203,7 @@ def main():
     
     args = parser.parse_args()
     
-    if not any([args.battery, args.info, args.anc is not None, args.game is not None, args.inear is not None, args.volboost is not None, args.hires is not None, args.fit is not None, args.fmd is not None, args.sync]):
+    if not any([args.battery, args.info, args.anc is not None, args.game is not None, args.inear is not None, args.volboost is not None, args.hires is not None, args.fit is not None, args.fmd is not None, args.sync, args.daemon]):
         parser.print_help()
         sys.exit(1)
 
@@ -215,8 +219,79 @@ def main():
         except Exception:
             pass
 
-    controller = MotoBudsController(mac_address=args.mac, port=args.port, output_json=args.json)
+    controller = MotoBudsController(mac_address=args.mac, port=args.port, output_json=args.json, is_daemon=args.daemon)
     
+    if args.daemon:
+        if not controller.connect():
+            print(json.dumps({"type": "error", "message": "Failed to connect to earbuds"}))
+            sys.exit(1)
+            
+        print(json.dumps({"type": "status", "status": "connected"}), flush=True)
+        
+        import threading
+        
+        def stdin_listener():
+            for line in sys.stdin:
+                line = line.strip()
+                if not line: continue
+                try:
+                    cmd = json.loads(line)
+                    op = cmd.get("op")
+                    if op == "anc":
+                        sub_mode = 1 if cmd.get("mode") == 1 else 0
+                        controller.toggle_anc(cmd.get("mode"), sub_mode)
+                    elif op == "game":
+                        controller.toggle_game_mode(cmd.get("enabled"))
+                    elif op == "inear":
+                        controller.toggle_inear(cmd.get("enabled"))
+                    elif op == "volboost":
+                        controller.toggle_volboost(cmd.get("enabled"))
+                    elif op == "hires":
+                        controller.toggle_hires(cmd.get("enabled"))
+                    elif op == "fit":
+                        controller.toggle_fit(cmd.get("enabled"))
+                    elif op == "fmd":
+                        controller.toggle_fmd(cmd.get("mode"))
+                    elif op == "sync":
+                        res_anc = controller._send_and_receive(0x0200, b"")
+                        res_hires = controller._send_and_receive(0x030C, b"")
+                        res_game = controller._send_and_receive(0x030E, b"")
+                        res_inear = controller._send_and_receive(0x0402, b"")
+                        sync_data = {}
+                        if res_anc: sync_data["anc_raw"] = res_anc.hex()
+                        if res_hires: sync_data["hires_raw"] = res_hires.hex()
+                        if res_game: sync_data["game_raw"] = res_game.hex()
+                        if res_inear: sync_data["inear_raw"] = res_inear.hex()
+                        print(json.dumps({"type": "sync", "data": sync_data}), flush=True)
+                    elif op == "battery":
+                        res = controller.read_battery()
+                        print(json.dumps({"type": "battery", "data": res}), flush=True)
+                    elif op == "info":
+                        res = controller.get_hardware_info()
+                        print(json.dumps({"type": "info", "data": res}), flush=True)
+                except Exception as e:
+                    controller.log(f"[-] Daemon JSON command error: {e}")
+        
+        # Start the thread that listens to commands from Electron
+        t = threading.Thread(target=stdin_listener, daemon=True)
+        t.start()
+        
+        # Main thread acts as the async event polling loop
+        controller.sock.settimeout(0.5)
+        while True:
+            try:
+                data = controller.sock.recv(1024)
+                if data:
+                    print(json.dumps({"type": "event", "data": data.hex()}), flush=True)
+            except socket.timeout:
+                continue
+            except Exception as e:
+                print(json.dumps({"type": "error", "message": f"Connection lost: {e}"}), flush=True)
+                break
+                
+        controller.disconnect()
+        sys.exit(0)
+
     results = {"status": "success", "data": {}}
     
     if controller.connect():

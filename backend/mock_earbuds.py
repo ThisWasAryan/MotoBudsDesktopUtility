@@ -63,7 +63,7 @@ def main():
                 elif opcode == 0x0004:
                     conn.send(create_packet(0x0004, b"MockHW"))
                 elif opcode == 0x0201:
-                    conn.send(create_packet(0x0201, b""))
+                    conn.send(create_packet(0x0204, bytes([1, 1])))
     except Exception as e:
         print(f"Error: {e}")
     finally:

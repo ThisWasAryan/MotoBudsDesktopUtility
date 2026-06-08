@@ -52,16 +52,16 @@ function App() {
   };
 
   const connectDevice = async () => {
-    if (!window.api || !window.api.motoCommand) {
-      setStatusMsg("Electron API missing. Please run 'npm run dev' and use the desktop window.");
+    if (!window.api || !window.api.startDaemon) {
+      setStatusMsg("Electron API missing or outdated. Please restart 'npm run dev'.");
       return;
     }
     setIsInitializing(true);
-    setStatusMsg('Connecting via SPP and reading battery...');
+    setStatusMsg('Starting background Bluetooth daemon...');
 
     try {
-      const batteryRes = await window.api.motoCommand(['--battery']);
-      if (batteryRes.status === 'success') {
+      const daemonRes = await window.api.startDaemon();
+      if (daemonRes.status === 'success') {
         setDevice({
           name: "Moto Buds",
           modelId: "XT-SPP",
@@ -69,46 +69,14 @@ function App() {
           battery: { left: null, right: null, case: null, chargingL: false, chargingR: false, chargingCase: false, inCaseL: false, inCaseR: false }
         });
         
-        if (batteryRes.data?.battery_raw) parseAndInjectPDU(batteryRes.data.battery_raw);
-
-        setStatusMsg('Reading hardware info...');
-        const infoRes = await window.api.motoCommand(['--info', '--sync']);
-        if (infoRes.data?.hardware_raw) parseAndInjectPDU(infoRes.data.hardware_raw);
-        if (infoRes.data?.anc_raw) parseAndInjectPDU(infoRes.data.anc_raw);
-        if (infoRes.data?.hires_raw) parseAndInjectPDU(infoRes.data.hires_raw);
-        if (infoRes.data?.game_raw) parseAndInjectPDU(infoRes.data.game_raw);
-        if (infoRes.data?.inear_raw) parseAndInjectPDU(infoRes.data.inear_raw);
+        setStatusMsg('Syncing hardware state...');
         
-        // Long-polling loop to keep the SPP socket open and receive async hardware events
-        const pollDevice = async () => {
-          if (!useDeviceStore.getState().connected) return;
-          try {
-            // --keepalive 3 ensures the python script stays open for 3 seconds listening to the socket
-            const pollRes = await window.api.motoCommand(['--battery', '--keepalive', '3']);
-            if (pollRes.data?.battery_raw) parseAndInjectPDU(pollRes.data.battery_raw);
-            if (pollRes.data?.async_events) {
-               for (const ev of pollRes.data.async_events) {
-                  parseAndInjectPDU(ev);
-               }
-            }
-          } catch (e) {
-            console.error("Polling error (likely killed by a UI command):", e);
-            // Wait 1 second before restarting the poll loop to give the UI command 
-            // plenty of time to grab the socket, send its payload, and exit.
-            setTimeout(pollDevice, 1000);
-            return;
-          }
-          // Immediately trigger the next poll to minimize socket downtime
-          setTimeout(pollDevice, 0);
-        };
-        
-        pollDevice();
-        
-        // Cleanup function for when disconnected (you'll need to handle this via state later if needed)
-        // For now, it polls indefinitely while connected
-
+        // Request initial state synchronization from the daemon
+        await window.api.motoCommand({ op: "info" });
+        await window.api.motoCommand({ op: "sync" });
+        await window.api.motoCommand({ op: "battery" });
       } else {
-        setStatusMsg(`Failed: ${batteryRes.message}`);
+        setStatusMsg(`Failed: ${daemonRes.message}`);
         disconnect();
       }
     } catch (err: any) {
@@ -120,12 +88,44 @@ function App() {
   };
 
   useEffect(() => {
+    const handleMotoEvent = (_event: any, payload: any) => {
+       if (!payload) return;
+       
+       try {
+          if (payload.type === 'event' || payload.type === 'battery' || payload.type === 'info') {
+             if (payload.data) parseAndInjectPDU(payload.data);
+          } else if (payload.type === 'sync') {
+             const data = payload.data;
+             if (data.anc_raw) parseAndInjectPDU(data.anc_raw);
+             if (data.hires_raw) parseAndInjectPDU(data.hires_raw);
+             if (data.game_raw) parseAndInjectPDU(data.game_raw);
+             if (data.inear_raw) parseAndInjectPDU(data.inear_raw);
+          } else if (payload.type === 'error') {
+             console.error("Daemon error:", payload.message);
+             setStatusMsg(`Connection lost: ${payload.message}`);
+             disconnect();
+          }
+       } catch (e) {
+          console.error("Failed to parse incoming event:", e);
+       }
+    };
+    
+    if (window.api && window.api.onMotoEvent) {
+       window.api.onMotoEvent(handleMotoEvent);
+    }
+
     (window as any).sendOpcodeToDevice = async (opcode: number, payload: number[]) => {
-       if (opcode === 513) await window.api.motoCommand(['--anc', payload[0].toString()]);
-       else if (opcode === 783) await window.api.motoCommand(['--game', payload[0].toString()]);
-       else if (opcode === 1027) await window.api.motoCommand(['--inear', payload[0].toString()]);
-       else if (opcode === 788) await window.api.motoCommand(['--volboost', payload[0].toString()]);
-       else if (opcode === 781) await window.api.motoCommand(['--hires', payload[0].toString()]);
+       if (opcode === 513) await window.api.motoCommand({ op: 'anc', mode: payload[0] });
+       else if (opcode === 783) await window.api.motoCommand({ op: 'game', enabled: payload[0] });
+       else if (opcode === 1027) await window.api.motoCommand({ op: 'inear', enabled: payload[0] });
+       else if (opcode === 788) await window.api.motoCommand({ op: 'volboost', enabled: payload[0] });
+       else if (opcode === 781) await window.api.motoCommand({ op: 'hires', enabled: payload[0] });
+    };
+    
+    return () => {
+       if (window.api && window.api.removeMotoEventListener) {
+          window.api.removeMotoEventListener(handleMotoEvent);
+       }
     };
   }, []);
 

@@ -171,42 +171,36 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
   setAncMode: (mode, subMode) => {
     if ((window as any).sendOpcodeToDevice) {
       (window as any).sendOpcodeToDevice(513, [mode, subMode]);
-    }// Optimistic update
-    set({ ancMode: mode, ancSubMode: subMode });
+    }
   },
 
   setEqState: (enabled) => {
     if ((window as any).sendOpcodeToDevice) {
       (window as any).sendOpcodeToDevice(771, [enabled ? 1 : 0]);
     }
-    set({ eqState: enabled });
   },
 
   setGameMode: (enabled) => {
     if ((window as any).sendOpcodeToDevice) {
       (window as any).sendOpcodeToDevice(783, [enabled ? 1 : 0]);
     }
-    set({ gameMode: enabled });
   },
 
   setHiRes: (enabled) => {
     if ((window as any).sendOpcodeToDevice) {
       (window as any).sendOpcodeToDevice(781, [enabled ? 1 : 0]);
     }
-    set({ hiRes: enabled });
   },
 
   setInEarFeature: (enabled) => {
     if ((window as any).sendOpcodeToDevice) {
       (window as any).sendOpcodeToDevice(1027, [enabled ? 1 : 0]);
     }
-    set({ inEarFeatureEnabled: enabled });
   },
 
   setVolBoost: (enabled) => {
     if ((window as any).sendOpcodeToDevice) {
       (window as any).sendOpcodeToDevice(788, [enabled ? 1 : 0]);
     }
-    set({ volBoost: enabled });
-  }
+  },
 }));
