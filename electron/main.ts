@@ -77,7 +77,7 @@ app.whenReady().then(() => {
                   resolve({ status: 'error', message: payload.message });
                } else {
                   // Route all other async events, syncs, or info back to the frontend
-                  if (mainWindow && mainWindow.webContents) {
+                  if (mainWindow && !mainWindow.isDestroyed() && mainWindow.webContents) {
                      mainWindow.webContents.send('moto-event', payload);
                   }
                }
@@ -94,7 +94,7 @@ app.whenReady().then(() => {
       pythonDaemon.on('close', (code: number) => {
          console.log(`Python daemon exited with code ${code}`);
          pythonDaemon = null;
-         if (mainWindow && mainWindow.webContents) {
+         if (mainWindow && !mainWindow.isDestroyed() && mainWindow.webContents) {
             mainWindow.webContents.send('moto-event', { type: 'error', message: 'Connection lost. Device disconnected.' });
          }
       });

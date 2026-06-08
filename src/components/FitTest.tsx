@@ -12,23 +12,8 @@ export const FitTest = () => {
     useDeviceStore.setState({ fitTestRunning: true, fitTestResult: null });
 
     if (window.api && window.api.motoCommand) {
-      const res = await window.api.motoCommand(['--fit', '1', '--keepalive', '15']);
-      if (res && res.data && res.data.async_events) {
-         // The async_events are hex strings. We need to parse them.
-         res.data.async_events.forEach((hexEvent: string) => {
-            // Very simple hack to parse it in place if window.api.parsePDU is not exposed
-            // We know the opcode for fit test result is 1025 (0x0401)
-            // If the hexEvent contains 0401, we can just extract the payload manually
-            if (hexEvent.includes("0401")) {
-               const idx = hexEvent.indexOf("0401");
-               if (idx + 6 <= hexEvent.length) {
-                  const val = parseInt(hexEvent.substring(idx+4, idx+6), 16);
-                  useDeviceStore.setState({ fitTestResult: val, fitTestRunning: false });
-               }
-            }
-         });
-      }
-      useDeviceStore.setState({ fitTestRunning: false });
+      await window.api.motoCommand({ op: 'fit', enabled: 1 });
+      // The daemon will emit the 0x0401 (1025) result asynchronously which updates the store
     }
   };
 

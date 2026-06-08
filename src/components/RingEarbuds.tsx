@@ -23,7 +23,7 @@ export const RingEarbuds = () => {
     }
     
     if (window.api && window.api.motoCommand) {
-      await window.api.motoCommand(['--fmd', mode.toString(), '--keepalive', '15']);
+      await window.api.motoCommand({ op: 'fmd', action: mode });
     }
   };
 

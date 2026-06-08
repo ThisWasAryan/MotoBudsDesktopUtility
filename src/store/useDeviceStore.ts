@@ -17,7 +17,7 @@ export interface DeviceState {
   };
   ancMode: number;
   ancSubMode: number;
-  eqState: boolean;
+  eqState: number;
   hiRes: boolean;
   gameMode: boolean;
   inEarFeatureEnabled: boolean;
@@ -26,19 +26,19 @@ export interface DeviceState {
   volBoost: boolean;
   fitTestRunning: boolean;
   fitTestResult: number | null;
-  currentView: 'main' | 'sound' | 'gestures' | 'more' | 'fit-test' | 'ring-earbuds';
+  currentView: 'main' | 'sound' | 'gestures' | 'more' | 'fit-test' | 'ring-earbuds' | 'equalizer';
   
   // Actions
   setDevice: (data: any) => void;
   disconnect: () => void;
   updateStateFromPdu: (pdu: any) => void;
   setAncMode: (mode: number, subMode: number) => void;
-  setEqState: (enabled: boolean) => void;
+  setEqState: (preset: number) => void;
   setGameMode: (enabled: boolean) => void;
   setHiRes: (enabled: boolean) => void;
   setInEarFeature: (enabled: boolean) => void;
   setVolBoost: (enabled: boolean) => void;
-  setCurrentView: (view: 'main' | 'sound' | 'gestures' | 'more' | 'fit-test' | 'ring-earbuds') => void;
+  setCurrentView: (view: 'main' | 'sound' | 'gestures' | 'more' | 'fit-test' | 'ring-earbuds' | 'equalizer') => void;
 }
 
 export const useDeviceStore = create<DeviceState>((set, get) => ({
@@ -49,7 +49,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
   battery: { left: null, right: null, case: null, chargingL: false, chargingR: false, chargingCase: false, inCaseL: false, inCaseR: false },
   ancMode: 0,
   ancSubMode: 0,
-  eqState: false,
+  eqState: 0,
   hiRes: false,
   gameMode: false,
   inEarFeatureEnabled: false,
@@ -126,9 +126,14 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
           return { ancMode: pdu.payload[0], ancSubMode: pdu.payload[1] };
         }
         break;
+      case 768: // Read EQ
+      case 770: // EQ changed
+        if (pdu.payload.length >= 1) return { eqState: pdu.payload[0] };
+        break;
       case 780:
       case 785:
-        if (pdu.payload.length >= 1) return { hiRes: pdu.payload[0] === 1 };
+        if (pdu.payload.length >= 2) return { hiRes: pdu.payload[1] === 1 };
+        else if (pdu.payload.length === 1) return { hiRes: pdu.payload[0] === 1 };
         break;
       case 782:
       case 786:
@@ -174,9 +179,9 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
     }
   },
 
-  setEqState: (enabled) => {
+  setEqState: (preset) => {
     if ((window as any).sendOpcodeToDevice) {
-      (window as any).sendOpcodeToDevice(771, [enabled ? 1 : 0]);
+      (window as any).sendOpcodeToDevice(771, [preset]);
     }
   },
 

@@ -127,8 +127,9 @@ All communication is structured into structured Protocol Data Units (PDUs) encap
 ### Hi-Res Audio (LDAC)
 * **Supported Devices:** Feature ID 109
 * **Read:** Opcode 780 | **Write:** Opcode 781
-* **Payload:** 1 Byte (`[0x00]` Disable, `[0x01]` Enable).
-* **State Machine:** Issuing this command causes the earbuds to intentionally drop the Bluetooth connection to reset and negotiate the LDAC codec. The app displays a "Reconnecting" spinner and waits for the OS connection broadcast.
+* **Read Payload:** 2 Bytes (`[0x01, 0x01]` where `payload[0]` is the Support Flag and `payload[1]` is the State Flag).
+* **Write Payload:** 1 Byte (`[0x00]` Disable, `[0x01]` Enable).
+* **State Machine:** Issuing this command causes the earbuds to intentionally drop the Bluetooth connection to reset and negotiate the LDAC codec. The daemon must gracefully survive this dropout, and on Linux, `bluetoothctl disconnect` must be used to force PipeWire to re-acquire the A2DP profile.
 
 ### Game Mode
 * **Supported Devices:** Feature ID 110

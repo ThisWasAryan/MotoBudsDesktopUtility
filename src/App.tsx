@@ -9,13 +9,17 @@ import { MoreMenu } from './components/MoreMenu';
 import { GesturesMenu } from './components/GesturesMenu';
 import { FitTest } from './components/FitTest';
 import { RingEarbuds } from './components/RingEarbuds';
+import { Equalizer } from './components/Equalizer';
 
 import './App.css'; 
 
 declare global {
   interface Window {
     api: {
-      motoCommand: (args: string[]) => Promise<{ status: string, message?: string, data?: any, raw?: string }>;
+      motoCommand: (args: any) => Promise<{ status: string, message?: string, data?: any, raw?: string }>;
+      startDaemon: () => Promise<{ status: string, message?: string }>;
+      onMotoEvent: (callback: any) => void;
+      removeMotoEventListener: (callback: any) => void;
     };
   }
 }
@@ -102,8 +106,13 @@ function App() {
              if (data.inear_raw) parseAndInjectPDU(data.inear_raw);
           } else if (payload.type === 'error') {
              console.error("Daemon error:", payload.message);
-             setStatusMsg(`Connection lost: ${payload.message}`);
-             disconnect();
+             if (payload.message && payload.message.includes('attempting to reconnect')) {
+                // Do not disconnect the UI, let the daemon handle the auto-reconnect loop
+                console.warn("Device is temporarily unavailable (codec renegotiation). Reconnecting...");
+             } else {
+                setStatusMsg(`Connection lost: ${payload.message}`);
+                disconnect();
+             }
           }
        } catch (e) {
           console.error("Failed to parse incoming event:", e);
@@ -120,6 +129,7 @@ function App() {
        else if (opcode === 1027) await window.api.motoCommand({ op: 'inear', enabled: payload[0] });
        else if (opcode === 788) await window.api.motoCommand({ op: 'volboost', enabled: payload[0] });
        else if (opcode === 781) await window.api.motoCommand({ op: 'hires', enabled: payload[0] });
+       else if (opcode === 771) await window.api.motoCommand({ op: 'eq', preset: payload[0] });
     };
     
     return () => {
@@ -155,6 +165,7 @@ function App() {
         {currentView === 'gestures' && <GesturesMenu key="gestures" />}
         {currentView === 'fit-test' && <FitTest key="fit-test" />}
         {currentView === 'ring-earbuds' && <RingEarbuds key="ring-earbuds" />}
+        {currentView === 'equalizer' && <Equalizer key="equalizer" />}
       </AnimatePresence>
     </div>
   );

@@ -1,9 +1,9 @@
 import { useDeviceStore } from '../store/useDeviceStore';
-import { Headphones, BatteryCharging, ChevronRight, SlidersHorizontal, Hand, Settings2 } from 'lucide-react';
+import { Headphones, BatteryCharging, ChevronRight, SlidersHorizontal, Hand, Settings2, Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const MainDashboard = () => {
-  const { name, modelId, battery, ancMode, setAncMode, physicallyInEarL, physicallyInEarR, setCurrentView } = useDeviceStore();
+  const { name, modelId, battery, ancMode, setAncMode, physicallyInEarL, physicallyInEarR, setCurrentView, hiRes, setHiRes } = useDeviceStore();
 
   const isCaseVisible = battery.inCaseL || battery.inCaseR;
 
@@ -90,6 +90,21 @@ export const MainDashboard = () => {
       {/* Menu Cards */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
         
+        <div className="skeuo-panel" style={{ margin: 0, padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+             <div className="skeuo-orb" style={{ width: 40, height: 40, margin: 0 }}>
+               <Activity size={20} className="metal-icon" />
+             </div>
+             <div style={{ display: 'flex', flexDirection: 'column' }}>
+               <span className="embossed-text sm">Hi-res mode</span>
+               <span className="engraved-text xs">Play audio in high resolution</span>
+             </div>
+           </div>
+           <button className={`skeuo-toggle ${hiRes ? 'on' : 'off'}`} onClick={() => setHiRes(!hiRes)}>
+             <div className="thumb"></div>
+           </button>
+        </div>
+
         <div className="skeuo-panel interactive" style={{ margin: 0, padding: '16px 20px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} onClick={() => setCurrentView('sound')}>
            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
              <div className="skeuo-orb" style={{ width: 40, height: 40, margin: 0 }}>

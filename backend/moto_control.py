@@ -74,33 +74,41 @@ class MotoBudsController:
         packet.extend(TAIL)
         return bytes(packet)
 
+    def send_command(self, opcode: int, payload: bytes):
+        if not self.sock:
+            return
+        packet = self._create_packet(opcode, payload)
+        self.sock.send(packet)
+
     def _send_and_receive(self, opcode: int, payload: bytes, wait_for_response=True):
         if not self.sock:
             self.log("[-] Not connected.")
             return None
-
-        packet = self._create_packet(opcode, payload)
-        try:
-            self.sock.send(packet)
-            if self.is_daemon:
-                return None
-            if wait_for_response:
-                self.sock.settimeout(0.5)
-                all_data = bytearray()
-                chunk = self.sock.recv(4096)
-                if chunk:
-                    all_data.extend(chunk)
-                    self.sock.settimeout(0.2)
-                    while True:
-                        try:
-                            more = self.sock.recv(4096)
-                            if not more: break
-                            all_data.extend(more)
-                        except socket.timeout:
-                            break
-                self.sock.settimeout(3.0)
-                return bytes(all_data) if all_data else None
+            
+        self.send_command(opcode, payload)
+        
+        # In daemon mode, we must not synchronously wait for responses because the 
+        # main thread is actively polling the socket. Doing so causes race conditions 
+        # and thread deadlocks.
+        if self.is_daemon or not wait_for_response:
             return None
+            
+        try:
+            self.sock.settimeout(0.5)
+            all_data = bytearray()
+            chunk = self.sock.recv(4096)
+            if chunk:
+                all_data.extend(chunk)
+                self.sock.settimeout(0.2)
+                while True:
+                    try:
+                        more = self.sock.recv(4096)
+                        if not more: break
+                        all_data.extend(more)
+                    except socket.timeout:
+                        break
+            self.sock.settimeout(3.0)
+            return bytes(all_data) if all_data else None
         except socket.timeout:
             self.log(f"[-] Timeout waiting for response to opcode {hex(opcode)}")
             return None
@@ -158,19 +166,13 @@ class MotoBudsController:
         self.log(f"[*] Setting Hi-Res Mode: {enabled}")
         resp = self._send_and_receive(0x030D, bytes([enabled]))
         
-        # In Linux, changing the codec on the earbud side doesn't automatically cause PipeWire/BlueZ 
-        # to renegotiate the A2DP codec (unlike Android). We must forcefully bounce the connection.
-        if self.mac_address != "127.0.0.1":
-            self.log("[*] Forcing Bluetooth renegotiation for codec switch...")
-            try:
-                # Issue the disconnect command asynchronously so we can return the success response to UI first
-                subprocess.Popen(
-                    f"sleep 1 && bluetoothctl disconnect {self.mac_address} && sleep 2 && bluetoothctl connect {self.mac_address}", 
-                    shell=True
-                )
-            except Exception as e:
-                self.log(f"[-] Failed to restart bluetooth interface: {e}")
-                
+        # Bouncing the connection using bluetoothctl disconnect/connect 
+        # is necessary on Linux because PipeWire/PulseAudio will fail to 
+        # re-negotiate the A2DP profile when the earbuds reboot internally.
+        # This fixes the "audio comes out of laptop instead of earbuds" bug.
+        import subprocess
+        subprocess.Popen(f"sleep 1 && bluetoothctl disconnect {self.mac_address} && sleep 2 && bluetoothctl connect {self.mac_address}", shell=True)
+        
         return resp.hex() if resp else None
 
     def toggle_fit(self, start: int):
@@ -286,8 +288,23 @@ def main():
             except socket.timeout:
                 continue
             except Exception as e:
-                print(json.dumps({"type": "error", "message": f"Connection lost: {e}"}), flush=True)
-                break
+                print(json.dumps({"type": "error", "message": f"Connection dropped, attempting to reconnect... ({e})"}), flush=True)
+                
+                # The earbuds often momentarily reboot their Bluetooth stack to renegotiate
+                # codecs (e.g., when toggling LDAC Hi-Res). Instead of crashing the daemon, 
+                # we wait and attempt to gracefully reconnect.
+                controller.disconnect()
+                reconnected = False
+                for attempt in range(10):
+                    time.sleep(2)
+                    if controller.connect():
+                        reconnected = True
+                        print(json.dumps({"type": "status", "status": "connected"}), flush=True)
+                        break
+                        
+                if not reconnected:
+                    print(json.dumps({"type": "error", "message": "Failed to reconnect after device reset."}), flush=True)
+                    break
                 
         controller.disconnect()
         sys.exit(0)
