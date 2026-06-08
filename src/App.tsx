@@ -6,9 +6,7 @@ import { AnimatePresence } from 'framer-motion';
 import { MainDashboard } from './components/MainDashboard';
 import { SoundMenu } from './components/SoundMenu';
 import { MoreMenu } from './components/MoreMenu';
-import { GesturesMenu } from './components/GesturesMenu';
 import { FitTest } from './components/FitTest';
-import { RingEarbuds } from './components/RingEarbuds';
 import { Equalizer } from './components/Equalizer';
 
 import './App.css'; 
@@ -162,9 +160,7 @@ function App() {
         {currentView === 'main' && <MainDashboard key="main" />}
         {currentView === 'sound' && <SoundMenu key="sound" />}
         {currentView === 'more' && <MoreMenu key="more" />}
-        {currentView === 'gestures' && <GesturesMenu key="gestures" />}
         {currentView === 'fit-test' && <FitTest key="fit-test" />}
-        {currentView === 'ring-earbuds' && <RingEarbuds key="ring-earbuds" />}
         {currentView === 'equalizer' && <Equalizer key="equalizer" />}
       </AnimatePresence>
     </div>

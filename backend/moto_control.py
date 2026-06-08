@@ -185,6 +185,26 @@ class MotoBudsController:
         resp = self._send_and_receive(0x0405, bytes([mode]))
         return resp.hex() if resp else None
 
+    def set_custom_eq(self, bands):
+        import struct
+        self.log(f"[*] Setting Custom EQ")
+        # 173 bytes payload for opcode 774 (0x0306)
+        payload = bytearray([0x3F])
+        payload.extend(struct.pack('<f', 0.0)) # Pre-amp
+        payload.extend(struct.pack('<f', 0.0)) # Post-amp
+        payload.extend(struct.pack('<i', 10))  # Num bands
+        
+        freqs = [32.0, 64.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0, 16000.0]
+        for i in range(10):
+            gain = float(bands[i]) if i < len(bands) else 0.0
+            payload.extend(struct.pack('<i', 0)) # Filter type
+            payload.extend(struct.pack('<f', gain))
+            payload.extend(struct.pack('<f', freqs[i]))
+            payload.extend(struct.pack('<f', 0.75)) # Q Factor
+            
+        resp = self._send_and_receive(0x0306, bytes(payload))
+        return resp.hex() if resp else None
+
 def main():
     parser = argparse.ArgumentParser(description="Moto Buds Controller")
     parser.add_argument("--battery", action="store_true", help="Read battery levels")
@@ -254,6 +274,8 @@ def main():
                         controller.toggle_fit(cmd.get("enabled"))
                     elif op == "fmd":
                         controller.toggle_fmd(cmd.get("mode"))
+                    elif op == "eq":
+                        controller.set_custom_eq(cmd.get("bands"))
                     elif op == "sync":
                         res_anc = controller._send_and_receive(0x0200, b"")
                         res_hires = controller._send_and_receive(0x030C, b"")

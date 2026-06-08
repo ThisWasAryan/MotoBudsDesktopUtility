@@ -1,16 +1,21 @@
+import { useState, useEffect } from 'react';
 import { useDeviceStore } from '../store/useDeviceStore';
-import { ArrowLeft, SlidersHorizontal, Sliders } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const Equalizer = () => {
-  const { setCurrentView, eqState, setEqState } = useDeviceStore();
+  const { setCurrentView, eqBands, setEqBands } = useDeviceStore();
+  const [localBands, setLocalBands] = useState<number[]>(eqBands);
 
-  const presets = [
-    { id: 0, name: 'Flat', icon: <SlidersHorizontal size={20} /> },
-    { id: 1, name: 'Bass Boost', icon: <Sliders size={20} /> },
-    { id: 2, name: 'Vocal Boost', icon: <Sliders size={20} /> },
-    { id: 3, name: 'Treble Boost', icon: <Sliders size={20} /> },
-  ];
+  useEffect(() => {
+    setLocalBands(eqBands);
+  }, [eqBands]);
+
+  const freqs = ['32', '64', '125', '250', '500', '1k', '2k', '4k', '8k', '16k'];
+
+  const commitBands = () => {
+    setEqBands(localBands);
+  };
 
   return (
     <motion.div 
@@ -23,31 +28,36 @@ export const Equalizer = () => {
         <button className="skeuo-icon-btn" onClick={() => setCurrentView('sound')}>
           <ArrowLeft size={22} className="metal-icon" />
         </button>
-        <h2 className="embossed-text">Equaliser</h2>
+        <h2 className="embossed-text">Custom Equaliser</h2>
         <div style={{width: 44}}></div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '20px' }}>
-        {presets.map((preset) => (
-          <div 
-            key={preset.id}
-            className={`skeuo-toggle-row clickable ${eqState === preset.id ? 'active' : ''}`}
-            onClick={() => setEqState(preset.id)}
-            style={{ 
-               cursor: 'pointer',
-               border: eqState === preset.id ? '2px solid var(--accent-blue)' : 'none'
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div className="metal-icon" style={{ color: eqState === preset.id ? 'var(--accent-blue)' : 'inherit' }}>
-                 {preset.icon}
+      <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1, justifyContent: 'center', marginTop: '20px' }}>
+        
+        <div className="skeuo-panel" style={{ padding: '30px 20px', margin: '0' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', height: '200px' }}>
+            {freqs.map((freq, i) => (
+              <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+                <span className="engraved-text xs">{localBands[i] > 0 ? '+' : ''}{localBands[i].toFixed(1)}</span>
+                <input 
+                  type="range" 
+                  min="-3" max="3" step="0.1"
+                  value={localBands[i]}
+                  onChange={(e) => {
+                     const newB = [...localBands];
+                     newB[i] = parseFloat(e.target.value);
+                     setLocalBands(newB);
+                  }}
+                  onPointerUp={commitBands}
+                  style={{ WebkitAppearance: 'slider-vertical', width: '24px', height: '120px', cursor: 'pointer' }}
+                />
+                <span className="embossed-text xs">{freq}</span>
               </div>
-              <span className="embossed-text sm">{preset.name}</span>
-            </div>
+            ))}
           </div>
-        ))}
+        </div>
+
       </div>
-      
     </motion.div>
   );
 };

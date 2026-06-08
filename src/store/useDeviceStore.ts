@@ -17,7 +17,7 @@ export interface DeviceState {
   };
   ancMode: number;
   ancSubMode: number;
-  eqState: number;
+  eqBands: number[];
   hiRes: boolean;
   gameMode: boolean;
   inEarFeatureEnabled: boolean;
@@ -34,7 +34,7 @@ export interface DeviceState {
   disconnect: () => void;
   updateStateFromPdu: (pdu: any) => void;
   setAncMode: (mode: number, subMode: number) => void;
-  setEqState: (preset: number) => void;
+  setEqBands: (bands: number[]) => void;
   setGameMode: (enabled: boolean) => void;
   setHiRes: (enabled: boolean) => void;
   setInEarFeature: (enabled: boolean) => void;
@@ -50,7 +50,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
   battery: { left: null, right: null, case: null, chargingL: false, chargingR: false, chargingCase: false, inCaseL: false, inCaseR: false },
   ancMode: 0,
   ancSubMode: 0,
-  eqState: 0,
+  eqBands: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   hiRes: false,
   gameMode: false,
   inEarFeatureEnabled: false,
@@ -184,9 +184,10 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
     }
   },
 
-  setEqState: (preset) => {
-    if ((window as any).sendOpcodeToDevice) {
-      (window as any).sendOpcodeToDevice(771, [preset]);
+  setEqBands: (bands) => {
+    set({ eqBands: bands });
+    if ((window as any).api && (window as any).api.motoCommand) {
+      (window as any).api.motoCommand({ op: 'eq', bands });
     }
   },
 

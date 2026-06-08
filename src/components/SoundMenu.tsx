@@ -3,7 +3,7 @@ import { Gamepad2, Volume2, Activity, ArrowLeft, Radio, SlidersHorizontal } from
 import { motion } from 'framer-motion';
 
 export const SoundMenu = () => {
-  const { setCurrentView, gameMode, setGameMode, volBoost, setVolBoost, hiRes, setHiRes } = useDeviceStore();
+  const { setCurrentView, name, gameMode, setGameMode, volBoost, setVolBoost, hiRes, setHiRes } = useDeviceStore();
 
   return (
     <motion.div 
@@ -21,22 +21,24 @@ export const SoundMenu = () => {
       </div>
 
       <div className="settings-list" style={{ marginTop: '20px' }}>
-        <div className="skeuo-toggle-row">
-          <div className="row-info">
-            <Radio size={20} className="metal-icon" />
-            <div>
-              <div className="embossed-text sm">Spatial audio</div>
-              <div className="engraved-text xs">Hear immersive, three-dimensional audio</div>
+        {name === 'Moto Buds+' && (
+          <div className="skeuo-toggle-row">
+            <div className="row-info">
+              <Radio size={20} className="metal-icon" />
+              <div>
+                <div className="embossed-text sm">Spatial audio</div>
+                <div className="engraved-text xs">Hear immersive, three-dimensional audio</div>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
-        <div className="skeuo-toggle-row interactive" style={{ cursor: 'pointer' }}>
+        <div className="skeuo-toggle-row interactive" style={{ cursor: 'pointer' }} onClick={() => setCurrentView('equalizer')}>
           <div className="row-info">
             <SlidersHorizontal size={20} className="metal-icon" />
             <div>
               <div className="embossed-text sm">Equaliser</div>
-              <div className="engraved-text xs">Flat</div>
+              <div className="engraved-text xs">Custom</div>
             </div>
           </div>
         </div>

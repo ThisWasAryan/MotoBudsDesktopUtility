@@ -1,5 +1,5 @@
 import { useDeviceStore } from '../store/useDeviceStore';
-import { Headphones, BatteryCharging, ChevronRight, SlidersHorizontal, Hand, Settings2, Activity } from 'lucide-react';
+import { Headphones, BatteryCharging, ChevronRight, SlidersHorizontal, Settings2, Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const MainDashboard = () => {
@@ -115,22 +115,12 @@ export const MainDashboard = () => {
            <ChevronRight size={20} className="metal-icon" />
         </div>
 
-        <div className="skeuo-panel interactive" style={{ margin: 0, padding: '16px 20px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} onClick={() => setCurrentView('gestures')}>
-           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-             <div className="skeuo-orb" style={{ width: 40, height: 40, margin: 0 }}>
-               <Hand size={20} className="metal-icon" />
-             </div>
-             <span className="embossed-text">Gestures</span>
-           </div>
-           <ChevronRight size={20} className="metal-icon" />
-        </div>
-
         <div className="skeuo-panel interactive" style={{ margin: 0, padding: '16px 20px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} onClick={() => setCurrentView('more')}>
            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
              <div className="skeuo-orb" style={{ width: 40, height: 40, margin: 0 }}>
                <Settings2 size={20} className="metal-icon" />
              </div>
-             <span className="embossed-text">More</span>
+             <span className="embossed-text sm">More</span>
            </div>
            <ChevronRight size={20} className="metal-icon" />
         </div>

@@ -1,5 +1,5 @@
 import { useDeviceStore } from '../store/useDeviceStore';
-import { Ear, ArrowLeft, Download, Volume1, Headphones } from 'lucide-react';
+import { Ear, ArrowLeft, Download, Headphones } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const MoreMenu = () => {
@@ -56,15 +56,6 @@ export const MoreMenu = () => {
           </>
         )}
 
-        <div className="skeuo-toggle-row interactive" style={{ cursor: 'pointer' }} onClick={() => setCurrentView('ring-earbuds')}>
-          <div className="row-info">
-            <Volume1 size={20} className="metal-icon" />
-            <div>
-              <div className="embossed-text sm">Ring my earbuds</div>
-              <div className="engraved-text xs">Locate your earbuds by playing a sound</div>
-            </div>
-          </div>
-        </div>
 
         <div className="skeuo-toggle-row interactive" style={{ cursor: 'pointer' }} onClick={() => setCurrentView('fit-test')}>
           <div className="row-info">
