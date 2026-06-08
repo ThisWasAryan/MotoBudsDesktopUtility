@@ -150,6 +150,16 @@ class MotoBudsController:
         resp = self._send_and_receive(0x030D, bytes([enabled]))
         return resp.hex() if resp else None
 
+    def toggle_fit(self, start: int):
+        self.log(f"[*] Setting Fit Test: {start}")
+        resp = self._send_and_receive(0x0400, bytes([start]))
+        return resp.hex() if resp else None
+
+    def toggle_fmd(self, mode: int):
+        self.log(f"[*] Setting FMD Mode: {mode}")
+        resp = self._send_and_receive(0x0405, bytes([mode]))
+        return resp.hex() if resp else None
+
 def main():
     parser = argparse.ArgumentParser(description="Moto Buds Controller")
     parser.add_argument("--battery", action="store_true", help="Read battery levels")
@@ -159,13 +169,15 @@ def main():
     parser.add_argument("--inear", type=int, choices=[0, 1], help="Set In-Ear Detection")
     parser.add_argument("--volboost", type=int, choices=[0, 1], help="Set Volume Boost")
     parser.add_argument("--hires", type=int, choices=[0, 1], help="Set Hi-Res/LDAC")
+    parser.add_argument("--fit", type=int, choices=[0, 1], help="Set Fit Test (0=Stop, 1=Start)")
+    parser.add_argument("--fmd", type=int, choices=[0, 1, 2, 3], help="Set Find My Device Mode")
     parser.add_argument("--json", action="store_true", help="Output results in JSON format")
     parser.add_argument("--mac", type=str, default=CLASSIC_MAC, help="MAC address or 127.0.0.1 for mock")
     parser.add_argument("--port", type=int, default=RFCOMM_PORT, help="Port")
     
     args = parser.parse_args()
     
-    if not any([args.battery, args.info, args.anc is not None, args.game is not None, args.inear is not None, args.volboost is not None, args.hires is not None]):
+    if not any([args.battery, args.info, args.anc is not None, args.game is not None, args.inear is not None, args.volboost is not None, args.hires is not None, args.fit is not None, args.fmd is not None]):
         parser.print_help()
         sys.exit(1)
 
@@ -196,6 +208,12 @@ def main():
         if args.hires is not None:
             res = controller.toggle_hires(args.hires)
             results["data"]["hires_response"] = res
+        if args.fit is not None:
+            res = controller.toggle_fit(args.fit)
+            results["data"]["fit_response"] = res
+        if args.fmd is not None:
+            res = controller.toggle_fmd(args.fmd)
+            results["data"]["fmd_response"] = res
             
         controller.disconnect()
     else:

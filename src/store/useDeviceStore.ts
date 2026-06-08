@@ -179,7 +179,7 @@ export const useDeviceStore = create<DeviceState>((set) => ({
     if ((window as any).sendOpcodeToDevice) {
       (window as any).sendOpcodeToDevice(1027, [enabled ? 1 : 0]);
     }
-    set({ inEar: enabled });
+    set({ inEarL: enabled, inEarR: enabled });
   },
 
   setVolBoost: (enabled) => {
