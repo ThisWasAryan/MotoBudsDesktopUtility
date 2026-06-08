@@ -31,11 +31,13 @@ Any new or modified UI components must bind to the values exported by `useDevice
 * `physicallyInEarL` & `physicallyInEarR` (boolean): In-Ear Detection hardware sensors.
 * `fitTestRunning` (boolean): Whether the Fit Test audio sequence is currently actively playing.
 * `fitTestResultL` & `fitTestResultR` (number | null): The result of the Fit Test for each earbud independently (1 = Good Fit).
+* `eqBands` (number[]): An array of 10 floating-point numbers representing the gain for the custom equalizer (-3.0 to 3.0).
 
 ### Available Action Functions
 When binding click handlers in your UI components, use these exposed setters. Note that these setters internally trigger the IPC `window.api.motoCommand` calls; you do not need to call the IPC layer manually from the UI components.
 
 * `setAncMode(mode: number, subMode: number)`
+* `setEqBands(bands: number[])`
 * `setGameMode(enabled: boolean)`
 * `setVolBoost(enabled: boolean)`
 * `setHiRes(enabled: boolean)`

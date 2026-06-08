@@ -1,92 +1,118 @@
-import { createRequire as e } from "node:module";
-import { BrowserWindow as t, app as n, ipcMain as r } from "electron";
-import i from "path";
-import { fileURLToPath as a } from "url";
-import { spawn as o } from "child_process";
+import { createRequire } from "node:module";
+import { BrowserWindow, app, ipcMain } from "electron";
+import path from "path";
+import { fileURLToPath } from "url";
+import { spawn } from "child_process";
 //#region \0rolldown/runtime.js
-var s = /* @__PURE__ */ e(import.meta.url), c = i.dirname(a(import.meta.url));
-process.env.APP_ROOT = i.join(c, ".."), process.env.VITE_PUBLIC = process.env.VITE_DEV_SERVER_URL ? i.join(process.env.APP_ROOT, "public") : i.join(process.env.APP_ROOT, "dist");
-var l = null;
-n.commandLine.appendSwitch("enable-web-bluetooth", "true"), n.commandLine.appendSwitch("enable-experimental-web-platform-features", "true");
-function u() {
-	l = new t({
+var __require = /* @__PURE__ */ createRequire(import.meta.url);
+//#endregion
+//#region electron/main.ts
+var __dirname = path.dirname(fileURLToPath(import.meta.url));
+process.env.APP_ROOT = path.join(__dirname, "..");
+process.env.VITE_PUBLIC = process.env.VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, "public") : path.join(process.env.APP_ROOT, "dist");
+var mainWindow = null;
+app.commandLine.appendSwitch("enable-web-bluetooth", "true");
+app.commandLine.appendSwitch("enable-experimental-web-platform-features", "true");
+function createWindow() {
+	mainWindow = new BrowserWindow({
 		width: 1024,
 		height: 768,
 		titleBarStyle: "hiddenInset",
 		backgroundColor: "#0F0F11",
-		show: !1,
+		show: false,
 		webPreferences: {
-			preload: i.join(c, "preload.mjs"),
-			contextIsolation: !0,
-			nodeIntegration: !1,
-			sandbox: !1,
-			experimentalFeatures: !0
+			preload: path.join(__dirname, "preload.mjs"),
+			contextIsolation: true,
+			nodeIntegration: false,
+			sandbox: false,
+			experimentalFeatures: true
 		}
-	}), l.webContents.on("console-message", (e, t, n, r, i) => {
-		console.log(`[Renderer Console] ${n} (line ${r} in ${i})`);
-	}), l.on("ready-to-show", () => {
-		l?.show();
-	}), process.env.VITE_DEV_SERVER_URL ? l.loadURL(process.env.VITE_DEV_SERVER_URL) : l.loadFile(i.join(process.env.APP_ROOT, "dist/index.html"));
+	});
+	mainWindow.webContents.on("console-message", (event, level, message, line, sourceId) => {
+		console.log(`[Renderer Console] ${message} (line ${line} in ${sourceId})`);
+	});
+	mainWindow.on("ready-to-show", () => {
+		mainWindow?.show();
+	});
+	if (process.env.VITE_DEV_SERVER_URL) mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
+	else mainWindow.loadFile(path.join(process.env.APP_ROOT, "dist/index.html"));
 }
-n.whenReady().then(() => {
-	u();
-	let e = null;
-	r.handle("start-daemon", async (t) => new Promise((t) => {
-		if (e) {
-			t({
-				status: "success",
-				message: "Daemon already running"
-			});
-			return;
-		}
-		e = o(i.join(process.env.APP_ROOT, ".venv/bin/python"), [
-			i.join(process.env.APP_ROOT, "backend/moto_control.py"),
-			"--daemon",
-			"--json"
-		], { cwd: process.env.APP_ROOT }), e.stdout.on("data", (e) => {
-			let n = e.toString().split("\n").filter((e) => e.trim().length > 0);
-			for (let e of n) try {
-				let n = JSON.parse(e);
-				n.type === "status" && n.status === "connected" ? t({ status: "success" }) : n.type === "error" ? (console.error("Python daemon error:", n.message), t({
-					status: "error",
-					message: n.message
-				})) : l && !l.isDestroyed() && l.webContents && l.webContents.send("moto-event", n);
-			} catch {
-				console.error("Failed to parse daemon output:", e);
+app.whenReady().then(() => {
+	createWindow();
+	let pythonDaemon = null;
+	ipcMain.handle("start-daemon", async (event) => {
+		return new Promise((resolve) => {
+			if (pythonDaemon) {
+				resolve({
+					status: "success",
+					message: "Daemon already running"
+				});
+				return;
 			}
-		}), e.stderr.on("data", (e) => {
-			console.error("Daemon stderr:", e.toString());
-		}), e.on("close", (t) => {
-			console.log(`Python daemon exited with code ${t}`), e = null, l && !l.isDestroyed() && l.webContents && l.webContents.send("moto-event", {
-				type: "error",
-				message: "Connection lost. Device disconnected."
+			pythonDaemon = spawn(path.join(process.env.APP_ROOT, ".venv/bin/python"), [
+				path.join(process.env.APP_ROOT, "backend/moto_control.py"),
+				"--daemon",
+				"--json"
+			], { cwd: process.env.APP_ROOT });
+			pythonDaemon.stdout.on("data", (data) => {
+				const lines = data.toString().split("\n").filter((l) => l.trim().length > 0);
+				for (const line of lines) try {
+					const payload = JSON.parse(line);
+					if (payload.type === "status" && payload.status === "connected") resolve({ status: "success" });
+					else if (payload.type === "error") {
+						console.error("Python daemon error:", payload.message);
+						resolve({
+							status: "error",
+							message: payload.message
+						});
+					} else if (mainWindow && !mainWindow.isDestroyed() && mainWindow.webContents) mainWindow.webContents.send("moto-event", payload);
+				} catch (e) {
+					console.error("Failed to parse daemon output:", line);
+				}
+			});
+			pythonDaemon.stderr.on("data", (data) => {
+				console.error("Daemon stderr:", data.toString());
+			});
+			pythonDaemon.on("close", (code) => {
+				console.log(`Python daemon exited with code ${code}`);
+				pythonDaemon = null;
+				if (mainWindow && !mainWindow.isDestroyed() && mainWindow.webContents) mainWindow.webContents.send("moto-event", {
+					type: "error",
+					message: "Connection lost. Device disconnected."
+				});
 			});
 		});
-	})), r.handle("moto-command", async (t, n) => new Promise((t) => {
-		if (!e) {
-			t({
-				status: "error",
-				message: "Daemon is not running"
-			});
-			return;
-		}
-		try {
-			e.stdin.write(JSON.stringify(n) + "\n"), t({ status: "success" });
-		} catch (e) {
-			t({
-				status: "error",
-				message: e.message
-			});
-		}
-	})), n.on("activate", () => {
-		t.getAllWindows().length === 0 && u();
 	});
-}), n.on("window-all-closed", () => {
+	ipcMain.handle("moto-command", async (event, cmdObj) => {
+		return new Promise((resolve) => {
+			if (!pythonDaemon) {
+				resolve({
+					status: "error",
+					message: "Daemon is not running"
+				});
+				return;
+			}
+			try {
+				pythonDaemon.stdin.write(JSON.stringify(cmdObj) + "\n");
+				resolve({ status: "success" });
+			} catch (e) {
+				resolve({
+					status: "error",
+					message: e.message
+				});
+			}
+		});
+	});
+	app.on("activate", () => {
+		if (BrowserWindow.getAllWindows().length === 0) createWindow();
+	});
+});
+app.on("window-all-closed", () => {
 	try {
-		let { execSync: e } = s("child_process");
-		e("pkill -f moto_control.py.*--daemon");
-	} catch {}
-	process.platform !== "darwin" && n.quit();
+		const { execSync } = __require("child_process");
+		execSync("pkill -f moto_control.py.*--daemon");
+	} catch (e) {}
+	if (process.platform !== "darwin") app.quit();
 });
 //#endregion
 export {};

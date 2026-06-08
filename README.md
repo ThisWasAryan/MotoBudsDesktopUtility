@@ -14,9 +14,10 @@ The following functionalities are confirmed to be 100% working:
 * **Charging Status**: Granular tracking. If both earbuds are in the case, both show charging status. If one is full, it correctly reports as not charging.
 * **Active Noise Cancellation (ANC)**: Verified working across all states.
 * **Fit Test**: Accurately tests the seal quality and provides distinct, independent pass/fail results for the left and right earbuds.
+* **Custom 10-Band Equalizer**: A full implementation of the `0x0306` equalizer protocol. Uses a custom 173-byte payload to offer precise floating-point gain control across 10 frequency bands.
 * **Hi-Res Audio (LDAC)**: Successfully implemented codec negotiation from the desktop client, entirely replicating the functionality that was previously restricted to the Android app.
 
-*Note: Additional features (Equalizer, Spatial Audio) are currently under active development and reverse-engineering.*
+*Note: Spatial Audio is partially supported and dynamically surfaces only when the connected device is a Moto Buds+.*
 
 ## How It Works: Step-by-Step
 
