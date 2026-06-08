@@ -1,72 +1,56 @@
-import { BrowserWindow, app, ipcMain } from "electron";
-import path from "path";
-import { fileURLToPath } from "url";
-import { exec } from "child_process";
+import { BrowserWindow as e, app as t, ipcMain as n } from "electron";
+import r from "path";
+import { fileURLToPath as i } from "url";
+import { exec as a } from "child_process";
 //#region electron/main.ts
-var __dirname = path.dirname(fileURLToPath(import.meta.url));
-process.env.APP_ROOT = path.join(__dirname, "..");
-process.env.VITE_PUBLIC = process.env.VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, "public") : path.join(process.env.APP_ROOT, "dist");
-var mainWindow = null;
-app.commandLine.appendSwitch("enable-web-bluetooth", "true");
-app.commandLine.appendSwitch("enable-experimental-web-platform-features", "true");
-function createWindow() {
-	mainWindow = new BrowserWindow({
+var o = r.dirname(i(import.meta.url));
+process.env.APP_ROOT = r.join(o, ".."), process.env.VITE_PUBLIC = process.env.VITE_DEV_SERVER_URL ? r.join(process.env.APP_ROOT, "public") : r.join(process.env.APP_ROOT, "dist");
+var s = null;
+t.commandLine.appendSwitch("enable-web-bluetooth", "true"), t.commandLine.appendSwitch("enable-experimental-web-platform-features", "true");
+function c() {
+	s = new e({
 		width: 1024,
 		height: 768,
 		titleBarStyle: "hiddenInset",
 		backgroundColor: "#0F0F11",
-		show: false,
+		show: !1,
 		webPreferences: {
-			preload: path.join(__dirname, "preload.mjs"),
-			contextIsolation: true,
-			nodeIntegration: false,
-			sandbox: false,
-			experimentalFeatures: true
+			preload: r.join(o, "preload.mjs"),
+			contextIsolation: !0,
+			nodeIntegration: !1,
+			sandbox: !1,
+			experimentalFeatures: !0
 		}
-	});
-	mainWindow.webContents.on("console-message", (event, level, message, line, sourceId) => {
-		console.log(`[Renderer Console] ${message} (line ${line} in ${sourceId})`);
-	});
-	mainWindow.on("ready-to-show", () => {
-		mainWindow?.show();
-	});
-	if (process.env.VITE_DEV_SERVER_URL) mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
-	else mainWindow.loadFile(path.join(process.env.APP_ROOT, "dist/index.html"));
+	}), s.webContents.on("console-message", (e, t, n, r, i) => {
+		console.log(`[Renderer Console] ${n} (line ${r} in ${i})`);
+	}), s.on("ready-to-show", () => {
+		s?.show();
+	}), process.env.VITE_DEV_SERVER_URL ? s.loadURL(process.env.VITE_DEV_SERVER_URL) : s.loadFile(r.join(process.env.APP_ROOT, "dist/index.html"));
 }
-app.whenReady().then(() => {
-	createWindow();
-	ipcMain.handle("moto-command", async (event, args) => {
-		return new Promise((resolve, reject) => {
-			const cmd = `${path.join(process.env.APP_ROOT, ".venv/bin/python")} ${path.join(process.env.APP_ROOT, "backend/moto_control.py")} ${args.join(" ")} --json`;
-			console.log(`Executing: ${cmd}`);
-			exec(cmd, { cwd: process.env.APP_ROOT }, (error, stdout, stderr) => {
-				if (error) {
-					console.error(`exec error: ${error}`);
-					return resolve({
-						status: "error",
-						message: error.message,
-						stderr
-					});
-				}
-				try {
-					resolve(JSON.parse(stdout));
-				} catch (parseError) {
-					console.error("Failed to parse python output:", stdout);
-					resolve({
-						status: "error",
-						message: "Invalid response from backend",
-						raw: stdout
-					});
-				}
+t.whenReady().then(() => {
+	c(), n.handle("moto-command", async (e, t) => new Promise((e, n) => {
+		let i = `${r.join(process.env.APP_ROOT, ".venv/bin/python")} ${r.join(process.env.APP_ROOT, "backend/moto_control.py")} ${t.join(" ")} --json`;
+		console.log(`Executing: ${i}`), a(i, { cwd: process.env.APP_ROOT }, (t, n, r) => {
+			if (t) return console.error(`exec error: ${t}`), e({
+				status: "error",
+				message: t.message,
+				stderr: r
 			});
+			try {
+				e(JSON.parse(n));
+			} catch {
+				console.error("Failed to parse python output:", n), e({
+					status: "error",
+					message: "Invalid response from backend",
+					raw: n
+				});
+			}
 		});
+	})), t.on("activate", () => {
+		e.getAllWindows().length === 0 && c();
 	});
-	app.on("activate", () => {
-		if (BrowserWindow.getAllWindows().length === 0) createWindow();
-	});
-});
-app.on("window-all-closed", () => {
-	if (process.platform !== "darwin") app.quit();
+}), t.on("window-all-closed", () => {
+	process.platform !== "darwin" && t.quit();
 });
 //#endregion
 export {};

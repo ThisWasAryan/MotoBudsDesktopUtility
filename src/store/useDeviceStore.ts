@@ -20,8 +20,9 @@ export interface DeviceState {
   eqState: boolean;
   hiRes: boolean;
   gameMode: boolean;
-  inEarL: boolean;
-  inEarR: boolean;
+  inEarFeatureEnabled: boolean;
+  physicallyInEarL: boolean;
+  physicallyInEarR: boolean;
   volBoost: boolean;
   fitTestRunning: boolean;
   fitTestResult: number | null;
@@ -35,7 +36,7 @@ export interface DeviceState {
   setEqState: (enabled: boolean) => void;
   setGameMode: (enabled: boolean) => void;
   setHiRes: (enabled: boolean) => void;
-  setInEar: (enabled: boolean) => void;
+  setInEarFeature: (enabled: boolean) => void;
   setVolBoost: (enabled: boolean) => void;
   setCurrentView: (view: 'main' | 'sound' | 'gestures' | 'more' | 'fit-test' | 'ring-earbuds') => void;
 }
@@ -51,8 +52,9 @@ export const useDeviceStore = create<DeviceState>((set) => ({
   eqState: false,
   hiRes: false,
   gameMode: false,
-  inEarL: false,
-  inEarR: false,
+  inEarFeatureEnabled: false,
+  physicallyInEarL: false,
+  physicallyInEarR: false,
   volBoost: false,
   fitTestRunning: false,
   fitTestResult: null,
@@ -109,8 +111,8 @@ export const useDeviceStore = create<DeviceState>((set) => ({
               chargingL: (rawLeft & 0x80) > 0,
               chargingR: (rawRight & 0x80) > 0,
               chargingCase: (rawCase & 0x80) > 0,
-              inCaseL: (rawLeft & 0x7F) > 100 ? false : ((rawLeft & 0x80) > 0 || (rawCase & 0x7F) <= 100),
-              inCaseR: (rawRight & 0x7F) > 100 ? false : ((rawRight & 0x80) > 0 || (rawCase & 0x7F) <= 100),
+              inCaseL: (rawLeft & 0x7F) > 100 ? false : ((rawLeft & 0x80) > 0),
+              inCaseR: (rawRight & 0x7F) > 100 ? false : ((rawRight & 0x80) > 0),
             }
           };
         }
@@ -134,10 +136,13 @@ export const useDeviceStore = create<DeviceState>((set) => ({
         if (pdu.payload.length >= 1) return { volBoost: pdu.payload[0] === 1 };
         break;
       case 1026:
+        if (pdu.payload.length >= 1) return { inEarFeatureEnabled: pdu.payload[0] === 1 };
+        break;
       case 1028:
         if (pdu.payload.length >= 1) {
-           // We assume payload[0] might be a bitmask or just boolean. Let's set both for now if 1.
-           return { inEarL: pdu.payload[0] === 1, inEarR: pdu.payload[0] === 1 };
+           const val = pdu.payload[0];
+           // Assume bitmask: bit 0 = Left, bit 1 = Right
+           return { physicallyInEarL: (val & 1) === 1, physicallyInEarR: (val & 2) === 2 };
         }
         break;
       case 1025: // Fit Test Result
@@ -175,11 +180,11 @@ export const useDeviceStore = create<DeviceState>((set) => ({
     set({ hiRes: enabled });
   },
 
-  setInEar: (enabled) => {
+  setInEarFeature: (enabled) => {
     if ((window as any).sendOpcodeToDevice) {
       (window as any).sendOpcodeToDevice(1027, [enabled ? 1 : 0]);
     }
-    set({ inEarL: enabled, inEarR: enabled });
+    set({ inEarFeatureEnabled: enabled });
   },
 
   setVolBoost: (enabled) => {

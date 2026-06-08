@@ -3,7 +3,7 @@ import { Headphones, BatteryCharging, ChevronRight, SlidersHorizontal, Hand, Set
 import { motion } from 'framer-motion';
 
 export const MainDashboard = () => {
-  const { name, modelId, battery, ancMode, setAncMode, inEarL, inEarR, setCurrentView } = useDeviceStore();
+  const { name, modelId, battery, ancMode, setAncMode, physicallyInEarL, physicallyInEarR, setCurrentView } = useDeviceStore();
 
   const isCaseVisible = battery.inCaseL || battery.inCaseR;
 
@@ -71,7 +71,7 @@ export const MainDashboard = () => {
       <div className="skeuo-panel anc-panel" style={{ position: 'relative' }}>
          <h3 className="engraved-text sm">NOISE CONTROL</h3>
          
-         {(!inEarL || !inEarR) && (
+         {(!physicallyInEarL || !physicallyInEarR) && (
             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(30,30,30,0.6)', backdropFilter: 'blur(2px)', zIndex: 20, borderRadius: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <span className="embossed-text sm" style={{ color: '#ff4d4f' }}>Make sure both earbuds are inserted</span>
             </div>

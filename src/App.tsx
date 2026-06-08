@@ -72,13 +72,18 @@ function App() {
         if (batteryRes.data?.battery_raw) parseAndInjectPDU(batteryRes.data.battery_raw);
 
         setStatusMsg('Reading hardware info...');
-        const infoRes = await window.api.motoCommand(['--info']);
+        const infoRes = await window.api.motoCommand(['--info', '--sync']);
         if (infoRes.data?.hardware_raw) parseAndInjectPDU(infoRes.data.hardware_raw);
+        if (infoRes.data?.anc_raw) parseAndInjectPDU(infoRes.data.anc_raw);
+        if (infoRes.data?.hires_raw) parseAndInjectPDU(infoRes.data.hires_raw);
+        if (infoRes.data?.game_raw) parseAndInjectPDU(infoRes.data.game_raw);
+        if (infoRes.data?.inear_raw) parseAndInjectPDU(infoRes.data.inear_raw);
         
         setInterval(async () => {
-            const pollRes = await window.api.motoCommand(['--battery']);
-            if (pollRes.data?.battery_raw) parseAndInjectPDU(pollRes.data.battery_raw);
-        }, 15000);
+          if (!connected) return;
+          const pollRes = await window.api.motoCommand(['--battery']);
+          if (pollRes.data?.battery_raw) parseAndInjectPDU(pollRes.data.battery_raw);
+        }, 3000);
 
       } else {
         setStatusMsg(`Failed: ${batteryRes.message}`);

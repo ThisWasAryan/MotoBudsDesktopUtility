@@ -186,13 +186,15 @@ def main():
     parser.add_argument("--hires", type=int, choices=[0, 1], help="Set Hi-Res/LDAC")
     parser.add_argument("--fit", type=int, choices=[0, 1], help="Set Fit Test (0=Stop, 1=Start)")
     parser.add_argument("--fmd", type=int, choices=[0, 1, 2, 3], help="Set Find My Device Mode")
+    parser.add_argument("--keepalive", type=int, help="Keep SPP connection alive for N seconds to capture async events")
+    parser.add_argument("--sync", action="store_true", help="Sync startup states (ANC, HiRes, Game, InEar)")
     parser.add_argument("--json", action="store_true", help="Output results in JSON format")
     parser.add_argument("--mac", type=str, default=CLASSIC_MAC, help="MAC address or 127.0.0.1 for mock")
     parser.add_argument("--port", type=int, default=RFCOMM_PORT, help="Port")
     
     args = parser.parse_args()
     
-    if not any([args.battery, args.info, args.anc is not None, args.game is not None, args.inear is not None, args.volboost is not None, args.hires is not None, args.fit is not None, args.fmd is not None]):
+    if not any([args.battery, args.info, args.anc is not None, args.game is not None, args.inear is not None, args.volboost is not None, args.hires is not None, args.fit is not None, args.fmd is not None, args.sync]):
         parser.print_help()
         sys.exit(1)
 
@@ -229,6 +231,37 @@ def main():
         if args.fmd is not None:
             res = controller.toggle_fmd(args.fmd)
             results["data"]["fmd_response"] = res
+
+        if args.sync:
+            # Opcode 512, 780, 782, 1026
+            res_anc = controller._send_and_receive(0x0200, b"")
+            res_hires = controller._send_and_receive(0x030C, b"")
+            res_game = controller._send_and_receive(0x030E, b"")
+            res_inear = controller._send_and_receive(0x0402, b"")
+            if res_anc: results["data"]["anc_raw"] = res_anc.hex()
+            if res_hires: results["data"]["hires_raw"] = res_hires.hex()
+            if res_game: results["data"]["game_raw"] = res_game.hex()
+            if res_inear: results["data"]["inear_raw"] = res_inear.hex()
+
+        if args.keepalive:
+            controller.log(f"[*] Keeping connection alive for {args.keepalive} seconds...")
+            start_t = time.time()
+            async_events = []
+            try:
+                controller.sock.settimeout(1.0)
+                while time.time() - start_t < args.keepalive:
+                    try:
+                        data = controller.sock.recv(1024)
+                        if data:
+                            async_events.append(data.hex())
+                            controller.log(f"[+] Async Event: {data.hex()}")
+                    except socket.timeout:
+                        continue
+            except Exception as e:
+                controller.log(f"[-] Keepalive error: {e}")
+            finally:
+                controller.sock.settimeout(2.0)
+            results["data"]["async_events"] = async_events
             
         controller.disconnect()
     else:

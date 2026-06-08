@@ -1,15 +1,15 @@
-import { contextBridge, ipcRenderer } from "electron";
+import { contextBridge as e, ipcRenderer as t } from "electron";
 //#region electron/preload.ts
-contextBridge.exposeInMainWorld("api", {
-	motoCommand: (args) => ipcRenderer.invoke("moto-command", args),
-	onDeviceConnected: (callback) => ipcRenderer.on("device-connected", (_event, value) => callback(value)),
-	onDeviceDisconnected: (callback) => ipcRenderer.on("device-disconnected", () => callback()),
-	onStateUpdate: (callback) => ipcRenderer.on("state-update", (_event, value) => callback(value)),
-	sendOpcode: (opcode, payload) => ipcRenderer.send("send-opcode", {
-		opcode,
-		payload
+e.exposeInMainWorld("api", {
+	motoCommand: (e) => t.invoke("moto-command", e),
+	onDeviceConnected: (e) => t.on("device-connected", (t, n) => e(n)),
+	onDeviceDisconnected: (e) => t.on("device-disconnected", () => e()),
+	onStateUpdate: (e) => t.on("state-update", (t, n) => e(n)),
+	sendOpcode: (e, n) => t.send("send-opcode", {
+		opcode: e,
+		payload: n
 	}),
-	triggerScan: () => ipcRenderer.send("trigger-scan")
+	triggerScan: () => t.send("trigger-scan")
 });
 //#endregion
 export {};

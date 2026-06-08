@@ -3,10 +3,7 @@ import { Ear, ArrowLeft, Download, Volume1, Headphones } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const MoreMenu = () => {
-  const { setCurrentView, inEarL, inEarR, setInEar } = useDeviceStore();
-
-  // The setting is global, so we use either. Assuming the protocol handles it globally via Opcode 1027
-  const inEar = inEarL || inEarR;
+  const { setCurrentView, modelId, inEarFeatureEnabled, setInEarFeature } = useDeviceStore();
 
   return (
     <motion.div 
@@ -32,19 +29,32 @@ export const MoreMenu = () => {
               <div className="engraved-text xs">Automatically play audio when earbuds are in</div>
             </div>
           </div>
-          <button className={`skeuo-toggle ${inEar ? 'on' : 'off'}`} onClick={() => setInEar(!inEar)}>
+          <button className={`skeuo-toggle ${inEarFeatureEnabled ? 'on' : 'off'}`} onClick={() => setInEarFeature(!inEarFeatureEnabled)}>
             <div className="thumb"></div>
           </button>
         </div>
 
-        <div className="skeuo-toggle-row">
-          <div className="row-info">
-            <Download size={20} className="metal-icon" />
-            <div>
-              <div className="embossed-text sm">Firmware update</div>
+        {modelId === 'XT2441-1' && (
+          <>
+            <div className="skeuo-toggle-row">
+              <div className="row-info">
+                <Headphones size={20} className="metal-icon" />
+                <div>
+                  <div className="embossed-text sm">Spatial Audio</div>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+            
+            <div className="skeuo-toggle-row">
+              <div className="row-info">
+                <Download size={20} className="metal-icon" />
+                <div>
+                  <div className="embossed-text sm">Firmware update</div>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
 
         <div className="skeuo-toggle-row interactive" style={{ cursor: 'pointer' }} onClick={() => setCurrentView('ring-earbuds')}>
           <div className="row-info">

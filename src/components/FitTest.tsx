@@ -3,16 +3,32 @@ import { ArrowLeft, Play, Loader2, CheckCircle2, XCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const FitTest = () => {
-  const { setCurrentView, inEarL, inEarR, fitTestRunning, fitTestResult } = useDeviceStore();
+  const { setCurrentView, physicallyInEarL, physicallyInEarR, fitTestRunning, fitTestResult } = useDeviceStore();
 
   const startTest = async () => {
-    if (!inEarL || !inEarR) return;
+    if (!physicallyInEarL || !physicallyInEarR) return;
     
     // Dispatch local state
     useDeviceStore.setState({ fitTestRunning: true, fitTestResult: null });
 
     if (window.api && window.api.motoCommand) {
-      await window.api.motoCommand(['--fit', '1']);
+      const res = await window.api.motoCommand(['--fit', '1', '--keepalive', '15']);
+      if (res && res.data && res.data.async_events) {
+         // The async_events are hex strings. We need to parse them.
+         res.data.async_events.forEach((hexEvent: string) => {
+            // Very simple hack to parse it in place if window.api.parsePDU is not exposed
+            // We know the opcode for fit test result is 1025 (0x0401)
+            // If the hexEvent contains 0401, we can just extract the payload manually
+            if (hexEvent.includes("0401")) {
+               const idx = hexEvent.indexOf("0401");
+               if (idx + 6 <= hexEvent.length) {
+                  const val = parseInt(hexEvent.substring(idx+4, idx+6), 16);
+                  useDeviceStore.setState({ fitTestResult: val, fitTestRunning: false });
+               }
+            }
+         });
+      }
+      useDeviceStore.setState({ fitTestRunning: false });
     }
   };
 
@@ -66,7 +82,7 @@ export const FitTest = () => {
           )}
         </div>
 
-        {(!inEarL || !inEarR) && !fitTestRunning && fitTestResult === null && (
+        {(!physicallyInEarL || !physicallyInEarR) && !fitTestRunning && fitTestResult === null && (
           <div style={{ padding: '12px 24px', background: 'rgba(255, 77, 79, 0.1)', borderRadius: '12px', border: '1px solid var(--danger)' }}>
              <span className="embossed-text sm" style={{ color: 'var(--danger)' }}>Make sure both earbuds are inserted</span>
           </div>
@@ -79,7 +95,7 @@ export const FitTest = () => {
            className="skeuo-btn connect-btn" 
            style={{ width: '100%', justifyContent: 'center' }} 
            onClick={startTest}
-           disabled={fitTestRunning || !inEarL || !inEarR}
+           disabled={fitTestRunning || !physicallyInEarL || !physicallyInEarR}
         >
           {fitTestRunning ? 'Testing...' : 'Start'}
         </button>
