@@ -152,7 +152,7 @@ class MotoBudsController:
         
         # In Linux, changing the codec on the earbud side doesn't automatically cause PipeWire/BlueZ 
         # to renegotiate the A2DP codec (unlike Android). We must forcefully bounce the connection.
-        if resp and self.mac_address != "127.0.0.1":
+        if self.mac_address != "127.0.0.1":
             self.log("[*] Forcing Bluetooth renegotiation for codec switch...")
             try:
                 # Issue the disconnect command asynchronously so we can return the success response to UI first

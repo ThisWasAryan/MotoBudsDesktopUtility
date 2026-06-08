@@ -98,10 +98,21 @@ export const useDeviceStore = create<DeviceState>((set) => ({
         break;
       case 5: // Battery
       case 9: // Battery notification
+      case 11: // Async Battery Notification (from diagnostics)
         if (pdu.payload.length >= 3) {
-          const rawLeft = pdu.payload[0];
-          const rawRight = pdu.payload[1];
-          const rawCase = pdu.payload[2];
+          let rawLeft, rawRight, rawCase;
+          
+          if (pdu.payload.length >= 9) {
+             // Opcode 11 has a 9+ byte payload. Values are at indices 6, 7, 8
+             rawLeft = pdu.payload[6];
+             rawRight = pdu.payload[7];
+             rawCase = pdu.payload[8];
+          } else {
+             // Standard Opcode 5 query has 3 byte payload
+             rawLeft = pdu.payload[0];
+             rawRight = pdu.payload[1];
+             rawCase = pdu.payload[2];
+          }
           
           return {
             battery: {
@@ -111,8 +122,8 @@ export const useDeviceStore = create<DeviceState>((set) => ({
               chargingL: (rawLeft & 0x80) > 0,
               chargingR: (rawRight & 0x80) > 0,
               chargingCase: (rawCase & 0x80) > 0,
-              inCaseL: (rawLeft & 0x7F) > 100 ? false : ((rawLeft & 0x80) > 0),
-              inCaseR: (rawRight & 0x7F) > 100 ? false : ((rawRight & 0x80) > 0),
+              inCaseL: rawCase !== 255,
+              inCaseR: rawCase !== 255,
             }
           };
         }
@@ -139,10 +150,14 @@ export const useDeviceStore = create<DeviceState>((set) => ({
         if (pdu.payload.length >= 1) return { inEarFeatureEnabled: pdu.payload[0] === 1 };
         break;
       case 1028:
-        if (pdu.payload.length >= 1) {
-           const val = pdu.payload[0];
-           // Assume bitmask: bit 0 = Left, bit 1 = Right
-           return { physicallyInEarL: (val & 1) === 1, physicallyInEarR: (val & 2) === 2 };
+        // As per diagnostics, Opcode 1028 payload is ~10 bytes
+        // Index 6 = Left In-Ear status (1 = In, 0 = Out)
+        // Index 7 = Right In-Ear status (1 = In, 0 = Out)
+        if (pdu.payload.length >= 8) {
+           return { 
+              physicallyInEarL: pdu.payload[6] === 1, 
+              physicallyInEarR: pdu.payload[7] === 1 
+           };
         }
         break;
       case 1025: // Fit Test Result
