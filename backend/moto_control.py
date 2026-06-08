@@ -5,6 +5,7 @@ import time
 import argparse
 import sys
 import json
+import subprocess
 
 CLASSIC_MAC = "54:84:50:92:78:AE"
 RFCOMM_PORT = 16
@@ -148,6 +149,20 @@ class MotoBudsController:
     def toggle_hires(self, enabled: int):
         self.log(f"[*] Setting Hi-Res Mode: {enabled}")
         resp = self._send_and_receive(0x030D, bytes([enabled]))
+        
+        # In Linux, changing the codec on the earbud side doesn't automatically cause PipeWire/BlueZ 
+        # to renegotiate the A2DP codec (unlike Android). We must forcefully bounce the connection.
+        if resp and self.mac_address != "127.0.0.1":
+            self.log("[*] Forcing Bluetooth renegotiation for codec switch...")
+            try:
+                # Issue the disconnect command asynchronously so we can return the success response to UI first
+                subprocess.Popen(
+                    f"sleep 1 && bluetoothctl disconnect {self.mac_address} && sleep 2 && bluetoothctl connect {self.mac_address}", 
+                    shell=True
+                )
+            except Exception as e:
+                self.log(f"[-] Failed to restart bluetooth interface: {e}")
+                
         return resp.hex() if resp else None
 
     def toggle_fit(self, start: int):
