@@ -165,14 +165,21 @@ class MotoBudsController:
     def toggle_hires(self, enabled: int):
         self.log(f"[*] Setting Hi-Res Mode: {enabled}")
         resp = self._send_and_receive(0x030D, bytes([enabled]))
-        
-        # Bouncing the connection using bluetoothctl disconnect/connect 
-        # is necessary on Linux because PipeWire/PulseAudio will fail to 
-        # re-negotiate the A2DP profile when the earbuds reboot internally.
-        # This fixes the "audio comes out of laptop instead of earbuds" bug.
-        import subprocess
-        subprocess.Popen(f"sleep 1 && bluetoothctl disconnect {self.mac_address} && sleep 2 && bluetoothctl connect {self.mac_address}", shell=True)
-        
+
+        # The earbuds will internally reboot to renegotiate the LDAC codec.
+        if resp and self.mac_address != "127.0.0.1":
+            import subprocess
+            # The user explicitly requested a full adapter bounce (power off -> power on)
+            # because Linux PipeWire sometimes completely fails to re-route A2DP
+            # when just the device disconnects or codecs change abruptly.
+            subprocess.Popen(
+                f"sleep 2 ; bluetoothctl power off ; sleep 3 ; bluetoothctl power on ; sleep 4 ; bluetoothctl connect {self.mac_address}", 
+                shell=True,
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
+
         return resp.hex() if resp else None
 
     def toggle_fit(self, start: int):
@@ -316,6 +323,12 @@ def main():
                 # codecs (e.g., when toggling LDAC Hi-Res). Instead of crashing the daemon, 
                 # we wait and attempt to gracefully reconnect.
                 controller.disconnect()
+                
+                # Give the OS-level bluetoothctl script 12 seconds to fully bounce
+                # the entire Bluetooth adapter (power off -> power on) before we aggressively 
+                # try to grab the RFCOMM serial port again. This prevents bluetoothd crashes.
+                time.sleep(12)
+                
                 reconnected = False
                 for attempt in range(10):
                     time.sleep(2)

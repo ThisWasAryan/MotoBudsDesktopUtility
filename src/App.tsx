@@ -107,8 +107,12 @@ function App() {
              if (payload.message && payload.message.includes('attempting to reconnect')) {
                 // Do not disconnect the UI, let the daemon handle the auto-reconnect loop
                 console.warn("Device is temporarily unavailable (codec renegotiation). Reconnecting...");
+             } else if (payload.message && payload.message.includes('Connection dropped')) {
+                console.warn("Daemon reported a connection drop. Waiting for background reconnect...");
+                setStatusMsg("Device rebooting to switch codecs. Please wait...");
+                // Do not call disconnect(). The daemon will automatically reconnect!
              } else {
-                setStatusMsg(`Connection lost: ${payload.message}`);
+                setStatusMsg(`Connection error: ${payload.message}`);
                 disconnect();
              }
           }

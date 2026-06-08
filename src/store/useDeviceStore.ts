@@ -133,17 +133,18 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
         if (pdu.payload.length >= 1) return { eqState: pdu.payload[0] };
         break;
       case 780:
+      case 781: // Hi-Res
       case 785:
         if (pdu.payload.length >= 2) return { hiRes: pdu.payload[1] === 1 };
         else if (pdu.payload.length === 1) return { hiRes: pdu.payload[0] === 1 };
         break;
       case 782:
-      case 786:
-        if (pdu.payload.length >= 1) return { gameMode: pdu.payload[0] === 1 };
+      case 786: // Game Mode
+        if (pdu.payload.length >= 1) return { gameMode: pdu.payload[0] === 1 || pdu.payload[0] === 0x19 };
         break;
       case 787:
-      case 789:
-        if (pdu.payload.length >= 1) return { volBoost: pdu.payload[0] === 1 };
+      case 789: // Volume Booster
+        if (pdu.payload.length >= 1) return { volBoost: pdu.payload[0] === 1 || pdu.payload[0] === 0x1D };
         break;
       case 1026:
         if (pdu.payload.length >= 1) return { inEarFeatureEnabled: pdu.payload[0] === 1 };

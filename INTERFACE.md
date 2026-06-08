@@ -36,6 +36,8 @@ Any new or modified UI components must bind to the values exported by `useDevice
 ### Available Action Functions
 When binding click handlers in your UI components, use these exposed setters. Note that these setters internally trigger the IPC `window.api.motoCommand` calls; you do not need to call the IPC layer manually from the UI components.
 
+*Note: Due to a hardware constraint, `hiRes` and `gameMode` cannot be active at the same time. The UI components (e.g., `SoundMenu.tsx`) must manage this mutual exclusivity by presenting a confirmation dialog before sequentially toggling the states using these action functions.*
+
 * `setAncMode(mode: number, subMode: number)`
 * `setEqBands(bands: number[])`
 * `setGameMode(enabled: boolean)`
