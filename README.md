@@ -37,6 +37,17 @@ This will concurrently compile the TypeScript backend, spin up the Vite React se
 
 For a full, in-depth breakdown of the proprietary protocol, opcodes, and packet structure, please see the completely documented [PROTOCOL.md](PROTOCOL.md).
 
+## Automated Testing
+
+To ensure the SPP parser logic is robust and doesn't drop asynchronous packets (like Battery Notifications trailing behind Empty ACKs), we have a mock local test server that mimics the exact Moto Buds PDU flow.
+
+You can run the full automated integration test without your earbuds being physically present:
+
+```bash
+source .venv/bin/activate
+python backend/test_integration.py
+```
+
 ## Troubleshooting Physical ANC States
 
 While the earbuds accept our perfectly framed ANC Write commands (`Opcode 0x0201`) and return a `Success` code, the physical ANC state sometimes does not toggle depending on the earbud variant.
