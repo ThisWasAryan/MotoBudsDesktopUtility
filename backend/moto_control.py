@@ -130,18 +130,42 @@ class MotoBudsController:
             self.log(f"[+] Response: {resp.hex()}")
         return resp.hex() if resp else None
 
+    def toggle_game_mode(self, enabled: int):
+        self.log(f"[*] Setting Game Mode: {enabled}")
+        resp = self._send_and_receive(0x030F, bytes([enabled]))
+        return resp.hex() if resp else None
+
+    def toggle_inear(self, enabled: int):
+        self.log(f"[*] Setting In-Ear Detection: {enabled}")
+        resp = self._send_and_receive(0x0403, bytes([enabled]))
+        return resp.hex() if resp else None
+
+    def toggle_volboost(self, enabled: int):
+        self.log(f"[*] Setting Volume Boost: {enabled}")
+        resp = self._send_and_receive(0x0314, bytes([enabled]))
+        return resp.hex() if resp else None
+
+    def toggle_hires(self, enabled: int):
+        self.log(f"[*] Setting Hi-Res Mode: {enabled}")
+        resp = self._send_and_receive(0x030D, bytes([enabled]))
+        return resp.hex() if resp else None
+
 def main():
     parser = argparse.ArgumentParser(description="Moto Buds Controller")
     parser.add_argument("--battery", action="store_true", help="Read battery levels")
     parser.add_argument("--info", action="store_true", help="Read hardware info")
     parser.add_argument("--anc", type=int, choices=[0, 1, 2], help="Set ANC Mode (0=Off, 1=ANC, 2=Transparency)")
+    parser.add_argument("--game", type=int, choices=[0, 1], help="Set Game Mode")
+    parser.add_argument("--inear", type=int, choices=[0, 1], help="Set In-Ear Detection")
+    parser.add_argument("--volboost", type=int, choices=[0, 1], help="Set Volume Boost")
+    parser.add_argument("--hires", type=int, choices=[0, 1], help="Set Hi-Res/LDAC")
     parser.add_argument("--json", action="store_true", help="Output results in JSON format")
     parser.add_argument("--mac", type=str, default=CLASSIC_MAC, help="MAC address or 127.0.0.1 for mock")
     parser.add_argument("--port", type=int, default=RFCOMM_PORT, help="Port")
     
     args = parser.parse_args()
     
-    if not any([args.battery, args.info, args.anc is not None]):
+    if not any([args.battery, args.info, args.anc is not None, args.game is not None, args.inear is not None, args.volboost is not None, args.hires is not None]):
         parser.print_help()
         sys.exit(1)
 
@@ -160,6 +184,18 @@ def main():
             sub_mode = 1 if args.anc == 1 else 0
             res = controller.toggle_anc(args.anc, sub_mode)
             results["data"]["anc_response"] = res
+        if args.game is not None:
+            res = controller.toggle_game_mode(args.game)
+            results["data"]["game_response"] = res
+        if args.inear is not None:
+            res = controller.toggle_inear(args.inear)
+            results["data"]["inear_response"] = res
+        if args.volboost is not None:
+            res = controller.toggle_volboost(args.volboost)
+            results["data"]["volboost_response"] = res
+        if args.hires is not None:
+            res = controller.toggle_hires(args.hires)
+            results["data"]["hires_response"] = res
             
         controller.disconnect()
     else:

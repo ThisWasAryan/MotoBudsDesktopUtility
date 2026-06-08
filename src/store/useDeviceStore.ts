@@ -16,6 +16,8 @@ export interface DeviceState {
   eqState: boolean;
   hiRes: boolean;
   gameMode: boolean;
+  inEar: boolean;
+  volBoost: boolean;
   fitTestRunning: boolean;
   fitTestResult: number | null;
   
@@ -27,6 +29,8 @@ export interface DeviceState {
   setEqState: (enabled: boolean) => void;
   setGameMode: (enabled: boolean) => void;
   setHiRes: (enabled: boolean) => void;
+  setInEar: (enabled: boolean) => void;
+  setVolBoost: (enabled: boolean) => void;
 }
 
 export const useDeviceStore = create<DeviceState>((set) => ({
@@ -40,6 +44,8 @@ export const useDeviceStore = create<DeviceState>((set) => ({
   eqState: false,
   hiRes: false,
   gameMode: false,
+  inEar: false,
+  volBoost: false,
   fitTestRunning: false,
   fitTestResult: null,
 
@@ -65,8 +71,15 @@ export const useDeviceStore = create<DeviceState>((set) => ({
           const str = new TextDecoder().decode(new Uint8Array(pdu.payload));
           // Strings are likely null-terminated or delimited. Let's just find the first XT... string.
           const match = str.match(/(XT\d{4}-\d)/);
+          
+          let nameStr = "Moto Buds";
+          if (str.toLowerCase().includes("moto buds bass")) nameStr = "Moto Buds Bass";
+          else if (str.toLowerCase().includes("moto buds+")) nameStr = "Moto Buds+";
+          
           if (match) {
-            return { modelId: match[1] };
+            return { modelId: match[1], name: nameStr };
+          } else if (nameStr !== "Moto Buds") {
+            return { name: nameStr };
           }
         } catch (e) {}
         break;
@@ -77,7 +90,7 @@ export const useDeviceStore = create<DeviceState>((set) => ({
             battery: {
               left: pdu.payload[0] & 0x7F,
               right: pdu.payload[1] & 0x7F,
-              case: pdu.payload[2] & 0x7F,
+              case: (pdu.payload[2] & 0x7F) > 100 ? null : (pdu.payload[2] & 0x7F),
               charging: (pdu.payload[0] & 0x80) > 0 || (pdu.payload[2] & 0x80) > 0
             }
           };
@@ -96,6 +109,14 @@ export const useDeviceStore = create<DeviceState>((set) => ({
       case 782:
       case 786:
         if (pdu.payload.length >= 1) return { gameMode: pdu.payload[0] === 1 };
+        break;
+      case 787:
+      case 789:
+        if (pdu.payload.length >= 1) return { volBoost: pdu.payload[0] === 1 };
+        break;
+      case 1026:
+      case 1028:
+        if (pdu.payload.length >= 1) return { inEar: pdu.payload[0] === 1 };
         break;
       case 1025: // Fit Test Result
         if (pdu.payload.length >= 1) return { fitTestResult: pdu.payload[0], fitTestRunning: false };
@@ -130,5 +151,19 @@ export const useDeviceStore = create<DeviceState>((set) => ({
       (window as any).sendOpcodeToDevice(781, [enabled ? 1 : 0]);
     }
     set({ hiRes: enabled });
+  },
+
+  setInEar: (enabled) => {
+    if ((window as any).sendOpcodeToDevice) {
+      (window as any).sendOpcodeToDevice(1027, [enabled ? 1 : 0]);
+    }
+    set({ inEar: enabled });
+  },
+
+  setVolBoost: (enabled) => {
+    if ((window as any).sendOpcodeToDevice) {
+      (window as any).sendOpcodeToDevice(788, [enabled ? 1 : 0]);
+    }
+    set({ volBoost: enabled });
   }
 }));

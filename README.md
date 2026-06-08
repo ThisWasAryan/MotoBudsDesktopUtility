@@ -47,17 +47,3 @@ You can run the full automated integration test without your earbuds being physi
 source .venv/bin/activate
 python backend/test_integration.py
 ```
-
-## Troubleshooting Physical ANC States
-
-While the earbuds accept our perfectly framed ANC Write commands (`Opcode 0x0201`) and return a `Success` code, the physical ANC state sometimes does not toggle depending on the earbud variant.
-
-If you want to debug the python scripts manually without the UI, you can run:
-
-```bash
-source .venv/bin/activate
-python backend/moto_control.py --battery --json
-python backend/moto_control.py --anc 1
-```
-
-We welcome contributions to help map the final physical toggle payloads for specific earbud models (like the Moto Buds Bass).

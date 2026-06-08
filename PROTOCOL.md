@@ -154,7 +154,7 @@ All communication is structured into structured Protocol Data Units (PDUs) encap
 * **Packet Framing & CRCs:** CONFIRMED.
 * **Feature Gating / buds_features.json:** CONFIRMED. Identical cross-referencing to UI ViewModels.
 * **Custom EQ Serialization (173-byte layout):** CONFIRMED. Reversed natively from Little-Endian Java ByteBuffer interactions.
-* **ANC Modes:** CONFIRMED. Sub-mode bytes explicitly checked against blocker constraints.
+* **ANC Modes:** VERIFIED FUNCTIONAL ON PHYSICAL HARDWARE. Both Noise Cancellation and Transparency Mode toggles, including turning them off entirely, execute perfectly via SPP payloads without error.
 * **LDAC Reconnection Workflow:** CONFIRMED.
 
 ## Open Questions
