@@ -9,17 +9,23 @@ export interface DeviceState {
     left: number | null;
     right: number | null;
     case: number | null;
-    charging: boolean;
+    chargingL: boolean;
+    chargingR: boolean;
+    chargingCase: boolean;
+    inCaseL: boolean;
+    inCaseR: boolean;
   };
   ancMode: number;
   ancSubMode: number;
   eqState: boolean;
   hiRes: boolean;
   gameMode: boolean;
-  inEar: boolean;
+  inEarL: boolean;
+  inEarR: boolean;
   volBoost: boolean;
   fitTestRunning: boolean;
   fitTestResult: number | null;
+  currentView: 'main' | 'sound' | 'gestures' | 'more' | 'fit-test' | 'ring-earbuds';
   
   // Actions
   setDevice: (data: any) => void;
@@ -31,6 +37,7 @@ export interface DeviceState {
   setHiRes: (enabled: boolean) => void;
   setInEar: (enabled: boolean) => void;
   setVolBoost: (enabled: boolean) => void;
+  setCurrentView: (view: 'main' | 'sound' | 'gestures' | 'more' | 'fit-test' | 'ring-earbuds') => void;
 }
 
 export const useDeviceStore = create<DeviceState>((set) => ({
@@ -38,16 +45,20 @@ export const useDeviceStore = create<DeviceState>((set) => ({
   modelId: null,
   name: null,
   features: [],
-  battery: { left: null, right: null, case: null, charging: false },
+  battery: { left: null, right: null, case: null, chargingL: false, chargingR: false, chargingCase: false, inCaseL: false, inCaseR: false },
   ancMode: 0,
   ancSubMode: 0,
   eqState: false,
   hiRes: false,
   gameMode: false,
-  inEar: false,
+  inEarL: false,
+  inEarR: false,
   volBoost: false,
   fitTestRunning: false,
   fitTestResult: null,
+  currentView: 'main',
+
+  setCurrentView: (view) => set({ currentView: view }),
 
   setDevice: (data) => set({
     connected: true,
@@ -86,12 +97,20 @@ export const useDeviceStore = create<DeviceState>((set) => ({
       case 5: // Battery
       case 9: // Battery notification
         if (pdu.payload.length >= 3) {
+          const rawLeft = pdu.payload[0];
+          const rawRight = pdu.payload[1];
+          const rawCase = pdu.payload[2];
+          
           return {
             battery: {
-              left: pdu.payload[0] & 0x7F,
-              right: pdu.payload[1] & 0x7F,
-              case: (pdu.payload[2] & 0x7F) > 100 ? null : (pdu.payload[2] & 0x7F),
-              charging: (pdu.payload[0] & 0x80) > 0 || (pdu.payload[2] & 0x80) > 0
+              left: (rawLeft & 0x7F) > 100 ? null : (rawLeft & 0x7F),
+              right: (rawRight & 0x7F) > 100 ? null : (rawRight & 0x7F),
+              case: (rawCase & 0x7F) > 100 ? null : (rawCase & 0x7F),
+              chargingL: (rawLeft & 0x80) > 0,
+              chargingR: (rawRight & 0x80) > 0,
+              chargingCase: (rawCase & 0x80) > 0,
+              inCaseL: (rawLeft & 0x7F) > 100 ? false : ((rawLeft & 0x80) > 0 || (rawCase & 0x7F) <= 100),
+              inCaseR: (rawRight & 0x7F) > 100 ? false : ((rawRight & 0x80) > 0 || (rawCase & 0x7F) <= 100),
             }
           };
         }
@@ -116,7 +135,10 @@ export const useDeviceStore = create<DeviceState>((set) => ({
         break;
       case 1026:
       case 1028:
-        if (pdu.payload.length >= 1) return { inEar: pdu.payload[0] === 1 };
+        if (pdu.payload.length >= 1) {
+           // We assume payload[0] might be a bitmask or just boolean. Let's set both for now if 1.
+           return { inEarL: pdu.payload[0] === 1, inEarR: pdu.payload[0] === 1 };
+        }
         break;
       case 1025: // Fit Test Result
         if (pdu.payload.length >= 1) return { fitTestResult: pdu.payload[0], fitTestRunning: false };

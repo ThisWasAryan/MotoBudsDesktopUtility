@@ -418,3 +418,24 @@ body {
 .skeuo-toggle.on .thumb {
   transform: translateX(24px);
 }
+
+.submenu-container {
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: var(--bg-primary);
+  z-index: 50;
+  overflow-y: auto;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.interactive {
+  transition: transform 0.1s;
+}
+.interactive:active {
+  transform: scale(0.98);
+}
+

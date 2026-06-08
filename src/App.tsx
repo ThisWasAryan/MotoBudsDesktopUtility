@@ -1,8 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useDeviceStore } from './store/useDeviceStore';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Headphones, Radio, Loader2, Settings, Battery, BatteryCharging, Gamepad2, Volume2, Ear, Activity } from 'lucide-react';
-import './App.css'; // Assuming we'll add custom skeuomorphic CSS here
+import { Headphones, Radio, Loader2 } from 'lucide-react';
+import { AnimatePresence } from 'framer-motion';
+
+import { MainDashboard } from './components/MainDashboard';
+import { SoundMenu } from './components/SoundMenu';
+import { MoreMenu } from './components/MoreMenu';
+import { GesturesMenu } from './components/GesturesMenu';
+import { FitTest } from './components/FitTest';
+import { RingEarbuds } from './components/RingEarbuds';
+
+import './App.css'; 
 
 declare global {
   interface Window {
@@ -14,14 +22,11 @@ declare global {
 
 function App() {
   const { 
-    connected, name, modelId, battery, ancMode, gameMode, inEar, volBoost, hiRes,
-    setDevice, updateStateFromPdu, disconnect, 
-    setAncMode, setGameMode, setInEar, setVolBoost, setHiRes 
+    connected, setDevice, updateStateFromPdu, disconnect, currentView 
   } = useDeviceStore();
   
   const [isInitializing, setIsInitializing] = useState(false);
   const [statusMsg, setStatusMsg] = useState('Connect your earbuds to begin.');
-  const [showSettings, setShowSettings] = useState(false);
 
   const parseAndInjectPDU = (hexStr: string) => {
     try {
@@ -61,7 +66,7 @@ function App() {
           name: "Moto Buds",
           modelId: "XT-SPP",
           features: [104, 109, 110, 113, 116], 
-          battery: { left: null, right: null, case: null, charging: false }
+          battery: { left: null, right: null, case: null, chargingL: false, chargingR: false, chargingCase: false, inCaseL: false, inCaseR: false }
         });
         
         if (batteryRes.data?.battery_raw) parseAndInjectPDU(batteryRes.data.battery_raw);
@@ -115,137 +120,14 @@ function App() {
   }
 
   return (
-    <div className="hero-container">
-      {/* Top Header */}
-      <div className="hero-header">
-        <div className="device-id-badge">
-          <div className="status-led active"></div>
-          <span className="embossed-text sm">{name || modelId || 'Moto Buds'}</span>
-        </div>
-        <button className="skeuo-icon-btn" onClick={() => setShowSettings(true)}>
-          <Settings size={22} className="metal-icon" />
-        </button>
-      </div>
-
-      {/* Main Display / Device Art */}
-      <div className="hero-art">
-         <div className="skeuo-device-plate">
-            <Headphones size={80} className="metal-icon lg" />
-         </div>
-      </div>
-
-      {/* Battery Dashboard */}
-      <div className="skeuo-panel battery-panel">
-         <div className="battery-pod">
-           <span className="engraved-text xs">L</span>
-           <div className="skeuo-battery-bar">
-             <div className="fill" style={{ height: `${battery.left || 0}%`, backgroundColor: (battery.left || 0) < 20 ? '#ff4d4f' : '#52c41a' }}></div>
-           </div>
-           <span className="embossed-text">{battery.left !== null ? `${battery.left}%` : '--'}</span>
-         </div>
-
-         <div className="battery-pod case">
-           <span className="engraved-text xs">CASE</span>
-           {battery.charging && <BatteryCharging size={16} className="metal-icon xs" style={{ position:'absolute', top: 5 }} />}
-           <div className="skeuo-battery-bar case-bar">
-             <div className="fill" style={{ height: `${battery.case || 0}%`, backgroundColor: '#1890ff' }}></div>
-           </div>
-           <span className="embossed-text">{battery.case !== null ? `${battery.case}%` : '--'}</span>
-         </div>
-
-         <div className="battery-pod">
-           <span className="engraved-text xs">R</span>
-           <div className="skeuo-battery-bar">
-             <div className="fill" style={{ height: `${battery.right || 0}%`, backgroundColor: (battery.right || 0) < 20 ? '#ff4d4f' : '#52c41a' }}></div>
-           </div>
-           <span className="embossed-text">{battery.right !== null ? `${battery.right}%` : '--'}</span>
-         </div>
-      </div>
-
-      {/* ANC Slider Hardware Switch */}
-      <div className="skeuo-panel anc-panel">
-         <h3 className="engraved-text sm">NOISE CONTROL</h3>
-         <div className="hardware-slider-track">
-            <div 
-               className={`hardware-slider-thumb pos-${ancMode}`}
-            ></div>
-            <div className="slider-labels">
-               <button className={`label-btn ${ancMode === 0 ? 'active' : ''}`} onClick={() => setAncMode(0, 0)}>Off</button>
-               <button className={`label-btn ${ancMode === 2 ? 'active' : ''}`} onClick={() => setAncMode(2, 0)}>Transp.</button>
-               <button className={`label-btn ${ancMode === 1 ? 'active' : ''}`} onClick={() => setAncMode(1, 1)}>ANC</button>
-            </div>
-         </div>
-      </div>
-
-      {/* Settings Modal (Dropdown/Overlay) */}
-      <AnimatePresence>
-        {showSettings && (
-          <motion.div 
-            className="skeuo-modal-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={(e) => { if (e.target === e.currentTarget) setShowSettings(false); }}
-          >
-            <motion.div 
-              className="skeuo-modal"
-              initial={{ y: 50, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 50, opacity: 0 }}
-            >
-               <div className="modal-header">
-                 <h2 className="embossed-text">System Preferences</h2>
-                 <button className="close-btn" onClick={() => setShowSettings(false)}>×</button>
-               </div>
-               
-               <div className="settings-list">
-                 <div className="skeuo-toggle-row">
-                   <div className="row-info">
-                     <Gamepad2 size={20} className="metal-icon" />
-                     <span className="embossed-text sm">Low Latency Game Mode</span>
-                   </div>
-                   <button className={`skeuo-toggle ${gameMode ? 'on' : 'off'}`} onClick={() => setGameMode(!gameMode)}>
-                     <div className="thumb"></div>
-                   </button>
-                 </div>
-
-                 <div className="skeuo-toggle-row">
-                   <div className="row-info">
-                     <Volume2 size={20} className="metal-icon" />
-                     <span className="embossed-text sm">Volume Boost</span>
-                   </div>
-                   <button className={`skeuo-toggle ${volBoost ? 'on' : 'off'}`} onClick={() => setVolBoost(!volBoost)}>
-                     <div className="thumb"></div>
-                   </button>
-                 </div>
-
-                 <div className="skeuo-toggle-row">
-                   <div className="row-info">
-                     <Ear size={20} className="metal-icon" />
-                     <span className="embossed-text sm">In-Ear Detection</span>
-                   </div>
-                   <button className={`skeuo-toggle ${inEar ? 'on' : 'off'}`} onClick={() => setInEar(!inEar)}>
-                     <div className="thumb"></div>
-                   </button>
-                 </div>
-
-                 <div className="skeuo-toggle-row">
-                   <div className="row-info">
-                     <Activity size={20} className="metal-icon" />
-                     <span className="embossed-text sm">Hi-Res Audio (LDAC)</span>
-                   </div>
-                   <button className={`skeuo-toggle ${hiRes ? 'on' : 'off'}`} onClick={() => setHiRes(!hiRes)}>
-                     <div className="thumb"></div>
-                   </button>
-                 </div>
-               </div>
-               
-               <p className="engraved-text xs text-center" style={{marginTop: 20}}>
-                 Warning: Toggling Hi-Res Audio will force an immediate Bluetooth reconnection.
-               </p>
-            </motion.div>
-          </motion.div>
-        )}
+    <div style={{ position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden' }}>
+      <AnimatePresence mode="wait">
+        {currentView === 'main' && <MainDashboard key="main" />}
+        {currentView === 'sound' && <SoundMenu key="sound" />}
+        {currentView === 'more' && <MoreMenu key="more" />}
+        {currentView === 'gestures' && <GesturesMenu key="gestures" />}
+        {currentView === 'fit-test' && <FitTest key="fit-test" />}
+        {currentView === 'ring-earbuds' && <RingEarbuds key="ring-earbuds" />}
       </AnimatePresence>
     </div>
   );
