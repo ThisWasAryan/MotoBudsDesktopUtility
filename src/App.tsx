@@ -79,11 +79,29 @@ function App() {
         if (infoRes.data?.game_raw) parseAndInjectPDU(infoRes.data.game_raw);
         if (infoRes.data?.inear_raw) parseAndInjectPDU(infoRes.data.inear_raw);
         
-        setInterval(async () => {
-          if (!connected) return;
-          const pollRes = await window.api.motoCommand(['--battery']);
-          if (pollRes.data?.battery_raw) parseAndInjectPDU(pollRes.data.battery_raw);
-        }, 3000);
+        // Long-polling loop to keep the SPP socket open and receive async hardware events
+        const pollDevice = async () => {
+          if (!useDeviceStore.getState().connected) return;
+          try {
+            // --keepalive 3 ensures the python script stays open for 3 seconds listening to the socket
+            const pollRes = await window.api.motoCommand(['--battery', '--keepalive', '3']);
+            if (pollRes.data?.battery_raw) parseAndInjectPDU(pollRes.data.battery_raw);
+            if (pollRes.data?.async_events) {
+               for (const ev of pollRes.data.async_events) {
+                  parseAndInjectPDU(ev);
+               }
+            }
+          } catch (e) {
+            console.error("Polling error:", e);
+          }
+          // Immediately trigger the next poll to minimize socket downtime
+          setTimeout(pollDevice, 0);
+        };
+        
+        pollDevice();
+        
+        // Cleanup function for when disconnected (you'll need to handle this via state later if needed)
+        // For now, it polls indefinitely while connected
 
       } else {
         setStatusMsg(`Failed: ${batteryRes.message}`);

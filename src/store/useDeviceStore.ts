@@ -41,7 +41,7 @@ export interface DeviceState {
   setCurrentView: (view: 'main' | 'sound' | 'gestures' | 'more' | 'fit-test' | 'ring-earbuds') => void;
 }
 
-export const useDeviceStore = create<DeviceState>((set) => ({
+export const useDeviceStore = create<DeviceState>((set, get) => ({
   connected: false,
   modelId: null,
   name: null,
@@ -100,30 +100,22 @@ export const useDeviceStore = create<DeviceState>((set) => ({
       case 9: // Battery notification
       case 11: // Async Battery Notification (from diagnostics)
         if (pdu.payload.length >= 3) {
-          let rawLeft, rawRight, rawCase;
+          const rawLeft = pdu.payload[0];
+          const rawRight = pdu.payload[1];
+          const rawCase = pdu.payload[2];
           
-          if (pdu.payload.length >= 9) {
-             // Opcode 11 has a 9+ byte payload. Values are at indices 6, 7, 8
-             rawLeft = pdu.payload[6];
-             rawRight = pdu.payload[7];
-             rawCase = pdu.payload[8];
-          } else {
-             // Standard Opcode 5 query has 3 byte payload
-             rawLeft = pdu.payload[0];
-             rawRight = pdu.payload[1];
-             rawCase = pdu.payload[2];
-          }
-          
+          const currentBattery = get().battery;
           return {
             battery: {
+              ...currentBattery,
               left: (rawLeft & 0x7F) > 100 ? null : (rawLeft & 0x7F),
               right: (rawRight & 0x7F) > 100 ? null : (rawRight & 0x7F),
               case: (rawCase & 0x7F) > 100 ? null : (rawCase & 0x7F),
               chargingL: (rawLeft & 0x80) > 0,
               chargingR: (rawRight & 0x80) > 0,
               chargingCase: (rawCase & 0x80) > 0,
-              inCaseL: rawCase !== 255,
-              inCaseR: rawCase !== 255,
+              inCaseL: (rawLeft & 0x80) > 0 ? true : currentBattery.inCaseL,
+              inCaseR: (rawRight & 0x80) > 0 ? true : currentBattery.inCaseR,
             }
           };
         }
@@ -150,13 +142,22 @@ export const useDeviceStore = create<DeviceState>((set) => ({
         if (pdu.payload.length >= 1) return { inEarFeatureEnabled: pdu.payload[0] === 1 };
         break;
       case 1028:
-        // As per diagnostics, Opcode 1028 payload is ~10 bytes
-        // Index 6 = Left In-Ear status (1 = In, 0 = Out)
-        // Index 7 = Right In-Ear status (1 = In, 0 = Out)
-        if (pdu.payload.length >= 8) {
+        if (pdu.payload.length >= 2) {
            return { 
-              physicallyInEarL: pdu.payload[6] === 1, 
-              physicallyInEarR: pdu.payload[7] === 1 
+              physicallyInEarL: pdu.payload[0] === 1, 
+              physicallyInEarR: pdu.payload[1] === 1 
+           };
+        }
+        break;
+      case 1036: // In-Case Status Notification
+        if (pdu.payload.length >= 2) {
+           const currentBattery = get().battery;
+           return {
+             battery: {
+               ...currentBattery,
+               inCaseL: pdu.payload[0] === 1,
+               inCaseR: pdu.payload[1] === 1
+             }
            };
         }
         break;
