@@ -21,6 +21,14 @@ The following functionalities are confirmed to be 100% working:
 
 *Note: Spatial Audio is partially supported and dynamically surfaces only when the connected device is a Moto Buds+.*
 
+## Installation (v1 Stable Release)
+
+Pre-packaged standalone binaries for **Debian-based systems** (`.deb`) and **other Linux distributions** (`.AppImage`) are available in the **Releases** section of this repository.
+
+> **⚠️ Connection Warning:** Please ensure your earbuds are natively connected to your OS via your Bluetooth manager **before** pressing the "Connect" button on the first screen. If you connect them *after* reaching the connection screen, you may experience slight connectivity issues. If this happens, simply disconnect and reconnect the earbuds from your OS Bluetooth manager.
+
+> **🖥️ Windows Status:** We are actively investigating a Windows release. However, the current backend relies heavily on the Linux BlueZ Bluetooth stack. A Windows port requires a significantly different architecture and will take some time.
+
 ## How It Works: Step-by-Step
 
 This application consists of two completely decoupled components: a lightweight Python background daemon that speaks natively to the earbuds, and a gorgeous React/Electron frontend that gives you control.

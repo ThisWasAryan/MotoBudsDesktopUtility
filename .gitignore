@@ -31,3 +31,4 @@ __pycache__/
 # Electron
 release
 Out
+builds/
