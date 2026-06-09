@@ -2,6 +2,8 @@
 
 An open-source desktop utility for configuring and controlling Motorola Moto Buds on Linux. This project successfully reverse-engineers the proprietary Bluetooth communication protocol used by the official Android application and provides a beautiful, premium desktop UI.
 
+[A Demonstration/Tutorial Video For v1.0.0](https://youtu.be/mqCdtErJAHM) *last updated on 10/06/2026*
+
 ## Hardware Verification (Moto Buds Base Model)
 
 All current protocol reverse-engineering and feature implementations have been strictly tested and verified on the **Moto Buds (Base Model)**. 
@@ -20,6 +22,9 @@ The following functionalities are confirmed to be 100% working:
 * **Hi-Res Audio (LDAC)**: Successfully implemented codec negotiation from the desktop client, entirely replicating the functionality that was previously restricted to the Android app. Handles mutual exclusivity with Game Mode.
 
 *Note: Spatial Audio is partially supported and dynamically surfaces only when the connected device is a Moto Buds+.*
+
+<img width="1079" height="734" alt="Hero_Utility" src="https://github.com/user-attachments/assets/f99e7dd2-a6dd-4d19-b86e-09fe7fa707b0" />
+
 
 ## Installation (v1 Stable Release)
 
@@ -78,6 +83,8 @@ npm run dev
 ```
 
 This will launch the Electron desktop window. From the beautiful premium two-column desktop interface, you can seamlessly connect to your earbuds and control ANC, Game Mode, Volume Boost, Hi-Res Audio, and In-Ear Detection.
+
+<img width="1024" height="740" alt="Hero2_Utility" src="https://github.com/user-attachments/assets/f37e98d4-82e2-472b-9c4d-497f1fd4c961" />
 
 ## Documentation
 
