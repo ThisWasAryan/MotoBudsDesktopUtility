@@ -58,10 +58,11 @@ app.whenReady().then(() => {
         return;
       }
       
-      const pythonPath = path.join(process.env.APP_ROOT!, '.venv/bin/python');
-      const scriptPath = path.join(process.env.APP_ROOT!, 'backend/moto_control.py');
+      const pythonPath = app.isPackaged ? 'python3' : path.join(process.env.APP_ROOT!, '.venv/bin/python');
+      const scriptPath = app.isPackaged ? path.join(process.resourcesPath, 'backend/moto_control.py') : path.join(process.env.APP_ROOT!, 'backend/moto_control.py');
+      const cwdPath = app.isPackaged ? process.resourcesPath : process.env.APP_ROOT;
       
-      pythonDaemon = spawn(pythonPath, [scriptPath, '--daemon', '--json'], { cwd: process.env.APP_ROOT });
+      pythonDaemon = spawn(pythonPath, [scriptPath, '--daemon', '--json'], { cwd: cwdPath });
       
       pythonDaemon.stdout.on('data', (data: Buffer) => {
          const str = data.toString();

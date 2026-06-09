@@ -2,6 +2,7 @@
   "name": "motobudsdesktoputility",
   "private": true,
   "version": "0.0.0",
+  "author": "ThisWasAryan <aryanrajviiid12@gmail.com>",
   "main": "dist-electron/main.js",
   "type": "module",
   "scripts": {
@@ -9,7 +10,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "dist:win": "tsc -b && vite build && electron-builder --win -c.extraMetadata.main=dist-electron/main.js"
+    "dist:win": "tsc -b && vite build && electron-builder --win -c.extraMetadata.main=dist-electron/main.js",
+    "dist:linux": "tsc -b && vite build && electron-builder --linux -c.extraMetadata.main=dist-electron/main.js"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -54,6 +56,16 @@
         "portable"
       ]
     },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "AudioVideo"
+    },
+    "extraResources": [
+      "backend/**/*"
+    ],
     "files": [
       "dist/**/*",
       "dist-electron/**/*"
