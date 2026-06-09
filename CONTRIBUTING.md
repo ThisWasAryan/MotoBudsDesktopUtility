@@ -4,7 +4,7 @@ First off, thank you for considering contributing to Moto Buds Desktop Utility! 
 
 ## 🧪 Testing on Different Hardware
 
-This application and its reverse-engineered Bluetooth protocol were developed and strictly tested exclusively against the **Moto Buds (Base Model)**. 
+This application and its reverse-engineered Bluetooth protocol were developed and strictly tested exclusively against the **Moto Buds Bass(India Only Model)**. 
 
 ### We Need Moto Buds+ Testers!
 If you own the **Moto Buds+**, we highly encourage you to test the application! Because the underlying Bluetooth opcodes might differ slightly between the base model and the "Plus" model (especially concerning Spatial Audio and advanced ANC modes), community testing is the only way we can guarantee 100% feature parity.
