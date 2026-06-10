@@ -169,7 +169,8 @@ class MotoBudsController:
         resp = self._send_and_receive(0x030D, bytes([enabled]))
 
         # The earbuds will internally reboot to renegotiate the LDAC codec.
-        if resp and self.mac_address != "127.0.0.1":
+        # We must bounce the adapter unconditionally because in daemon mode, _send_and_receive returns None.
+        if self.mac_address != "127.0.0.1":
             import subprocess
             # The user explicitly requested a full adapter bounce (power off -> power on)
             # because Linux PipeWire sometimes completely fails to re-route A2DP
