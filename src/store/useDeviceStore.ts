@@ -16,8 +16,8 @@ export interface DeviceState {
     inCaseR: boolean;
   };
   ancMode: number;
-  ancSubMode: number;
   eqBands: number[];
+  eqPreset: string;
   hiRes: boolean;
   gameMode: boolean;
   inEarFeatureEnabled: boolean;
@@ -27,19 +27,31 @@ export interface DeviceState {
   fitTestRunning: boolean;
   fitTestResultL: number | null;
   fitTestResultR: number | null;
+  fmdLeft: boolean;
+  fmdRight: boolean;
+  gestures: {
+    left: Record<number, number>;
+    right: Record<number, number>;
+  };
   currentView: 'main' | 'sound' | 'gestures' | 'more' | 'fit-test' | 'ring-earbuds' | 'equalizer';
+  reconnectStatus: 'idle' | 'dropping' | 'reconnecting' | 'success';
   
   // Actions
   setDevice: (data: any) => void;
+  setConnected: (status: boolean) => void;
   disconnect: () => void;
   updateStateFromPdu: (pdu: any) => void;
   setAncMode: (mode: number, subMode: number) => void;
   setEqBands: (bands: number[]) => void;
+  setEqPreset: (preset: string) => void;
   setGameMode: (enabled: boolean) => void;
   setHiRes: (enabled: boolean) => void;
   setInEarFeature: (enabled: boolean) => void;
   setVolBoost: (enabled: boolean) => void;
+  setFmd: (left: boolean, right: boolean) => void;
+  setGestureConfig: (earbud: number, gestureType: number, func: number) => void;
   setCurrentView: (view: 'main' | 'sound' | 'gestures' | 'more' | 'fit-test' | 'ring-earbuds' | 'equalizer') => void;
+  setReconnectStatus: (status: 'idle' | 'dropping' | 'reconnecting' | 'success') => void;
 }
 
 export const useDeviceStore = create<DeviceState>((set, get) => ({
@@ -51,6 +63,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
   ancMode: 0,
   ancSubMode: 0,
   eqBands: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  eqPreset: 'Custom EQ',
   hiRes: false,
   gameMode: false,
   inEarFeatureEnabled: false,
@@ -60,17 +73,23 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
   fitTestRunning: false,
   fitTestResultL: null,
   fitTestResultR: null,
+  fmdLeft: false,
+  fmdRight: false,
+  gestures: { left: {}, right: {} },
   currentView: 'main',
+  reconnectStatus: 'idle',
 
   setCurrentView: (view) => set({ currentView: view }),
+  setReconnectStatus: (status) => set({ reconnectStatus: status }),
 
   setDevice: (data) => set({
-    connected: true,
     modelId: data.modelId,
     name: data.name,
     features: data.features,
     battery: data.battery
   }),
+
+  setConnected: (status) => set({ connected: status }),
 
   disconnect: () => set({
     connected: false,
@@ -175,6 +194,32 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
       case 1025: // Fit Test Result
         if (pdu.payload.length >= 2) return { fitTestResultL: pdu.payload[0], fitTestResultR: pdu.payload[1], fitTestRunning: false };
         break;
+      case 1038: // FMD State Notification
+        if (pdu.payload.length >= 2) return { fmdLeft: pdu.payload[0] === 1, fmdRight: pdu.payload[1] === 1 };
+        break;
+      case 256: // Get Toggle Configs
+      case 261: // Toggle Configs Status Changed
+        if (pdu.payload.length >= 16) {
+           const newGestures = { left: {} as Record<number, number>, right: {} as Record<number, number> };
+           for (let i = 0; i < 8; i += 2) {
+              if (pdu.payload[i] !== 0) newGestures.left[pdu.payload[i]] = pdu.payload[i+1];
+           }
+           for (let i = 8; i < 16; i += 2) {
+              if (pdu.payload[i] !== 0) newGestures.right[pdu.payload[i]] = pdu.payload[i+1];
+           }
+           return { gestures: newGestures };
+        } else if (pdu.payload.length === 3) {
+           const currentGestures = get().gestures;
+           const earbud = pdu.payload[0];
+           const gesture = pdu.payload[1];
+           const func = pdu.payload[2];
+           if (earbud === 0) {
+              return { gestures: { ...currentGestures, left: { ...currentGestures.left, [gesture]: func } } };
+           } else {
+              return { gestures: { ...currentGestures, right: { ...currentGestures.right, [gesture]: func } } };
+           }
+        }
+        break;
     }
     return {};
   }),
@@ -191,6 +236,8 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
       (window as any).api.motoCommand({ op: 'eq', bands });
     }
   },
+
+  setEqPreset: (preset) => set({ eqPreset: preset }),
 
   setGameMode: (enabled) => {
     if ((window as any).sendOpcodeToDevice) {
@@ -213,6 +260,19 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
   setVolBoost: (enabled) => {
     if ((window as any).sendOpcodeToDevice) {
       (window as any).sendOpcodeToDevice(788, [enabled ? 1 : 0]);
+    }
+  },
+
+  setFmd: (left, right) => {
+    set({ fmdLeft: left, fmdRight: right });
+    if ((window as any).api && (window as any).api.motoCommand) {
+      (window as any).api.motoCommand({ op: 'fmd', left: left ? 1 : 0, right: right ? 1 : 0 });
+    }
+  },
+
+  setGestureConfig: (earbud, gestureType, func) => {
+    if ((window as any).api && (window as any).api.motoCommand) {
+      (window as any).api.motoCommand({ op: 'gesture', earbud, gesture: gestureType, func });
     }
   },
 }));

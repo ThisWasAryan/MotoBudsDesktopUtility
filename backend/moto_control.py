@@ -22,7 +22,9 @@ class MotoBudsController:
         self.is_daemon = is_daemon
         
     def log(self, msg):
-        if not self.output_json:
+        if self.is_daemon:
+            print(json.dumps({"type": "log", "message": msg}), flush=True)
+        elif not self.output_json:
             print(msg)
 
     def connect(self):
@@ -187,9 +189,9 @@ class MotoBudsController:
         resp = self._send_and_receive(0x0400, bytes([start]))
         return resp.hex() if resp else None
 
-    def toggle_fmd(self, mode: int):
-        self.log(f"[*] Setting FMD Mode: {mode}")
-        resp = self._send_and_receive(0x0405, bytes([mode]))
+    def toggle_fmd(self, left: int, right: int):
+        self.log(f"[*] Setting FMD: Left={left}, Right={right}")
+        resp = self._send_and_receive(0x0405, bytes([left, right]))
         return resp.hex() if resp else None
 
     def set_custom_eq(self, bands):
@@ -210,6 +212,11 @@ class MotoBudsController:
             payload.extend(struct.pack('<f', 0.75)) # Q Factor
             
         resp = self._send_and_receive(0x0306, bytes(payload))
+        return resp.hex() if resp else None
+
+    def set_gesture(self, earbud: int, gesture_type: int, function_id: int):
+        self.log(f"[*] Setting Gesture: Earbud={earbud}, Type={gesture_type}, Func={function_id}")
+        resp = self._send_and_receive(0x0102, bytes([earbud, gesture_type, function_id]))
         return resp.hex() if resp else None
 
 def main():
@@ -280,19 +287,23 @@ def main():
                     elif op == "fit":
                         controller.toggle_fit(cmd.get("enabled"))
                     elif op == "fmd":
-                        controller.toggle_fmd(cmd.get("mode"))
+                        controller.toggle_fmd(int(cmd.get("left", 0)), int(cmd.get("right", 0)))
                     elif op == "eq":
                         controller.set_custom_eq(cmd.get("bands"))
+                    elif op == "gesture":
+                        controller.set_gesture(cmd.get("earbud"), cmd.get("gesture"), cmd.get("func"))
                     elif op == "sync":
                         res_anc = controller._send_and_receive(0x0200, b"")
                         res_hires = controller._send_and_receive(0x030C, b"")
                         res_game = controller._send_and_receive(0x030E, b"")
                         res_inear = controller._send_and_receive(0x0402, b"")
+                        res_gestures = controller._send_and_receive(0x0100, b"")
                         sync_data = {}
                         if res_anc: sync_data["anc_raw"] = res_anc.hex()
                         if res_hires: sync_data["hires_raw"] = res_hires.hex()
                         if res_game: sync_data["game_raw"] = res_game.hex()
                         if res_inear: sync_data["inear_raw"] = res_inear.hex()
+                        if res_gestures: sync_data["gestures_raw"] = res_gestures.hex()
                         print(json.dumps({"type": "sync", "data": sync_data}), flush=True)
                     elif op == "battery":
                         res = controller.read_battery()
@@ -382,10 +393,12 @@ def main():
             res_hires = controller._send_and_receive(0x030C, b"")
             res_game = controller._send_and_receive(0x030E, b"")
             res_inear = controller._send_and_receive(0x0402, b"")
+            res_gestures = controller._send_and_receive(0x0100, b"")
             if res_anc: results["data"]["anc_raw"] = res_anc.hex()
             if res_hires: results["data"]["hires_raw"] = res_hires.hex()
             if res_game: results["data"]["game_raw"] = res_game.hex()
             if res_inear: results["data"]["inear_raw"] = res_inear.hex()
+            if res_gestures: results["data"]["gestures_raw"] = res_gestures.hex()
 
         if args.keepalive:
             controller.log(f"[*] Keeping connection alive for {args.keepalive} seconds...")

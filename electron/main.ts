@@ -17,8 +17,8 @@ app.commandLine.appendSwitch('enable-experimental-web-platform-features', 'true'
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1024,
-    height: 768,
+    width: 1250,
+    height: 900,
     titleBarStyle: 'hiddenInset',
     backgroundColor: '#0F0F11',
     show: false,
@@ -49,6 +49,15 @@ function createWindow() {
 app.whenReady().then(() => {
   createWindow();
 
+  if (process.platform === 'linux') {
+     try {
+        spawn('mpris-proxy', [], { stdio: 'ignore', detached: true }).unref();
+        spawn('bluetoothctl', ['trust', '54:84:50:92:78:AE'], { stdio: 'ignore' });
+     } catch (e) {
+        console.error("Failed to start mpris-proxy or trust device", e);
+     }
+  }
+
   let pythonDaemon: any = null;
 
   ipcMain.handle('start-daemon', async (event) => {
@@ -76,11 +85,11 @@ app.whenReady().then(() => {
                } else if (payload.type === 'error') {
                   console.error('Python daemon error:', payload.message);
                   resolve({ status: 'error', message: payload.message });
-               } else {
-                  // Route all other async events, syncs, or info back to the frontend
-                  if (mainWindow && !mainWindow.isDestroyed() && mainWindow.webContents) {
-                     mainWindow.webContents.send('moto-event', payload);
-                  }
+               }
+               
+               // Route all events to frontend (including status and errors for reconnect logic)
+               if (mainWindow && !mainWindow.isDestroyed() && mainWindow.webContents) {
+                  mainWindow.webContents.send('moto-event', payload);
                }
             } catch (e) {
                console.error("Failed to parse daemon output:", line);

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useDeviceStore } from './store/useDeviceStore';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Check } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { MainDashboard } from './components/MainDashboard';
@@ -8,6 +8,8 @@ import { SoundMenu } from './components/SoundMenu';
 import { MoreMenu } from './components/MoreMenu';
 import { FitTest } from './components/FitTest';
 import { Equalizer } from './components/Equalizer';
+import { FindMyDevice } from './components/FindMyDevice';
+import { Gestures } from './components/Gestures';
 
 import budsWithCase from './assets/buds_with_case.png';
 
@@ -24,10 +26,12 @@ declare global {
 
 function App() {
   const { 
-    connected, setDevice, updateStateFromPdu, disconnect, currentView 
+    connected, setConnected, setDevice, updateStateFromPdu, disconnect, currentView 
   } = useDeviceStore();
   
   const [isInitializing, setIsInitializing] = useState(false);
+  const [connectionSuccess, setConnectionSuccess] = useState(false);
+  const [logs, setLogs] = useState<string[]>([]);
   const [statusMsg, setStatusMsg] = useState('Connect your earbuds to begin');
 
   const parseAndInjectPDU = (hexStr: string) => {
@@ -64,17 +68,24 @@ function App() {
     try {
       const daemonRes = await window.api.startDaemon();
       if (daemonRes.status === 'success') {
+        setConnectionSuccess(true);
+        setStatusMsg('Syncing device state...');
+
         setDevice({
           name: "Moto Buds",
           modelId: "XT-SPP",
           features: [104, 109, 110, 113, 116], 
           battery: { left: null, right: null, case: null, chargingL: false, chargingR: false, chargingCase: false, inCaseL: false, inCaseR: false }
         });
-        
-        setStatusMsg('Syncing...');
+
         await window.api.motoCommand({ op: "info" });
         await window.api.motoCommand({ op: "sync" });
         await window.api.motoCommand({ op: "battery" });
+        
+        setTimeout(() => {
+          setIsInitializing(false);
+          setConnected(true);
+        }, 1200);
       } else {
         setStatusMsg(`Failed: ${daemonRes.message}`);
         disconnect();
@@ -82,7 +93,6 @@ function App() {
     } catch (err: any) {
       setStatusMsg(`Connection error: ${err.message}`);
       disconnect();
-    } finally {
       setIsInitializing(false);
     }
   };
@@ -92,7 +102,9 @@ function App() {
        if (!payload) return;
        
        try {
-          if (payload.type === 'event' || payload.type === 'battery' || payload.type === 'info') {
+          if (payload.type === 'log') {
+             setLogs(prev => [...prev.slice(-4), payload.message]);
+          } else if (payload.type === 'event' || payload.type === 'battery' || payload.type === 'info') {
              if (payload.data) parseAndInjectPDU(payload.data);
           } else if (payload.type === 'sync') {
              const data = payload.data;
@@ -100,11 +112,21 @@ function App() {
              if (data.hires_raw) parseAndInjectPDU(data.hires_raw);
              if (data.game_raw) parseAndInjectPDU(data.game_raw);
              if (data.inear_raw) parseAndInjectPDU(data.inear_raw);
+             if (data.gestures_raw) console.log("RAW_GESTURE_PAYLOAD=" + data.gestures_raw);
+          } else if (payload.type === 'status') {
+             if (payload.status === 'connected' && useDeviceStore.getState().reconnectStatus !== 'idle') {
+                useDeviceStore.getState().setReconnectStatus('success');
+                setTimeout(() => useDeviceStore.getState().setReconnectStatus('idle'), 2000);
+             }
           } else if (payload.type === 'error') {
              console.error("Daemon error:", payload.message);
-             if (payload.message && payload.message.includes('attempting to reconnect')) {
-                console.warn("Device is temporarily unavailable (codec renegotiation). Reconnecting...");
-             } else if (payload.message && payload.message.includes('Connection dropped')) {
+             if (payload.message && payload.message.includes('Connection dropped')) {
+                useDeviceStore.getState().setReconnectStatus('dropping');
+                setTimeout(() => {
+                   if (useDeviceStore.getState().reconnectStatus !== 'success') {
+                       useDeviceStore.getState().setReconnectStatus('reconnecting');
+                   }
+                }, 500);
                 console.warn("Daemon reported a connection drop. Waiting for background reconnect...");
                 setStatusMsg("Device rebooting to switch codecs. Please wait...");
              } else {
@@ -145,10 +167,24 @@ function App() {
         <h1 className="connect-title">Moto Buds</h1>
         <p className="connect-subtitle">{statusMsg}</p>
         
-        <button className="connect-btn" onClick={connectDevice} disabled={isInitializing}>
-          {isInitializing ? <Loader2 size={18} className="spinner" /> : null}
-          <span>{isInitializing ? 'Connecting' : 'Connect'}</span>
+        <button 
+          className={`connect-btn ${connectionSuccess ? 'success' : ''}`} 
+          onClick={connectDevice} 
+          disabled={isInitializing || connectionSuccess}
+          style={connectionSuccess ? { backgroundColor: 'var(--success)', borderColor: 'var(--success)', color: '#000' } : {}}
+        >
+          {isInitializing && !connectionSuccess ? <Loader2 size={18} className="spinner" /> : null}
+          {connectionSuccess ? <Check size={18} /> : null}
+          <span>{connectionSuccess ? 'Connected' : isInitializing ? 'Connecting' : 'Connect'}</span>
         </button>
+
+        {logs.length > 0 && (
+          <div className="terminal-logs" style={{ marginTop: '24px', width: '320px', textAlign: 'left', fontFamily: 'monospace', fontSize: '11px', color: 'var(--text-3)', background: 'rgba(0,0,0,0.3)', padding: '12px', borderRadius: '8px' }}>
+            {logs.map((log, i) => (
+              <div key={i}>{log}</div>
+            ))}
+          </div>
+        )}
       </div>
     );
   }
@@ -159,6 +195,8 @@ function App() {
       case 'sound': return <SoundMenu key="sound" />;
       case 'equalizer': return <Equalizer key="equalizer" />;
       case 'fit-test': return <FitTest key="fit-test" />;
+      case 'ring-earbuds': return <FindMyDevice key="ring-earbuds" />;
+      case 'gestures': return <Gestures key="gestures" />;
       case 'more': return <MoreMenu key="more" />;
       default: return <WelcomePanel key="welcome" />;
     }

@@ -1,5 +1,6 @@
 import { useDeviceStore } from '../store/useDeviceStore';
-import { Zap, SlidersHorizontal, Headphones, Settings, Activity } from 'lucide-react';
+import { useState } from 'react';
+import { Zap, SlidersHorizontal, Headphones, Settings, Activity, BellRing, Ear, MousePointerClick, CheckCircle2, EarOff, Sun, Target, X, Loader2 } from 'lucide-react';
 import budsInCase from '../assets/buds_in_case.png';
 
 export const MainDashboard = () => {
@@ -7,25 +8,56 @@ export const MainDashboard = () => {
     name, battery, ancMode, setAncMode, 
     physicallyInEarL, physicallyInEarR, 
     currentView, setCurrentView,
-    hiRes, gameMode, volBoost
+    hiRes, gameMode, volBoost, reconnectStatus
   } = useDeviceStore();
+
+  const [hoveredMode, setHoveredMode] = useState<number | null>(null);
 
   const getBatteryClass = (level: number | null) => {
     if (level === null) return '';
+    if (level < 10) return 'danger-extreme';
     if (level < 20) return 'danger';
-    if (level < 40) return 'warning';
+    if (level < 80) return 'warning';
     return 'healthy';
+  };
+
+  const renderConnectionStatus = () => {
+    switch (reconnectStatus) {
+      case 'dropping':
+        return (
+          <span title="Connection dropping..." style={{ display: 'flex', alignItems: 'center' }}>
+            <X size={18} color="var(--danger)" />
+          </span>
+        );
+      case 'reconnecting':
+        return (
+          <span title="Trying to reconnect" style={{ display: 'flex', alignItems: 'center' }}>
+            <Loader2 size={18} color="var(--warning)" className="spinner" />
+          </span>
+        );
+      case 'success':
+        return (
+          <span title="Reconnected!" style={{ display: 'flex', alignItems: 'center' }} className="blink-green">
+            <CheckCircle2 size={18} color="var(--success)" />
+          </span>
+        );
+      default:
+        return (
+          <span title="Device is trusted" style={{ display: 'flex', alignItems: 'center' }}>
+            <CheckCircle2 size={18} color="var(--accent)" />
+          </span>
+        );
+    }
   };
 
   const isCaseVisible = battery.inCaseL || battery.inCaseR;
 
   return (
     <>
-      {/* ─── Device Header ─── */}
       <div className="device-header">
         <div className="device-info">
-          <div className="status-dot" />
           <span className="device-name">{name || 'Moto Buds'}</span>
+          {renderConnectionStatus()}
         </div>
       </div>
 
@@ -41,11 +73,13 @@ export const MainDashboard = () => {
           <div className="battery-card">
             <div className="battery-card-header">
               <span className="type-battery-label">Left</span>
+              {battery.inCaseL 
+                ? <Zap size={14} className="charging-icon" title="Charging" /> 
+                : (physicallyInEarL && <Ear size={14} style={{ opacity: 0.6 }} title="In Ear" />)}
             </div>
             <div className="battery-value">
               <span className="type-battery">{battery.left !== null ? battery.left : '--'}</span>
               <span className="battery-percent-sign">%</span>
-              {battery.inCaseL && <Zap size={16} className="charging-icon" style={{ marginLeft: '4px' }} />}
             </div>
             <div className="battery-bar-track">
               <div 
@@ -59,11 +93,13 @@ export const MainDashboard = () => {
           <div className="battery-card">
             <div className="battery-card-header">
               <span className="type-battery-label">Right</span>
+              {battery.inCaseR 
+                ? <Zap size={14} className="charging-icon" title="Charging" /> 
+                : (physicallyInEarR && <Ear size={14} style={{ opacity: 0.6 }} title="In Ear" />)}
             </div>
             <div className="battery-value">
               <span className="type-battery">{battery.right !== null ? battery.right : '--'}</span>
               <span className="battery-percent-sign">%</span>
-              {battery.inCaseR && <Zap size={16} className="charging-icon" style={{ marginLeft: '4px' }} />}
             </div>
             <div className="battery-bar-track">
               <div 
@@ -78,11 +114,11 @@ export const MainDashboard = () => {
             <div className="battery-card">
               <div className="battery-card-header">
                 <span className="type-battery-label">Case</span>
+                {battery.chargingCase && <Zap size={14} className="charging-icon" title="Charging" />}
               </div>
               <div className="battery-value">
                 <span className="type-battery">{battery.case !== null ? battery.case : '--'}</span>
                 <span className="battery-percent-sign">%</span>
-                {battery.chargingCase && <Zap size={16} className="charging-icon" style={{ marginLeft: '4px' }} />}
               </div>
               <div className="battery-bar-track">
                 <div 
@@ -97,18 +133,50 @@ export const MainDashboard = () => {
 
       {/* ─── ANC Control ─── */}
       <div className="anc-section">
-        <div className="type-heading anc-label">Noise Control</div>
-        <div style={{ position: 'relative' }}>
+        <div className="type-heading anc-label" style={{ marginBottom: '16px' }}>Noise Control</div>
+        <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           {(!physicallyInEarL || !physicallyInEarR) && (
-            <div className="anc-disabled-overlay">
+            <div className="anc-disabled-overlay" style={{ borderRadius: '100px' }}>
               <span className="anc-disabled-text">Insert both earbuds</span>
             </div>
           )}
-          <div className="anc-segmented">
-            <div className={`anc-segmented-indicator pos-${ancMode}`} />
-            <button className={`anc-btn ${ancMode === 0 ? 'active' : ''}`} onClick={() => setAncMode(0, 0)}>Off</button>
-            <button className={`anc-btn ${ancMode === 2 ? 'active' : ''}`} onClick={() => setAncMode(2, 0)}>Aware</button>
-            <button className={`anc-btn ${ancMode === 1 ? 'active' : ''}`} onClick={() => setAncMode(1, 1)}>ANC</button>
+          
+          <div className="anc-pill-container" onMouseLeave={() => setHoveredMode(null)}>
+            <div className={`anc-pill-indicator pos-${ancMode}`} />
+            
+            <button 
+              className={`anc-pill-btn ${ancMode === 0 ? 'active' : ''}`} 
+              onClick={() => setAncMode(0, 0)}
+              onMouseEnter={() => setHoveredMode(0)}
+            >
+              <EarOff size={20} />
+            </button>
+            
+            <button 
+              className={`anc-pill-btn ${ancMode === 2 ? 'active' : ''}`} 
+              onClick={() => setAncMode(2, 0)}
+              onMouseEnter={() => setHoveredMode(2)}
+            >
+              <Sun size={20} />
+            </button>
+            
+            <button 
+              className={`anc-pill-btn ${ancMode === 1 ? 'active' : ''}`} 
+              onClick={() => setAncMode(1, 1)}
+              onMouseEnter={() => setHoveredMode(1)}
+            >
+              <Target size={20} />
+            </button>
+          </div>
+          
+          <div className="anc-mode-text">
+            {hoveredMode !== null ? (
+              hoveredMode === 0 ? 'Off' : hoveredMode === 2 ? 'Transparency' : 'Noise Cancellation'
+            ) : (
+              (!physicallyInEarL || !physicallyInEarR) ? 'Make sure both earbuds are inserted' : (
+                ancMode === 0 ? 'Off' : ancMode === 2 ? 'Transparency' : 'Noise Cancellation'
+              )
+            )}
           </div>
         </div>
       </div>
@@ -134,25 +202,18 @@ export const MainDashboard = () => {
             Sound
           </button>
           <button 
-            className={`nav-item ${currentView === 'equalizer' ? 'active' : ''}`} 
-            onClick={() => setCurrentView('equalizer')}
+            className={`nav-item ${currentView === 'gestures' ? 'active' : ''}`} 
+            onClick={() => setCurrentView('gestures')}
           >
-            <SlidersHorizontal size={18} className="nav-item-icon" />
-            Equalizer
-          </button>
-          <button 
-            className={`nav-item ${currentView === 'fit-test' ? 'active' : ''}`} 
-            onClick={() => setCurrentView('fit-test')}
-          >
-            <Headphones size={18} className="nav-item-icon" />
-            Fit Test
+            <MousePointerClick size={18} className="nav-item-icon" />
+            Gestures
           </button>
           <button 
             className={`nav-item ${currentView === 'more' ? 'active' : ''}`} 
             onClick={() => setCurrentView('more')}
           >
             <Settings size={18} className="nav-item-icon" />
-            Settings
+            More
           </button>
         </div>
       </div>

@@ -32,6 +32,9 @@ Any new or modified UI components must bind to the values exported by `useDevice
 * `fitTestRunning` (boolean): Whether the Fit Test audio sequence is currently actively playing.
 * `fitTestResultL` & `fitTestResultR` (number | null): The result of the Fit Test for each earbud independently (1 = Good Fit).
 * `eqBands` (number[]): An array of 10 floating-point numbers representing the gain for the custom equalizer (-3.0 to 3.0).
+* `fmdLeft` & `fmdRight` (boolean): Find My Device active ringing status for the Left and Right earbuds.
+* `inEarFeatureEnabled` (boolean): Whether the auto-pause in-ear detection feature is globally enabled.
+* `gestures`: Object containing `left` and `right` mappings. Each maps gesture types (1 = Double Tap, 2 = Triple Tap, 3 = Press and Hold) to function IDs (0 = None, 1 = Play/Pause, 2 = Previous, 3 = Next, 4 = Voice Assistant, 10 = Noise Control).
 
 ### Available Action Functions
 When binding click handlers in your UI components, use these exposed setters. Note that these setters internally trigger the IPC `window.api.motoCommand` calls; you do not need to call the IPC layer manually from the UI components.
@@ -43,14 +46,19 @@ When binding click handlers in your UI components, use these exposed setters. No
 * `setGameMode(enabled: boolean)`
 * `setVolBoost(enabled: boolean)`
 * `setHiRes(enabled: boolean)`
+* `setFmd(left: boolean, right: boolean)`
+* `setInEarFeature(enabled: boolean)`
+* `setGestureConfig(earbud: number, gestureType: number, func: number)`
 
 ## Component Structure
 
 The current app utilizes a framer-motion powered single-page architecture:
 * `App.tsx`: The root orchestrator. It manages the connection screen, IPC routing, and dynamically mounts sub-components based on `currentView`.
-* `MainDashboard.tsx`: The primary hero screen featuring the device artwork, live battery pods, and ANC sliders.
+* `MainDashboard.tsx`: The primary hero screen featuring the device artwork, live battery pods, ANC sliders, and an in-ear status indicator (an `Ear` icon next to the left/right label). **Design Constraint:** The battery charging icon (`Zap`) must be placed in the card header mutually exclusively with the `Ear` icon, because an earbud cannot be charging in the case and physically in-ear simultaneously. Do not place the charging icon next to the battery percentage.
 * `SoundMenu.tsx`: A sub-menu containing detailed toggles (Spatial Audio, EQ, Game Mode).
-* `Equalizer.tsx`: The 10-band custom graphic equalizer UI.
+* `Equalizer.tsx`: The 10-band custom graphic equalizer UI. Features preset options (Flat, Bass Boost, Treble Boost, Classical, Electronic, Acoustic, Vocal) alongside a "Custom EQ" mode. When in Custom EQ mode, users can adjust individual frequency bands or use global Bass/Treble macro sliders that apply a scaled curve to the lower/upper frequencies.
+* `FindMyDevice.tsx`: A menu for locating misplaced earbuds. Contains logic to check `physicallyInEarL` and `physicallyInEarR` to display a warning modal before triggering the loud ring sound. It utilizes the `setFmd` action to start/stop the ringing individually.
+* `Gestures.tsx`: A panel for customizing tap actions (Double Tap, Triple Tap, Press and Hold) for the left and right earbuds independently. Implements UI constraints to ensure Voice Assistant (4) and Noise Control (10) cannot be active on the same earbud simultaneously.
 
 ### Designing New Components
 If you decide to rewrite the UI (e.g., switching from Skeuomorphism to Flat Material Design):
