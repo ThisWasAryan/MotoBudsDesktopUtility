@@ -42,6 +42,7 @@ There are **zero** protocol differences between variants. All models utilize a u
 ## Bluetooth Layer
 * **Transport:** Both BLE and Classic Bluetooth RFCOMM are supported. 
 * **Routing:** `C4430d` negotiates the active connection. Wait for connection intent, bind service, and manage the I/O streams. The application uses a standard custom profile UUID `192d0100-4899-11ee-be56-0242ac120002` (and similar variants like `18290100...`) to connect and identify models.
+* **Linux Trust Protocol**: In order for certain features to correctly activate on Linux (specifically **Tap Gestures** and **In-Ear Detection**), the host machine must fully *trust* the earbuds. A simple OS pairing is not enough. The `bluetoothctl trust <MAC>` command must be executed against the device MAC address to grant it extended permissions to emit system-level input events over Bluetooth. Without this, the earbuds will reject or ignore gesture configuration payloads and in-ear detection will stall.
 
 ## Packet Layer
 All communication is structured into structured Protocol Data Units (PDUs) encapsulated with headers, footers, lengths, and checksums.

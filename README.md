@@ -1,6 +1,8 @@
-# Moto Buds Desktop Utility (Linux)
+# Moto Buds Desktop Utility: V2 Launch (Linux)
 
 An open-source desktop utility for configuring and controlling Motorola Moto Buds on Linux. This project successfully reverse-engineers the proprietary Bluetooth communication protocol used by the official Android application and provides a beautiful, premium desktop UI.
+
+**V2 Update:** We have completely overhauled the UI layout, vastly improved connection reliability, and achieved feature parity with the official Android application (excluding Adaptive ANC). All features have been rigorously tested and confirmed working!
 
 [A Demonstration/Tutorial Video For v1.0.0](https://youtu.be/mqCdtErJAHM) *last updated on 10/06/2026*
 
@@ -9,24 +11,28 @@ An open-source desktop utility for configuring and controlling Motorola Moto Bud
 All current protocol reverse-engineering and feature implementations have been strictly tested and verified on the **Moto Buds (Base Model)**. 
 
 The following functionalities are confirmed to be 100% working:
-* **In-Ear Detection**: Accurately detects whether the earphones are physically inside the ear.
+* **In-Ear Detection**: Accurately detects whether the earphones are physically inside the ear and seamlessly auto-pauses/resumes.
 * **Battery Levels**: 
   * Granular battery reporting for individual earbuds (Left/Right).
   * Accurate Case battery reporting (even when only one earbud is inside the case).
 * **Charging Status**: Real-time tracking. Earbuds show a charging indicator when placed inside the case, and the case accurately reports its own charging status when plugged in.
 * **Active Noise Cancellation (ANC)**: Verified working across all states.
-* **Fit Test**: Accurately tests the seal quality and provides distinct, independent pass/fail results for the left and right earbuds.
+* **Fit Test (Improved)**: Accurately tests the seal quality and provides distinct, independent pass/fail results for the left and right earbuds using dedicated visual indicators.
+* **Find My Device**: Individually ring your left or right misplaced earbuds with safety checks (prevents ringing if the earbud is physically detected inside your ear).
+* **Gestures Control**: Highly customizable tap settings (Double Tap, Triple Tap, Press & Hold) for each earbud independently. This desktop app actually offers *more granular customization* than the official Motorola mobile app.
+* **Trust Protocol**: We have implemented a command that makes the host device automatically trust the earbuds, ensuring that tap gestures and in-ear detection function flawlessly without manual Bluetooth pairing intervention.
+* **Connection Monitoring**: A seamless background state machine provides visual feedback (loading spinners, checks, drops) while the earbuds momentarily disconnect to renegotiate codecs or drop connections.
 * **Game Mode**: Verified working. Automatically handles mutual exclusivity with Hi-Res Audio via custom UI dialogs.
 * **Volume Booster**: Verified working.
-* **Custom 10-Band Equalizer**: A full implementation of the `0x0306` equalizer protocol. Uses a custom 173-byte payload to offer precise floating-point gain control across 10 frequency bands.
-* **Hi-Res Audio (LDAC)**: Successfully implemented codec negotiation from the desktop client, entirely replicating the functionality that was previously restricted to the Android app. Features a seamless background state machine that provides visual feedback (loading spinners, checks) while the earbuds momentarily drop connection to renegotiate the codec. Handles mutual exclusivity with Game Mode.
+* **Custom 10-Band Equalizer (With Presets)**: A full implementation of the `0x0306` equalizer protocol. Uses a custom 173-byte payload to offer precise floating-point gain control across 10 frequency bands. You can now seamlessly switch between pre-configured custom presets (Flat, Bass Boost, Treble Boost, etc.) or dial in your own Custom EQ.
+* **Hi-Res Audio (LDAC)**: Successfully implemented codec negotiation from the desktop client, entirely replicating the functionality that was previously restricted to the Android app. Handles mutual exclusivity with Game Mode.
 
 *Note: Spatial Audio is partially supported and dynamically surfaces only when the connected device is a Moto Buds+.*
 
 <img width="1079" height="734" alt="Hero_Utility" src="https://github.com/user-attachments/assets/f99e7dd2-a6dd-4d19-b86e-09fe7fa707b0" />
 
 
-## Installation (v1 Stable Release)
+## Installation (V2 Stable Release)
 
 Pre-packaged standalone binaries for **Debian-based systems** (`.deb`) and **other Linux distributions** (`.AppImage`) are available in the **Releases** section of this repository.
 
