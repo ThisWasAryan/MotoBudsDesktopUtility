@@ -117,6 +117,7 @@ function App() {
              if (payload.status === 'connected' && useDeviceStore.getState().reconnectStatus !== 'idle') {
                 useDeviceStore.getState().setReconnectStatus('success');
                 setTimeout(() => useDeviceStore.getState().setReconnectStatus('idle'), 2000);
+                window.api.motoCommand({ op: 'sync' });
              }
           } else if (payload.type === 'error') {
              console.error("Daemon error:", payload.message);
