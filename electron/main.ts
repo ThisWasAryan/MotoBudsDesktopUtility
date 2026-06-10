@@ -18,7 +18,7 @@ app.commandLine.appendSwitch('enable-experimental-web-platform-features', 'true'
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1250,
-    height: 900,
+    height: 950,
     titleBarStyle: 'hiddenInset',
     backgroundColor: '#0F0F11',
     show: false,

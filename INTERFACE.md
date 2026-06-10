@@ -22,6 +22,7 @@ Any new or modified UI components must bind to the values exported by `useDevice
 
 ### Available State Variables
 * `connected` (boolean): Whether the Python daemon is actively attached.
+* `reconnectStatus` (string: 'idle' | 'dropping' | 'reconnecting' | 'success'): The state machine for codec reconnection UI sequences.
 * `name` & `modelId` (string): Hardware identifiers.
 * `battery`: Object containing `left`, `right`, and `case` percentages (0-100), as well as charging booleans (`chargingL`, `chargingR`, `chargingCase`, `inCaseL`, `inCaseR`).
 * `ancMode` (number): Active Noise Cancellation state (0 = Off, 1 = ANC, 2 = Transparency).
@@ -55,8 +56,9 @@ When binding click handlers in your UI components, use these exposed setters. No
 The current app utilizes a framer-motion powered single-page architecture:
 * `App.tsx`: The root orchestrator. It manages the connection screen, IPC routing, and dynamically mounts sub-components based on `currentView`.
 * `MainDashboard.tsx`: The primary hero screen featuring the device artwork, live battery pods, ANC sliders, and an in-ear status indicator (an `Ear` icon next to the left/right label). **Design Constraint:** The battery charging icon (`Zap`) must be placed in the card header mutually exclusively with the `Ear` icon, because an earbud cannot be charging in the case and physically in-ear simultaneously. Do not place the charging icon next to the battery percentage.
-* `SoundMenu.tsx`: A sub-menu containing detailed toggles (Spatial Audio, EQ, Game Mode).
+* `SoundMenu.tsx`: A sub-menu containing detailed toggles (Spatial Audio, Game Mode, Hi-Res, Volume Boost) and a navigation link to the custom Equalizer.
 * `Equalizer.tsx`: The 10-band custom graphic equalizer UI. Features preset options (Flat, Bass Boost, Treble Boost, Classical, Electronic, Acoustic, Vocal) alongside a "Custom EQ" mode. When in Custom EQ mode, users can adjust individual frequency bands or use global Bass/Treble macro sliders that apply a scaled curve to the lower/upper frequencies.
+* `MoreMenu.tsx`: A settings hub serving as the third main navigation tab. Contains the `In-Ear Detection` toggle, and navigation cards routing to `Fit Test` and `Find My Device`.
 * `FindMyDevice.tsx`: A menu for locating misplaced earbuds. Contains logic to check `physicallyInEarL` and `physicallyInEarR` to display a warning modal before triggering the loud ring sound. It utilizes the `setFmd` action to start/stop the ringing individually.
 * `Gestures.tsx`: A panel for customizing tap actions (Double Tap, Triple Tap, Press and Hold) for the left and right earbuds independently. Implements UI constraints to ensure Voice Assistant (4) and Noise Control (10) cannot be active on the same earbud simultaneously.
 

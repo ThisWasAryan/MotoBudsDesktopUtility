@@ -19,7 +19,7 @@ The following functionalities are confirmed to be 100% working:
 * **Game Mode**: Verified working. Automatically handles mutual exclusivity with Hi-Res Audio via custom UI dialogs.
 * **Volume Booster**: Verified working.
 * **Custom 10-Band Equalizer**: A full implementation of the `0x0306` equalizer protocol. Uses a custom 173-byte payload to offer precise floating-point gain control across 10 frequency bands.
-* **Hi-Res Audio (LDAC)**: Successfully implemented codec negotiation from the desktop client, entirely replicating the functionality that was previously restricted to the Android app. Handles mutual exclusivity with Game Mode.
+* **Hi-Res Audio (LDAC)**: Successfully implemented codec negotiation from the desktop client, entirely replicating the functionality that was previously restricted to the Android app. Features a seamless background state machine that provides visual feedback (loading spinners, checks) while the earbuds momentarily drop connection to renegotiate the codec. Handles mutual exclusivity with Game Mode.
 
 *Note: Spatial Audio is partially supported and dynamically surfaces only when the connected device is a Moto Buds+.*
 
