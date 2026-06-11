@@ -59,7 +59,7 @@ Here is exactly what happens under the hood when you use the app:
 
 ### 2. Event-Driven IPC Command Execution
 1. You click a control, such as the "ANC" toggle, on the Main Dashboard.
-2. The React UI **does not** optimistically change the slider position. Instead, it fires an IPC command: `window.api.motoCommand({ op: 'anc', mode: 1 })`.
+2. The React UI **does not** optimistically change the slider position. Instead, it fires an IPC command: `window.api.motoCommand({ op: 'anc', mode: 1 })`. *(Note: The sole exception to this rule is the In-Ear Detection toggle, which is optimistically updated locally because the earbuds' firmware does not emit an asynchronous confirmation packet for opcode `1027`.)*
 3. Electron receives this command and pipes it into the `stdin` (Standard Input) of the running Python daemon.
 4. The Python daemon reads the input, formats the proprietary Protocol Data Unit (PDU) packet, appends a dynamically calculated CRC32 checksum, and writes it to the Bluetooth RFCOMM socket.
 5. The earbuds receive the packet, physically enable Active Noise Cancellation, and immediately broadcast a confirmation PDU packet back to the host.

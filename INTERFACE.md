@@ -9,9 +9,9 @@ The frontend UI is completely decoupled from the actual hardware execution. The 
 ### How the Flow Works
 1. **User Action:** A user clicks a button in the UI (e.g., toggling ANC).
 2. **IPC Command:** The UI calls `window.api.motoCommand({ op: 'anc', mode: 1 })`. 
-   * **CRITICAL:** The UI does *not* optimistically update the state.
+   * **CRITICAL:** The UI does *not* optimistically update the state. *(Note: The sole exception to this rule is the In-Ear Detection toggle, which is optimistically updated because the earbuds' firmware does not emit an asynchronous confirmation packet for opcode `1027`.)*
 3. **Daemon Execution:** The Python daemon writes the payload to the Bluetooth RFCOMM socket.
-4. **Hardware Response:** The earbuds execute the command and asynchronously broadcast a state-change packet back to the host.
+4. **Hardware Response:** The earbuds execute the command and asynchronously broadcast a state-change packet back to the host (for all toggles except In-Ear Detection).
 5. **State Ingestion:** The Python daemon reads this packet and emits a JSON event to `stdout`.
 6. **Store Update:** `App.tsx` intercepts this JSON, parses the packet, and updates the Zustand store (`useDeviceStore`).
 7. **UI Reactivity:** The React components automatically re-render based on the new Zustand state.
@@ -38,7 +38,7 @@ Any new or modified UI components must bind to the values exported by `useDevice
 * `gestures`: Object containing `left` and `right` mappings. Each maps gesture types (1 = Double Tap, 2 = Triple Tap, 3 = Press and Hold) to function IDs (0 = None, 1 = Play/Pause, 2 = Previous, 3 = Next, 4 = Voice Assistant, 10 = Noise Control).
 
 ### Available Action Functions
-When binding click handlers in your UI components, use these exposed setters. Note that these setters internally trigger the IPC `window.api.motoCommand` calls; you do not need to call the IPC layer manually from the UI components.
+When binding click handlers in your UI components, use these exposed setters. Note that these setters internally trigger the IPC `window.api.motoCommand` calls; you do not need to call the IPC layer manually from the UI components. All setters strictly wait for the hardware to broadcast a state change to update the store, **except** `setInEarFeature`, which optimistically updates the state locally.
 
 *Note: Due to a hardware constraint, `hiRes` and `gameMode` cannot be active at the same time. The UI components (e.g., `SoundMenu.tsx`) must manage this mutual exclusivity by presenting a confirmation dialog before sequentially toggling the states using these action functions.*
 
