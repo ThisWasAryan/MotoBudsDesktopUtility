@@ -1,7 +1,7 @@
 {
   "name": "motobudsdesktoputility",
   "private": true,
-  "version": "0.0.0",
+  "version": "2.0.0",
   "author": "ThisWasAryan <aryanrajviiid12@gmail.com>",
   "main": "dist-electron/main.js",
   "type": "module",
@@ -62,6 +62,7 @@
         "deb"
       ],
       "category": "AudioVideo",
+      "icon": "build/icon.png",
       "depends": [
         "python3",
         "bluez"

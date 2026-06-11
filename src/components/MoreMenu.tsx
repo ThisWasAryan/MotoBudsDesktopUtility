@@ -78,6 +78,11 @@ export const MoreMenu = () => {
           </div>
         )}
       </div>
+
+      <div style={{ marginTop: 'auto', paddingTop: '24px', textAlign: 'center', fontSize: '13px', color: 'var(--text-3)' }}>
+        <p style={{ margin: '0 0 6px 0' }}>Made with ❤️ by <a href="https://github.com/ThisWasAryan" target="_blank" rel="noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontWeight: 600 }}>ThisWasAryan</a></p>
+        <a href="https://github.com/ThisWasAryan/MotoBudsDesktopUtility" target="_blank" rel="noreferrer" style={{ color: 'var(--text-3)', textDecoration: 'underline' }}>View Repository</a>
+      </div>
     </motion.div>
   );
 };
