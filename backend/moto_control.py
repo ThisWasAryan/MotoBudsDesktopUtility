@@ -172,11 +172,10 @@ class MotoBudsController:
         # We must bounce the adapter unconditionally because in daemon mode, _send_and_receive returns None.
         if self.mac_address != "127.0.0.1":
             import subprocess
-            # The user explicitly requested a full adapter bounce (power off -> power on)
-            # because Linux PipeWire sometimes completely fails to re-route A2DP
-            # when just the device disconnects or codecs change abruptly.
+            # We use disconnect and connect to force the Linux A2DP stack to renegotiate
+            # the codec successfully without taking down the entire bluetooth adapter.
             subprocess.Popen(
-                f"sleep 2 ; bluetoothctl power off ; sleep 3 ; bluetoothctl power on ; sleep 4 ; bluetoothctl connect {self.mac_address}", 
+                f"sleep 1 ; bluetoothctl disconnect {self.mac_address} ; sleep 2 ; bluetoothctl connect {self.mac_address}", 
                 shell=True,
                 stdin=subprocess.DEVNULL,
                 stdout=subprocess.DEVNULL,
@@ -336,10 +335,10 @@ def main():
                 # we wait and attempt to gracefully reconnect.
                 controller.disconnect()
                 
-                # Give the OS-level bluetoothctl script 12 seconds to fully bounce
-                # the entire Bluetooth adapter (power off -> power on) before we aggressively 
-                # try to grab the RFCOMM serial port again. This prevents bluetoothd crashes.
-                time.sleep(12)
+                # Give the OS-level bluetoothctl script 4 seconds to fully bounce
+                # the connection (disconnect -> connect) before we aggressively 
+                # try to grab the RFCOMM serial port again.
+                time.sleep(4)
                 
                 reconnected = False
                 for attempt in range(10):
