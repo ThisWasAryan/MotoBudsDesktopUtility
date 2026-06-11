@@ -1,5 +1,5 @@
 import { useDeviceStore } from '../store/useDeviceStore';
-import { Play, Loader2, RotateCcw, Check, AlertCircle } from 'lucide-react';
+import { Play, Loader2, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import leftBud from '../assets/left_bud.png';
 import rightBud from '../assets/right_bud.png';

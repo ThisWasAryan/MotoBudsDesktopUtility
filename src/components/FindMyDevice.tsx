@@ -179,7 +179,6 @@ export const FindMyDevice = () => {
                width: '100%',
                padding: '14px',
                borderRadius: '12px',
-               border: 'none',
                display: 'flex',
                alignItems: 'center',
                justifyContent: 'center',

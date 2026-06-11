@@ -1,6 +1,6 @@
 import { useDeviceStore } from '../store/useDeviceStore';
 import { useState } from 'react';
-import { Zap, SlidersHorizontal, Headphones, Settings, Activity, BellRing, Ear, MousePointerClick, CheckCircle2, EarOff, Sun, Target, X, Loader2 } from 'lucide-react';
+import { Zap, Settings, Activity, Ear, MousePointerClick, CheckCircle2, EarOff, Sun, Target, X, Loader2 } from 'lucide-react';
 import budsInCase from '../assets/buds_in_case.png';
 
 export const MainDashboard = () => {
@@ -74,8 +74,8 @@ export const MainDashboard = () => {
             <div className="battery-card-header">
               <span className="type-battery-label">Left</span>
               {battery.inCaseL 
-                ? <Zap size={14} className="charging-icon" title="Charging" /> 
-                : (physicallyInEarL && <Ear size={14} style={{ opacity: 0.6 }} title="In Ear" />)}
+                ? <Zap size={14} className="charging-icon" /> 
+                : (physicallyInEarL && <Ear size={14} style={{ opacity: 0.6 }} />)}
             </div>
             <div className="battery-value">
               <span className="type-battery">{battery.left !== null ? battery.left : '--'}</span>
@@ -94,8 +94,8 @@ export const MainDashboard = () => {
             <div className="battery-card-header">
               <span className="type-battery-label">Right</span>
               {battery.inCaseR 
-                ? <Zap size={14} className="charging-icon" title="Charging" /> 
-                : (physicallyInEarR && <Ear size={14} style={{ opacity: 0.6 }} title="In Ear" />)}
+                ? <Zap size={14} className="charging-icon" /> 
+                : (physicallyInEarR && <Ear size={14} style={{ opacity: 0.6 }} />)}
             </div>
             <div className="battery-value">
               <span className="type-battery">{battery.right !== null ? battery.right : '--'}</span>
@@ -114,7 +114,7 @@ export const MainDashboard = () => {
             <div className="battery-card">
               <div className="battery-card-header">
                 <span className="type-battery-label">Case</span>
-                {battery.chargingCase && <Zap size={14} className="charging-icon" title="Charging" />}
+                {battery.chargingCase && <Zap size={14} className="charging-icon" />}
               </div>
               <div className="battery-value">
                 <span className="type-battery">{battery.case !== null ? battery.case : '--'}</span>
