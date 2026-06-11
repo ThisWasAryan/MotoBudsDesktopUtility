@@ -253,6 +253,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
   },
 
   setInEarFeature: (enabled) => {
+    set({ inEarFeatureEnabled: enabled });
     if ((window as any).sendOpcodeToDevice) {
       (window as any).sendOpcodeToDevice(1027, [enabled ? 1 : 0]);
     }
