@@ -3,7 +3,7 @@
 ## Project Overview
 
 **Project Goals:** To completely reverse engineer the proprietary Motorola Moto Buds Android application communication protocol, recovering the full mechanism used to interact with the earbuds.
-**Supported Devices:** Moto Buds, Moto Buds+, Moto Buds Bass, Moto Buds Loop, Moto Buds Clip, Moto Buds 2, Moto Buds 2 Plus.
+**Supported Devices:** Moto Buds, Moto Buds+ and Moto Buds Bass.
 **Scope:** Device identification, feature gating, Bluetooth LE/RFCOMM transport, packet framing, opcode registry, and feature-specific workflows (ANC, EQ, Gestures, Fit Test, Hi-Res, Game Mode).
 **Current Status:** Protocol framing, opcode registry, custom EQ payloads, and feature workflows have been fully mapped and verified from the decompiled Android source code.
 
