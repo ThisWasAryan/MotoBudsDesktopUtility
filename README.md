@@ -5,6 +5,53 @@ An open-source, fully-featured desktop utility for configuring and controlling M
 **What's New in the Latest Overhaul:** We have completely rewritten the UI layout to feature a dual-pane aesthetic, vastly improved connection reliability through daemon-level adapter bouncing, and achieved complete 100% feature parity with the official Android application (excluding Adaptive ANC). **Every single feature has been rigorously tested and is confirmed to be fully working on native Linux!**
 
 [A Demonstration/Tutorial Video For Previous Versions](https://youtu.be/mqCdtErJAHM) *last updated on 10/06/2026*
+## Application Preview
+
+<p align="center">
+  <a href="https://github.com/user-attachments/assets/c91bd90a-ad84-4424-b291-0094ab8f8575">
+    <img src="https://github.com/user-attachments/assets/c91bd90a-ad84-4424-b291-0094ab8f8575" width="900" alt="MotoBudsController Overview">
+  </a>
+</p>
+
+## Feature Gallery
+
+<table>
+<tr>
+<td align="center">
+<a href="https://github.com/user-attachments/assets/4641ca38-0e72-49fe-8482-e9030fc11150">
+<img src="https://github.com/user-attachments/assets/4641ca38-0e72-49fe-8482-e9030fc11150" width="420" alt="Sound">
+</a>
+<br>
+<b>Sound Control</b>
+</td>
+
+<td align="center">
+<a href="https://github.com/user-attachments/assets/783bdad1-f3bb-4d96-a394-57e9f838a617">
+<img src="https://github.com/user-attachments/assets/783bdad1-f3bb-4d96-a394-57e9f838a617" width="420" alt="Equalizer">
+</a>
+<br>
+<b>Equalizer</b>
+</td>
+</tr>
+
+<tr>
+<td align="center">
+<a href="https://github.com/user-attachments/assets/de3287be-f407-49ac-9bdf-9a762c485148">
+<img src="https://github.com/user-attachments/assets/de3287be-f407-49ac-9bdf-9a762c485148" width="420" alt="Gestures">
+</a>
+<br>
+<b>Gesture Configuration</b>
+</td>
+
+<td align="center">
+<a href="https://github.com/user-attachments/assets/9536afb7-6fbf-4a41-ace9-febcbf599023">
+<img src="https://github.com/user-attachments/assets/9536afb7-6fbf-4a41-ace9-febcbf599023" width="420" alt="More">
+</a>
+<br>
+<b>Additional Settings</b>
+</td>
+</tr>
+</table>
 
 ## Hardware Verification (Moto Buds Base Model)
 
@@ -29,7 +76,6 @@ The following functionalities are confirmed to be **100% working**:
 
 *Note: Spatial Audio is partially supported and dynamically surfaces only when the connected device is a Moto Buds+.*
 
-<img width="1079" height="734" alt="Hero_Utility" src="https://github.com/user-attachments/assets/f99e7dd2-a6dd-4d19-b86e-09fe7fa707b0" />
 
 ## Packaging & Installation
 
