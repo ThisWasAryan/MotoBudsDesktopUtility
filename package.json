@@ -61,7 +61,11 @@
         "AppImage",
         "deb"
       ],
-      "category": "AudioVideo"
+      "category": "AudioVideo",
+      "depends": [
+        "python3",
+        "bluez"
+      ]
     },
     "extraResources": [
       "backend/**/*"

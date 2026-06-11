@@ -51,10 +51,9 @@ app.whenReady().then(() => {
 
   if (process.platform === 'linux') {
      try {
-        spawn('mpris-proxy', [], { stdio: 'ignore', detached: true }).unref();
         spawn('bluetoothctl', ['trust', '54:84:50:92:78:AE'], { stdio: 'ignore' });
      } catch (e) {
-        console.error("Failed to start mpris-proxy or trust device", e);
+        console.error("Failed to trust device", e);
      }
   }
 
