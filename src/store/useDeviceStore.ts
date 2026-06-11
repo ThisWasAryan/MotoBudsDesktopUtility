@@ -166,6 +166,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
         if (pdu.payload.length >= 1) return { volBoost: pdu.payload[0] === 1 || pdu.payload[0] === 0x1D };
         break;
       case 1026:
+      case 1027: // Write response
         if (pdu.payload.length >= 1) return { inEarFeatureEnabled: pdu.payload[0] === 1 };
         break;
       case 1028:

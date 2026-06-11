@@ -1,66 +1,67 @@
-# Moto Buds Desktop Utility: V2 Launch (Linux)
+# Moto Buds Desktop Utility for Linux
 
-An open-source desktop utility for configuring and controlling Motorola Moto Buds on Linux. This project successfully reverse-engineers the proprietary Bluetooth communication protocol used by the official Android application and provides a beautiful, premium desktop UI.
+An open-source, fully-featured desktop utility for configuring and controlling Motorola Moto Buds on Linux. This project successfully reverse-engineers the proprietary Bluetooth RFCOMM communication protocol used by the official Android application and implements a beautiful, premium skeuomorphic desktop user interface using React and Electron.
 
-**V2 Update:** We have completely overhauled the UI layout, vastly improved connection reliability, and achieved feature parity with the official Android application (excluding Adaptive ANC). All features have been rigorously tested and confirmed working!
+**What's New in the Latest Overhaul:** We have completely rewritten the UI layout to feature a dual-pane aesthetic, vastly improved connection reliability through daemon-level adapter bouncing, and achieved complete 100% feature parity with the official Android application (excluding Adaptive ANC). **Every single feature has been rigorously tested and is confirmed to be fully working on native Linux!**
 
-[A Demonstration/Tutorial Video For v1.0.0](https://youtu.be/mqCdtErJAHM) *last updated on 10/06/2026*
+[A Demonstration/Tutorial Video For Previous Versions](https://youtu.be/mqCdtErJAHM) *last updated on 10/06/2026*
 
 ## Hardware Verification (Moto Buds Base Model)
 
-All current protocol reverse-engineering and feature implementations have been strictly tested and verified on the **Moto Buds (Base Model)**. 
+All current protocol reverse-engineering, payload cryptography, and feature implementations have been strictly tested and verified on the **Moto Buds (Base Model)**. 
 
-The following functionalities are confirmed to be 100% working:
-* **In-Ear Detection**: Accurately detects whether the earphones are physically inside the ear and seamlessly auto-pauses/resumes.
-* **Battery Levels**: 
+The following functionalities are confirmed to be **100% working**:
+* **Gestures Control (Advanced)**: Highly customizable tap settings (Double Tap, Triple Tap, Press & Hold) for each earbud independently. This desktop app securely injects opcode `0x0100` and offers *more granular customization* than the official Motorola mobile app. We have implemented native AVRCP bridging via `mpris-proxy`, ensuring your taps accurately pause, play, and skip media globally across your Linux desktop.
+* **Trust Protocol Integration**: We have implemented a native D-Bus command sequence that makes the Linux host device automatically trust the earbuds. This ensures that tap gestures and in-ear detection function flawlessly without manual Bluetooth pairing intervention or trust command-line hacking.
+* **Custom 10-Band Equalizer (With Presets)**: A full implementation of the `0x0306` equalizer protocol. Uses a custom 173-byte payload to offer precise floating-point gain control across 10 frequency bands. You can seamlessly switch between pre-configured custom presets (Flat, Bass Boost, Treble Boost, etc.) or dial in your own Custom EQ.
+* **Hi-Res Audio (LDAC) Negotiation**: Successfully implemented codec negotiation directly from the desktop client, entirely replicating the functionality that was previously restricted to the Android app. Our backend gracefully survives the deliberate Bluetooth protocol disconnect triggered by the earbuds, and forcefully re-routes the Linux PipeWire A2DP stack to accept the new LDAC sample rates. Handles mutual exclusivity with Game Mode out of the box.
+* **In-Ear Detection**: Accurately detects whether the earphones are physically inside the ear and seamlessly auto-pauses/resumes system media.
+* **Fit Test (Improved Diagnostics)**: Accurately tests the seal quality and provides distinct, independent pass/fail results for the left and right earbuds using dedicated visual indicators. It utilizes a state machine to track the `1024` and `1025` response codes from the earbuds during the diagnostic sweep.
+* **Find My Device**: Individually ring your left or right misplaced earbuds with safety checks (prevents ringing if the earbud is physically detected inside your ear to prevent hearing damage).
+* **Connection State Machine**: A seamless background state machine provides visual feedback (loading spinners, connection checks, dropped statuses) while the earbuds momentarily disconnect to renegotiate codecs or drop connections. The UI instantly reflects the daemon's internal RFCOMM socket state.
+* **Active Noise Cancellation (ANC)**: Verified working across all states (Off, Transparency, Active Noise Cancellation).
+* **Game Mode**: Verified working via latency reduction opcodes. Automatically handles mutual exclusivity with Hi-Res Audio via custom UI dialogs.
+* **Volume Booster**: Verified working.
+* **Battery & Charging Telemetry**: 
   * Granular battery reporting for individual earbuds (Left/Right).
   * Accurate Case battery reporting (even when only one earbud is inside the case).
-* **Charging Status**: Real-time tracking. Earbuds show a charging indicator when placed inside the case, and the case accurately reports its own charging status when plugged in.
-* **Active Noise Cancellation (ANC)**: Verified working across all states.
-* **Fit Test (Improved)**: Accurately tests the seal quality and provides distinct, independent pass/fail results for the left and right earbuds using dedicated visual indicators.
-* **Find My Device**: Individually ring your left or right misplaced earbuds with safety checks (prevents ringing if the earbud is physically detected inside your ear).
-* **Gestures Control**: Highly customizable tap settings (Double Tap, Triple Tap, Press & Hold) for each earbud independently. This desktop app actually offers *more granular customization* than the official Motorola mobile app.
-* **Trust Protocol**: We have implemented a command that makes the host device automatically trust the earbuds, ensuring that tap gestures and in-ear detection function flawlessly without manual Bluetooth pairing intervention.
-* **Connection Monitoring**: A seamless background state machine provides visual feedback (loading spinners, checks, drops) while the earbuds momentarily disconnect to renegotiate codecs or drop connections.
-* **Game Mode**: Verified working. Automatically handles mutual exclusivity with Hi-Res Audio via custom UI dialogs.
-* **Volume Booster**: Verified working.
-* **Custom 10-Band Equalizer (With Presets)**: A full implementation of the `0x0306` equalizer protocol. Uses a custom 173-byte payload to offer precise floating-point gain control across 10 frequency bands. You can now seamlessly switch between pre-configured custom presets (Flat, Bass Boost, Treble Boost, etc.) or dial in your own Custom EQ.
-* **Hi-Res Audio (LDAC)**: Successfully implemented codec negotiation from the desktop client, entirely replicating the functionality that was previously restricted to the Android app. Handles mutual exclusivity with Game Mode.
+  * Real-time charging tracking. Earbuds show a charging indicator when placed inside the case, and the case accurately reports its own charging status when plugged in.
 
 *Note: Spatial Audio is partially supported and dynamically surfaces only when the connected device is a Moto Buds+.*
 
 <img width="1079" height="734" alt="Hero_Utility" src="https://github.com/user-attachments/assets/f99e7dd2-a6dd-4d19-b86e-09fe7fa707b0" />
 
+## Packaging & Installation
 
-## Installation (V2 Stable Release)
+We strictly maintain our repository to only contain raw source code. All runtime dependencies, including the Python daemon components and Bluetooth bridging utilities, are automatically resolved during packaging.
 
-Pre-packaged standalone binaries for **Debian-based systems** (`.deb`) and **other Linux distributions** (`.AppImage`) are available in the **Releases** section of this repository.
+Pre-packaged standalone binaries for **Debian-based systems** (`.deb`) and **other Linux distributions** (`.AppImage`) are available in the **Releases** section of this repository. The `.deb` package specifically declares dependencies on `python3` and `bluez` to ensure `mpris-proxy` is available on your system for media gestures.
 
 > **⚠️ Connection Warning:** Please ensure your earbuds are natively connected to your OS via your Bluetooth manager **before** pressing the "Connect" button on the first screen. If you connect them *after* reaching the connection screen, you may experience slight connectivity issues. If this happens, simply disconnect and reconnect the earbuds from your OS Bluetooth manager.
 
 > **🖥️ Windows Status:** We are actively investigating a Windows release. However, the current backend relies heavily on the Linux BlueZ Bluetooth stack. A Windows port requires a significantly different architecture and will take some time.
 
-## How It Works: Step-by-Step
+## Architecture: How It Works
 
-This application consists of two completely decoupled components: a lightweight Python background daemon that speaks natively to the earbuds, and a gorgeous React/Electron frontend that gives you control.
+This application consists of two completely decoupled components: a lightweight Python background daemon that speaks natively to the earbuds over RFCOMM, and a gorgeous React/Electron frontend that gives you visual control.
 
 Here is exactly what happens under the hood when you use the app:
 
-### 1. Opening the App & Clicking Connect
-1. You run `npm run dev`, which compiles the frontend and launches the Electron window.
+### 1. Daemon Initialization & State Synchronization
+1. You launch the application.
 2. The app starts on the "Unconnected" screen.
-3. When you click **Connect**, the React app sends an IPC (Inter-Process Communication) message to Electron's `main.ts` file.
-4. `main.ts` uses Node's `child_process.spawn()` to silently boot up `backend/moto_control.py` in daemon mode.
+3. When you click **Connect**, the React app sends an IPC (Inter-Process Communication) message to Electron's main process.
+4. Electron uses Node's `child_process.spawn()` to silently boot up `backend/moto_control.py` in daemon mode.
 5. The Python daemon opens a Classic Bluetooth RFCOMM socket (Port 16) directly to your earbuds and negotiates the initialization handshake. 
-6. Upon success, the Python daemon prints `{"type": "status", "status": "connected"}` to its standard output.
+6. Upon establishing a successful connection, the Python daemon fires up `mpris-proxy` in the background to handle AVRCP gesture bridging, and prints `{"type": "status", "status": "connected"}` to its standard output.
 7. Electron reads this output, forwards it to the React app, and the UI visually transitions to the Main Dashboard.
-8. The React app immediately requests a full state synchronization (Battery, ANC, Hi-Res, etc.).
+8. The React app immediately requests a full state synchronization by injecting a `sync` opcode sequence into the daemon, fetching Battery, ANC, Gestures, and Hi-Res states.
 
-### 2. Performing an Action (e.g., Toggling ANC)
-1. You click the "ANC" control on the Main Dashboard.
+### 2. Event-Driven IPC Command Execution
+1. You click a control, such as the "ANC" toggle, on the Main Dashboard.
 2. The React UI **does not** optimistically change the slider position. Instead, it fires an IPC command: `window.api.motoCommand({ op: 'anc', mode: 1 })`.
 3. Electron receives this command and pipes it into the `stdin` (Standard Input) of the running Python daemon.
-4. The Python daemon reads the input, formats the proprietary Protocol Data Unit (PDU) packet for Opcode `513`, and writes it to the Bluetooth RFCOMM socket.
+4. The Python daemon reads the input, formats the proprietary Protocol Data Unit (PDU) packet, appends a dynamically calculated CRC32 checksum, and writes it to the Bluetooth RFCOMM socket.
 5. The earbuds receive the packet, physically enable Active Noise Cancellation, and immediately broadcast a confirmation PDU packet back to the host.
 6. The Python daemon's asynchronous polling loop reads the raw hex response from the socket and prints it as a JSON event to `stdout`.
 7. Electron captures the `stdout`, pipes it back to React, and the Zustand state manager (`useDeviceStore.ts`) parses the packet.
@@ -68,9 +69,9 @@ Here is exactly what happens under the hood when you use the app:
 
 *This entire round-trip takes milliseconds. Because the UI only updates upon guaranteed hardware broadcast, the interface represents the absolute physical truth of the earbuds.*
 
-## How to Run
+## Development & Building
 
-Running the entire full-stack application (Frontend + Backend) has been unified into a single command!
+If you wish to build the application from source or contribute to the project:
 
 ### Prerequisites & Setup
 1. Ensure your Moto Buds are paired and connected to your Linux machine via standard OS Bluetooth settings.
@@ -78,23 +79,23 @@ Running the entire full-stack application (Frontend + Backend) has been unified 
    ```bash
    npm install
    ```
-3. The Python backend scripts rely purely on standard libraries (`socket`, `struct`, `binascii`), so no external pip packages are necessary.
+3. The Python backend scripts rely purely on standard libraries (`socket`, `struct`, `binascii`, `subprocess`, `json`), so no external `pip` packages are necessary.
 
 ### Start the Application
-
 Simply run:
-
 ```bash
 npm run dev
 ```
 
-This will launch the Electron desktop window. From the beautiful premium two-column desktop interface, you can seamlessly connect to your earbuds and control ANC, Game Mode, Volume Boost, Hi-Res Audio, and In-Ear Detection.
-
-<img width="1024" height="740" alt="Hero2_Utility" src="https://github.com/user-attachments/assets/f37e98d4-82e2-472b-9c4d-497f1fd4c961" />
+### Build Distributions
+To compile the standalone binaries yourself:
+```bash
+npm run dist:linux
+```
 
 ## Documentation
 
-* **[PROTOCOL.md](PROTOCOL.md)**: A complete, in-depth breakdown of the proprietary reverse-engineered Bluetooth protocol, opcodes, and packet structures.
+* **[PROTOCOL.md](PROTOCOL.md)**: A complete, in-depth breakdown of the proprietary reverse-engineered Bluetooth protocol, opcodes, CRC32 algorithms, and payload structures.
 * **[INTERFACE.md](INTERFACE.md)**: Documentation on the decoupling between the React frontend and the Python backend, explaining the state management system for developers or AI agents wanting to completely redesign the UI.
 
 ## Automated Testing
