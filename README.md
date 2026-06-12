@@ -9,7 +9,7 @@ An open-source, fully-featured desktop utility for configuring and controlling M
 
 <p align="center">
   <a href="https://github.com/user-attachments/assets/c91bd90a-ad84-4424-b291-0094ab8f8575">
-    <img src="https://github.com/user-attachments/assets/c91bd90a-ad84-4424-b291-0094ab8f8575" width="900" alt="MotoBudsController Overview">
+    <img src="https://github.com/user-attachments/assets/c91bd90a-ad84-4424-b291-0094ab8f8575" width="1000" alt="MotoBudsController Overview">
   </a>
 </p>
 
@@ -19,36 +19,60 @@ An open-source, fully-featured desktop utility for configuring and controlling M
 <tr>
 <td align="center">
 <a href="https://github.com/user-attachments/assets/4641ca38-0e72-49fe-8482-e9030fc11150">
-<img src="https://github.com/user-attachments/assets/4641ca38-0e72-49fe-8482-e9030fc11150" width="420" alt="Sound">
+<img src="https://github.com/user-attachments/assets/4641ca38-0e72-49fe-8482-e9030fc11150" width="500" alt="Sound">
 </a>
 <br>
-<b>Sound Control</b>
+<b>Sound Control</b><br>
+ANC, Transparency, and audio settings.
 </td>
 
 <td align="center">
 <a href="https://github.com/user-attachments/assets/783bdad1-f3bb-4d96-a394-57e9f838a617">
-<img src="https://github.com/user-attachments/assets/783bdad1-f3bb-4d96-a394-57e9f838a617" width="420" alt="Equalizer">
+<img src="https://github.com/user-attachments/assets/783bdad1-f3bb-4d96-a394-57e9f838a617" width="500" alt="Equalizer">
 </a>
 <br>
-<b>Equalizer</b>
+<b>Equalizer</b><br>
+Fine tune your listening experience.
 </td>
 </tr>
 
 <tr>
 <td align="center">
 <a href="https://github.com/user-attachments/assets/de3287be-f407-49ac-9bdf-9a762c485148">
-<img src="https://github.com/user-attachments/assets/de3287be-f407-49ac-9bdf-9a762c485148" width="420" alt="Gestures">
+<img src="https://github.com/user-attachments/assets/de3287be-f407-49ac-9bdf-9a762c485148" width="500" alt="Gestures">
 </a>
 <br>
-<b>Gesture Configuration</b>
+<b>Gesture Configuration</b><br>
+Customize earbud touch controls.
+</td>
+
+<td align="center">
+<a href="https://github.com/user-attachments/assets/a5d800f5-2d7e-4e8b-b83f-4864ee51b0de">
+<img src="https://github.com/user-attachments/assets/a5d800f5-2d7e-4e8b-b83f-4864ee51b0de" width="500" alt="Find My Device">
+</a>
+<br>
+<b>Find My Device</b><br>
+Locate misplaced earbuds.
+</td>
+</tr>
+
+<tr>
+<td align="center">
+<a href="https://github.com/user-attachments/assets/2e892da0-3b1f-4a66-897f-6e4e0611e448">
+<img src="https://github.com/user-attachments/assets/2e892da0-3b1f-4a66-897f-6e4e0611e448" width="500" alt="Fit Test">
+</a>
+<br>
+<b>Ear Tip Fit Test</b><br>
+Verify fit and seal quality.
 </td>
 
 <td align="center">
 <a href="https://github.com/user-attachments/assets/9536afb7-6fbf-4a41-ace9-febcbf599023">
-<img src="https://github.com/user-attachments/assets/9536afb7-6fbf-4a41-ace9-febcbf599023" width="420" alt="More">
+<img src="https://github.com/user-attachments/assets/9536afb7-6fbf-4a41-ace9-febcbf599023" width="500" alt="More">
 </a>
 <br>
-<b>Additional Settings</b>
+<b>Additional Settings</b><br>
+Advanced options and device information.
 </td>
 </tr>
 </table>
@@ -115,6 +139,11 @@ Here is exactly what happens under the hood when you use the app:
 
 *This entire round-trip takes milliseconds. Because the UI only updates upon guaranteed hardware broadcast, the interface represents the absolute physical truth of the earbuds.*
 
+## Documentation
+
+* **[PROTOCOL.md](PROTOCOL.md)**: A complete, in-depth breakdown of the proprietary reverse-engineered Bluetooth protocol, opcodes, CRC32 algorithms, and payload structures.
+* **[INTERFACE.md](INTERFACE.md)**: Documentation on the decoupling between the React frontend and the Python backend, explaining the state management system for developers or AI agents wanting to completely redesign the UI.
+
 ## Development & Building
 
 If you wish to build the application from source or contribute to the project:
@@ -138,11 +167,6 @@ To compile the standalone binaries yourself:
 ```bash
 npm run dist:linux
 ```
-
-## Documentation
-
-* **[PROTOCOL.md](PROTOCOL.md)**: A complete, in-depth breakdown of the proprietary reverse-engineered Bluetooth protocol, opcodes, CRC32 algorithms, and payload structures.
-* **[INTERFACE.md](INTERFACE.md)**: Documentation on the decoupling between the React frontend and the Python backend, explaining the state management system for developers or AI agents wanting to completely redesign the UI.
 
 ## Automated Testing
 
