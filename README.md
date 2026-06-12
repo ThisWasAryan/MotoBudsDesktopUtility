@@ -4,7 +4,6 @@ An open-source, fully-featured desktop utility for configuring and controlling M
 
 **What's New in the Latest Overhaul:** We have completely rewritten the UI layout to feature a dual-pane aesthetic, vastly improved connection reliability through daemon-level adapter bouncing, and achieved complete 100% feature parity with the official Android application (excluding Adaptive ANC). **Every single feature has been rigorously tested and is confirmed to be fully working on native Linux!**
 
-[A Demonstration/Tutorial Video For Previous Versions](https://youtu.be/mqCdtErJAHM) *last updated on 10/06/2026*
 ## Application Preview
 
 <p align="center">
@@ -143,6 +142,7 @@ Here is exactly what happens under the hood when you use the app:
 
 * **[PROTOCOL.md](PROTOCOL.md)**: A complete, in-depth breakdown of the proprietary reverse-engineered Bluetooth protocol, opcodes, CRC32 algorithms, and payload structures.
 * **[INTERFACE.md](INTERFACE.md)**: Documentation on the decoupling between the React frontend and the Python backend, explaining the state management system for developers or AI agents wanting to completely redesign the UI.
+* [A Demonstration/Tutorial Video for v2](https://youtu.be/_nepY64ECYo) *(last updated on 12/06/2026)*
 
 ## Development & Building
 
