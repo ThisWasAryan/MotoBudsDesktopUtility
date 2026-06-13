@@ -1,9 +1,23 @@
 import { useDeviceStore } from '../store/useDeviceStore';
 import { Ear, Headphones, BellRing, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 
 export const MoreMenu = () => {
   const { modelId, inEarFeatureEnabled, setInEarFeature, setCurrentView, minimizeToTray, setMinimizeToTray } = useDeviceStore();
+  const [showTrayPrompt, setShowTrayPrompt] = useState(false);
+
+  const handleTrayToggle = () => {
+    const newState = !minimizeToTray;
+    setMinimizeToTray(newState);
+    if (newState) {
+      if (localStorage.getItem('hideTrayPrompt') !== 'true') {
+        setShowTrayPrompt(true);
+      }
+    } else {
+      setShowTrayPrompt(false);
+    }
+  };
 
   return (
     <motion.div 
@@ -46,10 +60,37 @@ export const MoreMenu = () => {
               <span className="setting-desc">Keep running in background when closed</span>
             </div>
           </div>
-          <button className={`toggle ${minimizeToTray ? 'on' : 'off'}`} onClick={() => setMinimizeToTray(!minimizeToTray)}>
+          <button className={`toggle ${minimizeToTray ? 'on' : 'off'}`} onClick={handleTrayToggle}>
             <div className="toggle-thumb" />
           </button>
         </div>
+
+        {showTrayPrompt && (
+          <motion.div 
+            initial={{ opacity: 0, height: 0 }} 
+            animate={{ opacity: 1, height: 'auto' }} 
+            style={{ background: 'var(--surface-3)', borderRadius: '12px', padding: '16px', marginTop: '-12px', marginBottom: '16px', overflow: 'hidden' }}
+          >
+            <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', color: 'var(--text-1)' }}>Pin Moto Buds</h4>
+            <p style={{ margin: '0 0 16px 0', fontSize: '13px', color: 'var(--text-2)', lineHeight: '1.4' }}>
+              If you haven't already, pin the Moto Buds icon in your taskbar overflow menu so you can always see it.
+            </p>
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+              <button 
+                onClick={() => setShowTrayPrompt(false)} 
+                style={{ background: 'transparent', border: '1px solid var(--border)', padding: '6px 12px', borderRadius: '6px', color: 'var(--text-1)', cursor: 'pointer', fontSize: '12px' }}
+              >
+                Close
+              </button>
+              <button 
+                onClick={() => { localStorage.setItem('hideTrayPrompt', 'true'); setShowTrayPrompt(false); }} 
+                style={{ background: 'var(--accent)', border: 'none', padding: '6px 12px', borderRadius: '6px', color: '#000', cursor: 'pointer', fontSize: '12px', fontWeight: 500 }}
+              >
+                Don't remind me again
+              </button>
+            </div>
+          </motion.div>
+        )}
 
         {/* Fit Test */}
         <div className="setting-row" onClick={() => setCurrentView('fit-test')} style={{ cursor: 'pointer' }}>

@@ -44,6 +44,9 @@ function createWindow() {
   });
 
   mainWindow.on('ready-to-show', () => {
+    if (process.platform === 'win32') {
+       mainWindow?.webContents.setZoomLevel(-1);
+    }
     mainWindow?.show();
   });
 
