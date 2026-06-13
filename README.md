@@ -1,18 +1,19 @@
-# Moto Buds Desktop Utility for Linux
+# Moto Buds Desktop Utility for Windows
 
-An open-source, fully-featured desktop utility for configuring and controlling Motorola Moto Buds on Linux. This project successfully reverse-engineers the proprietary Bluetooth RFCOMM communication protocol used by the official Android application and implements a beautiful, premium skeuomorphic desktop user interface using React and Electron.
+An open-source, fully-featured desktop utility for configuring and controlling Motorola Moto Buds natively on Windows. This project successfully reverse-engineers the proprietary Bluetooth RFCOMM communication protocol used by the official Android application and implements a beautiful, premium skeuomorphic desktop user interface using React and Electron.
 
-**What's New in the Latest Overhaul:** We have added a persistent background **System Tray** for quick access to battery and ANC controls. We also completely rewrote the UI layout to feature a dual-pane aesthetic, vastly improved connection reliability through daemon-level adapter bouncing, and achieved complete 100% feature parity with the official Android application (excluding Adaptive ANC). **Every single feature has been rigorously tested and is confirmed to be fully working on native Linux!**
+**This is the `dev-windows` branch**, specifically tailored and compiled as a standalone native Windows executable.
 
-## System Tray Integration
+## System Tray Integration & Background Operation
 
-MotoBudsDesktopUtility includes a system tray integration that allows the application to continue running in the background after the main window is closed. Users can quickly view battery information, switch noise control modes, and reopen the full application directly from the tray.
+MotoBudsDesktopUtility includes a seamless system tray integration that allows the application to continue running in the background after the main window is closed. This provides instant access to your earbuds without cluttering your taskbar.
 
-### Background Operation Setting
+### How to Pin the App to the Taskbar
 
-<img width="719" height="64" alt="SystemTraySettings" src="https://github.com/user-attachments/assets/dd92a7c8-d561-44f5-b5ae-36e5e35eb88b" />
-
-Enable background operation by allowing the application to minimize to the system tray when closed.
+By default, Windows hides new system tray icons inside the overflow menu (the small `^` arrow on your taskbar). To keep the Moto Buds icon always visible for quick access:
+1. Right-click your Windows Taskbar and select **Taskbar settings**.
+2. Expand the **Other system tray icons** section.
+3. Find **MotoBudsDesktopUtility** in the list and toggle the switch to **On**.
 
 ### Tray Features
 
@@ -32,8 +33,6 @@ Access noise control modes, open the application, or quit directly from the tray
 </td>
 </tr>
 </table>
-
-
 
 ## Application Preview
 
@@ -109,102 +108,65 @@ Advanced options and device information.
 
 ## Hardware Verification (Moto Buds Base Model)
 
-All current protocol reverse-engineering, payload cryptography, and feature implementations have been strictly tested and verified on the **Moto Buds (Base Model)**. 
+All protocol reverse-engineering, payload cryptography, and feature implementations have been strictly tested and verified on the **Moto Buds (Base Model)** on Windows 10/11 using native `AF_BTH` Winsock sockets.
 
-The following functionalities are confirmed to be **100% working**:
-* **Gestures Control (Advanced)**: Highly customizable tap settings (Double Tap, Triple Tap, Press & Hold) for each earbud independently. This desktop app securely injects opcode `0x0100` and offers *more granular customization* than the official Motorola mobile app. We have implemented native AVRCP bridging via `mpris-proxy`, ensuring your taps accurately pause, play, and skip media globally across your Linux desktop.
-* **Trust Protocol Integration**: We have implemented a native D-Bus command sequence that makes the Linux host device automatically trust the earbuds. This ensures that tap gestures and in-ear detection function flawlessly without manual Bluetooth pairing intervention or trust command-line hacking.
-* **Custom 10-Band Equalizer (With Presets)**: A full implementation of the `0x0306` equalizer protocol. Uses a custom 173-byte payload to offer precise floating-point gain control across 10 frequency bands. You can seamlessly switch between pre-configured custom presets (Flat, Bass Boost, Treble Boost, etc.) or dial in your own Custom EQ.
-* **Hi-Res Audio (LDAC) Negotiation**: Successfully implemented codec negotiation directly from the desktop client, entirely replicating the functionality that was previously restricted to the Android app. Our backend gracefully survives the deliberate Bluetooth protocol disconnect triggered by the earbuds, and forcefully re-routes the Linux PipeWire A2DP stack to accept the new LDAC sample rates. Handles mutual exclusivity with Game Mode out of the box.
-* **System Tray Integration**: Quickly access battery levels, toggle Noise Control, and manage connections directly from your Linux system tray/panel, ensuring the app remains accessible without cluttering your workspace.
-* **In-Ear Detection**: Accurately detects whether the earphones are physically inside the ear and seamlessly auto-pauses/resumes system media.
-* **Fit Test (Improved Diagnostics)**: Accurately tests the seal quality and provides distinct, independent pass/fail results for the left and right earbuds using dedicated visual indicators. It utilizes a state machine to track the `1024` and `1025` response codes from the earbuds during the diagnostic sweep.
+The following functionalities are confirmed to be **100% working natively on Windows**:
+* **Gestures Control (Advanced)**: Highly customizable tap settings (Double Tap, Triple Tap, Press & Hold) for each earbud independently. 
+* **Custom 10-Band Equalizer (With Presets)**: A full implementation of the `0x0306` equalizer protocol. Uses a custom 173-byte payload to offer precise floating-point gain control across 10 frequency bands. You can seamlessly switch between pre-configured custom presets or dial in your own Custom EQ.
+* **In-Ear Detection**: Accurately detects whether the earphones are physically inside the ear.
+* **Fit Test (Improved Diagnostics)**: Accurately tests the seal quality and provides distinct, independent pass/fail results for the left and right earbuds using dedicated visual indicators.
 * **Find My Device**: Individually ring your left or right misplaced earbuds with safety checks (prevents ringing if the earbud is physically detected inside your ear to prevent hearing damage).
-* **Connection State Machine**: A seamless background state machine provides visual feedback (loading spinners, connection checks, dropped statuses) while the earbuds momentarily disconnect to renegotiate codecs or drop connections. The UI instantly reflects the daemon's internal RFCOMM socket state.
+* **Connection State Machine**: A seamless background state machine provides visual feedback while the earbuds are syncing.
 * **Active Noise Cancellation (ANC)**: Verified working across all states (Off, Transparency, Active Noise Cancellation).
-* **Game Mode**: Verified working via latency reduction opcodes. Automatically handles mutual exclusivity with Hi-Res Audio via custom UI dialogs.
+* **Game Mode**: Verified working via latency reduction opcodes. 
 * **Volume Booster**: Verified working.
 * **Battery & Charging Telemetry**: 
   * Granular battery reporting for individual earbuds (Left/Right).
   * Accurate Case battery reporting (even when only one earbud is inside the case).
-  * Real-time charging tracking. Earbuds show a charging indicator when placed inside the case, and the case accurately reports its own charging status when plugged in.
+  * Real-time charging tracking. 
 
-*Note: Spatial Audio is partially supported and dynamically surfaces only when the connected device is a Moto Buds+.*
+*(Note: Hi-Res audio codec switching is a Linux-only feature and is safely disabled on the Windows client.)*
 
+## Installation & Download
 
-## Packaging & Installation
+MotoBudsDesktopUtility provides pre-compiled binaries that include absolutely everything you need, bundling a local Python environment so you do not need to install Python or any dependencies on your system.
 
-We strictly maintain our repository to only contain raw source code. All runtime dependencies, including the Python daemon components and Bluetooth bridging utilities, are automatically resolved during packaging.
+1. **Download the latest release**: Navigate to the [Releases](https://github.com/ThisWasAryan/MotoBudsDesktopUtility/releases) page.
+2. **Choose your version**:
+   - `MotoBudsDesktopUtility Setup X.X.X.exe` (Recommended: Full installation wizard that adds the app to your Start Menu and creates shortcuts).
+   - `MotoBudsDesktopUtility X.X.X.exe` (Portable: Runs instantly without installation).
+3. **Run the application**: Make sure your Moto Buds are connected to your Windows Bluetooth settings before clicking "Connect" in the app!
 
-Pre-packaged standalone binaries for **Debian-based systems** (`.deb`) and **other Linux distributions** (`.AppImage`) are available in the **Releases** section of this repository. The `.deb` package specifically declares dependencies on `python3` and `bluez` to ensure `mpris-proxy` is available on your system for media gestures.
+## Developer Mode (Virtual Testing)
 
-> **⚠️ Connection Warning:** Please ensure your earbuds are natively connected to your OS via your Bluetooth manager **before** pressing the "Connect" button on the first screen. If you connect them *after* reaching the connection screen, you may experience slight connectivity issues. If this happens, simply disconnect and reconnect the earbuds from your OS Bluetooth manager.
+If you do not have physical Moto Buds connected to your PC or are testing the app in a Virtual Machine, you can toggle the **Developer Mode (Simulate Earbuds)** checkbox on the connection screen. This boots up a local mocked Bluetooth server that feeds the application dummy battery states and packet responses, allowing you to click around and test the UI natively.
 
-> **🖥️ Windows Status:** MotoBudsDesktopUtility has been fully ported to Windows! The Windows build is a zero-dependency portable `.exe` and Installer featuring a bundled Python environment that connects seamlessly to your earbuds over native `AF_BTH` sockets. We also include a built-in Developer Mode to simulate connections without requiring physical Bluetooth passthrough.
+## Building from Source
 
-## Architecture: How It Works
-
-This application consists of two completely decoupled components: a lightweight Python background daemon that speaks natively to the earbuds over RFCOMM, and a gorgeous React/Electron frontend that gives you visual control.
-
-Here is exactly what happens under the hood when you use the app:
-
-### 1. Daemon Initialization & State Synchronization
-1. You launch the application.
-2. The app starts on the "Unconnected" screen.
-3. When you click **Connect**, the React app sends an IPC (Inter-Process Communication) message to Electron's main process.
-4. Electron uses Node's `child_process.spawn()` to silently boot up `backend/moto_control.py` in daemon mode.
-5. The Python daemon opens a Classic Bluetooth RFCOMM socket (Port 16) directly to your earbuds and negotiates the initialization handshake. 
-6. Upon establishing a successful connection, the Python daemon fires up `mpris-proxy` in the background to handle AVRCP gesture bridging, and prints `{"type": "status", "status": "connected"}` to its standard output.
-7. Electron reads this output, forwards it to the React app, and the UI visually transitions to the Main Dashboard.
-8. The React app immediately requests a full state synchronization by injecting a `sync` opcode sequence into the daemon, fetching Battery, ANC, Gestures, and Hi-Res states.
-
-### 2. Event-Driven IPC Command Execution
-1. You click a control, such as the "ANC" toggle, on the Main Dashboard.
-2. The React UI **does not** optimistically change the slider position. Instead, it fires an IPC command: `window.api.motoCommand({ op: 'anc', mode: 1 })`. *(Note: The sole exception to this rule is the In-Ear Detection toggle, which is optimistically updated locally because the earbuds' firmware does not emit an asynchronous confirmation packet for opcode `1027`.)*
-3. Electron receives this command and pipes it into the `stdin` (Standard Input) of the running Python daemon.
-4. The Python daemon reads the input, formats the proprietary Protocol Data Unit (PDU) packet, appends a dynamically calculated CRC32 checksum, and writes it to the Bluetooth RFCOMM socket.
-5. The earbuds receive the packet, physically enable Active Noise Cancellation, and immediately broadcast a confirmation PDU packet back to the host.
-6. The Python daemon's asynchronous polling loop reads the raw hex response from the socket and prints it as a JSON event to `stdout`.
-7. Electron captures the `stdout`, pipes it back to React, and the Zustand state manager (`useDeviceStore.ts`) parses the packet.
-8. The Zustand state updates `ancMode` to `1`, which triggers React to re-render the Dashboard, finally updating the ANC segment in the UI.
-
-*This entire round-trip takes milliseconds. Because the UI only updates upon guaranteed hardware broadcast, the interface represents the absolute physical truth of the earbuds.*
-
-## Documentation
-
-* **[PROTOCOL.md](PROTOCOL.md)**: A complete, in-depth breakdown of the proprietary reverse-engineered Bluetooth protocol, opcodes, CRC32 algorithms, and payload structures.
-* **[INTERFACE.md](INTERFACE.md)**: Documentation on the decoupling between the React frontend and the Python backend, explaining the state management system for developers or AI agents wanting to completely redesign the UI.
-* [A Demonstration/Tutorial Video for v2](https://youtu.be/_nepY64ECYo) *(last updated on 12/06/2026)*
-
-## Development & Building
-
-If you wish to build the application from source or contribute to the project:
+If you wish to build the Windows application from source or contribute to the project:
 
 ### Prerequisites & Setup
-1. Ensure your Moto Buds are paired and connected to your Linux machine via standard OS Bluetooth settings.
-2. Install the necessary Node modules for the Electron frontend:
+1. Ensure you have Node.js installed.
+2. Clone this repository and checkout the `dev-windows` branch:
+   ```bash
+   git clone https://github.com/ThisWasAryan/MotoBudsDesktopUtility.git
+   cd MotoBudsDesktopUtility
+   git checkout dev-windows
+   ```
+3. Install the necessary Node modules:
    ```bash
    npm install
    ```
-3. The Python backend scripts rely purely on standard libraries (`socket`, `struct`, `binascii`, `subprocess`, `json`), so no external `pip` packages are necessary.
 
-### Start the Application
+### Start the Application (Development)
 Simply run:
 ```bash
 npm run dev
 ```
 
 ### Build Distributions
-To compile the standalone binaries yourself:
+To compile the standalone Windows `.exe` binaries yourself using Electron Builder:
 ```bash
-npm run dist:linux
+npm run dist:win
 ```
-
-## Automated Testing
-
-To ensure the SPP parser logic is robust and doesn't drop asynchronous packets, we have a mock local test server that mimics the exact Moto Buds PDU flow. You can run the full automated integration test without your earbuds being physically present:
-
-```bash
-source .venv/bin/activate
-python backend/test_integration.py
-```
+Your compiled binaries will be output to the `builds/` directory.

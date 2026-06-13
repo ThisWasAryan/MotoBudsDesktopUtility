@@ -52,24 +52,6 @@ function createWindow() {
     if (minimizeToTray && !isQuitting) {
       event.preventDefault();
       mainWindow?.hide();
-      
-      if (process.platform === 'win32') {
-         const flagPath = path.join(app.getPath('userData'), 'tray_notification_shown.json');
-         let shouldShow = true;
-         if (fs.existsSync(flagPath)) {
-            try {
-               const data = JSON.parse(fs.readFileSync(flagPath, 'utf8'));
-               if (data.shown) shouldShow = false;
-            } catch (e) {}
-         }
-         
-         if (shouldShow) {
-            mainWindow?.webContents.send('show-tray-dialog');
-            return;
-         }
-      }
-      
-      mainWindow?.hide();
     }
   });
 
@@ -88,23 +70,6 @@ app.whenReady().then(() => {
 
   ipcMain.on('set-minimize-to-tray', (event, enabled) => {
     minimizeToTray = enabled;
-  });
-
-  ipcMain.on('hide-window', () => {
-    mainWindow?.hide();
-  });
-
-  ipcMain.on('open-taskbar-settings', () => {
-    shell.openExternal('ms-settings:taskbar');
-  });
-
-  ipcMain.on('disable-tray-notification', () => {
-    const flagPath = path.join(app.getPath('userData'), 'tray_notification_shown.json');
-    try {
-      fs.writeFileSync(flagPath, '{"shown":true}');
-    } catch (e) {
-      console.error("Failed to write tray notification flag", e);
-    }
   });
 
   ipcMain.on('update-tray-tooltip', (event, text) => {
