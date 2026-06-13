@@ -4,6 +4,37 @@ An open-source, fully-featured desktop utility for configuring and controlling M
 
 **What's New in the Latest Overhaul:** We have added a persistent background **System Tray** for quick access to battery and ANC controls. We also completely rewrote the UI layout to feature a dual-pane aesthetic, vastly improved connection reliability through daemon-level adapter bouncing, and achieved complete 100% feature parity with the official Android application (excluding Adaptive ANC). **Every single feature has been rigorously tested and is confirmed to be fully working on native Linux!**
 
+## 🚧 Unreleased Feature: System Tray Integration
+
+MotoBudsController now includes an upcoming system tray integration that allows the application to continue running in the background after the main window is closed. Users can quickly view battery information, switch noise control modes, and reopen the full application directly from the tray.
+
+### Background Operation Setting
+
+<img width="719" height="64" alt="SystemTraySettings" src="https://github.com/user-attachments/assets/dd92a7c8-d561-44f5-b5ae-36e5e35eb88b" />
+
+Enable background operation by allowing the application to minimize to the system tray when closed.
+
+### Tray Features
+
+<table>
+<tr>
+<td align="center" valign="top" width="50%">
+  <b>Battery Monitoring</b>
+<img width="480" height="132" alt="TrayHoverCROPPED" src="https://github.com/user-attachments/assets/ad003afa-3a5f-4812-962c-e0f5988d0220" />
+  Hover over the tray icon to instantly view earbud battery levels.
+<img width="480" height="132" alt="TrayHover+BatCaseCROPPED" src="https://github.com/user-attachments/assets/272d2f41-4cf7-44d6-99db-642f2c918298" />
+ When the earbuds are placed in the charging case, case battery information is automatically displayed as well.
+</td>
+<td align="center" valign="top" width="50%">
+<img width="504" height="293" alt="TrayOPENCROPPED" src="https://github.com/user-attachments/assets/0194e664-6d4b-43a9-8cac-4238ae009035" />
+<br><b>Quick Controls</b><br>
+Access noise control modes, open the application, or quit directly from the tray menu.
+</td>
+</tr>
+</table>
+
+
+
 ## Application Preview
 
 <p align="center">
