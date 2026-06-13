@@ -4,6 +4,10 @@ An open-source, fully-featured desktop utility for configuring and controlling M
 
 **What's New in the Latest Overhaul:** We have completely rewritten the UI layout to feature a dual-pane aesthetic, vastly improved connection reliability through daemon-level adapter bouncing, and achieved complete 100% feature parity with the official Android application (excluding Adaptive ANC). **Every single feature has been rigorously tested and is confirmed to be fully working on native Linux!**
 
+🚧 For the latest features, previews, and development updates, see the [dev branch](https://github.com/ThisWasAryan/MotoBudsDesktopUtility/blob/dev/README.md#-unreleased-feature-system-tray-integration).
+<br> <sub><i>Development branches may contain unfinished features and require building from source. Prebuilt binaries are not provided.</i></sub>
+
+
 ## Application Preview
 
 <p align="center">
