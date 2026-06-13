@@ -2,7 +2,7 @@
 
 An open-source, fully-featured desktop utility for configuring and controlling Motorola Moto Buds on Linux. This project successfully reverse-engineers the proprietary Bluetooth RFCOMM communication protocol used by the official Android application and implements a beautiful, premium skeuomorphic desktop user interface using React and Electron.
 
-**What's New in the Latest Overhaul:** We have completely rewritten the UI layout to feature a dual-pane aesthetic, vastly improved connection reliability through daemon-level adapter bouncing, and achieved complete 100% feature parity with the official Android application (excluding Adaptive ANC). **Every single feature has been rigorously tested and is confirmed to be fully working on native Linux!**
+**What's New in the Latest Overhaul:** We have added a persistent background **System Tray** for quick access to battery and ANC controls. We also completely rewrote the UI layout to feature a dual-pane aesthetic, vastly improved connection reliability through daemon-level adapter bouncing, and achieved complete 100% feature parity with the official Android application (excluding Adaptive ANC). **Every single feature has been rigorously tested and is confirmed to be fully working on native Linux!**
 
 ## Application Preview
 
@@ -85,6 +85,7 @@ The following functionalities are confirmed to be **100% working**:
 * **Trust Protocol Integration**: We have implemented a native D-Bus command sequence that makes the Linux host device automatically trust the earbuds. This ensures that tap gestures and in-ear detection function flawlessly without manual Bluetooth pairing intervention or trust command-line hacking.
 * **Custom 10-Band Equalizer (With Presets)**: A full implementation of the `0x0306` equalizer protocol. Uses a custom 173-byte payload to offer precise floating-point gain control across 10 frequency bands. You can seamlessly switch between pre-configured custom presets (Flat, Bass Boost, Treble Boost, etc.) or dial in your own Custom EQ.
 * **Hi-Res Audio (LDAC) Negotiation**: Successfully implemented codec negotiation directly from the desktop client, entirely replicating the functionality that was previously restricted to the Android app. Our backend gracefully survives the deliberate Bluetooth protocol disconnect triggered by the earbuds, and forcefully re-routes the Linux PipeWire A2DP stack to accept the new LDAC sample rates. Handles mutual exclusivity with Game Mode out of the box.
+* **System Tray Integration**: Quickly access battery levels, toggle Noise Control, and manage connections directly from your Linux system tray/panel, ensuring the app remains accessible without cluttering your workspace.
 * **In-Ear Detection**: Accurately detects whether the earphones are physically inside the ear and seamlessly auto-pauses/resumes system media.
 * **Fit Test (Improved Diagnostics)**: Accurately tests the seal quality and provides distinct, independent pass/fail results for the left and right earbuds using dedicated visual indicators. It utilizes a state machine to track the `1024` and `1025` response codes from the earbuds during the diagnostic sweep.
 * **Find My Device**: Individually ring your left or right misplaced earbuds with safety checks (prevents ringing if the earbud is physically detected inside your ear to prevent hearing damage).

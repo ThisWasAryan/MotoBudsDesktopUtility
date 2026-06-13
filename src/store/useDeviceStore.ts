@@ -35,6 +35,7 @@ export interface DeviceState {
   };
   currentView: 'main' | 'sound' | 'gestures' | 'more' | 'fit-test' | 'ring-earbuds' | 'equalizer';
   reconnectStatus: 'idle' | 'dropping' | 'reconnecting' | 'success';
+  minimizeToTray: boolean;
   
   // Actions
   setDevice: (data: any) => void;
@@ -52,6 +53,7 @@ export interface DeviceState {
   setGestureConfig: (earbud: number, gestureType: number, func: number) => void;
   setCurrentView: (view: 'main' | 'sound' | 'gestures' | 'more' | 'fit-test' | 'ring-earbuds' | 'equalizer') => void;
   setReconnectStatus: (status: 'idle' | 'dropping' | 'reconnecting' | 'success') => void;
+  setMinimizeToTray: (enabled: boolean) => void;
 }
 
 export const useDeviceStore = create<DeviceState>((set, get) => ({
@@ -78,6 +80,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
   gestures: { left: {}, right: {} },
   currentView: 'main',
   reconnectStatus: 'idle',
+  minimizeToTray: localStorage.getItem('minimizeToTray') === 'true',
 
   setCurrentView: (view) => set({ currentView: view }),
   setReconnectStatus: (status) => set({ reconnectStatus: status }),
@@ -277,4 +280,40 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
       (window as any).api.motoCommand({ op: 'gesture', earbud, gesture: gestureType, func });
     }
   },
+
+  setMinimizeToTray: (enabled) => {
+    localStorage.setItem('minimizeToTray', enabled ? 'true' : 'false');
+    set({ minimizeToTray: enabled });
+    if ((window as any).api && (window as any).api.setMinimizeToTray) {
+      (window as any).api.setMinimizeToTray(enabled);
+    }
+  },
 }));
+
+useDeviceStore.subscribe((state, prevState) => {
+  if (state.battery !== prevState.battery || state.ancMode !== prevState.ancMode || state.physicallyInEarL !== prevState.physicallyInEarL || state.physicallyInEarR !== prevState.physicallyInEarR || state.name !== prevState.name) {
+    if ((window as any).api && (window as any).api.updateTrayTooltip) {
+      let tooltip = state.name || "Moto Buds";
+      const b = state.battery;
+      const parts = [
+        `L: ${b.left ?? '--'}%`,
+        `R: ${b.right ?? '--'}%`
+      ];
+      if ((b.inCaseL || b.inCaseR) && b.case !== null) {
+        parts.push(`Case: ${b.case}%`);
+      }
+      tooltip += '\n' + parts.join(' | ');
+      
+      (window as any).api.updateTrayTooltip(tooltip);
+      
+      if ((window as any).api.updateTrayMenu) {
+         (window as any).api.updateTrayMenu({
+            battery: state.battery,
+            ancMode: state.ancMode,
+            inEarL: state.physicallyInEarL,
+            inEarR: state.physicallyInEarR
+         });
+      }
+    }
+  }
+});

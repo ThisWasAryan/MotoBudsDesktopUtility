@@ -20,6 +20,9 @@ declare global {
       startDaemon: () => Promise<{ status: string, message?: string }>;
       onMotoEvent: (callback: any) => void;
       removeMotoEventListener: (callback: any) => void;
+      setMinimizeToTray?: (enabled: boolean) => void;
+      updateTrayTooltip?: (text: string) => void;
+      updateTrayMenu?: (data: any) => void;
     };
   }
 }
@@ -98,6 +101,11 @@ function App() {
   };
 
   useEffect(() => {
+    // Sync initial settings with main process
+    if (window.api && window.api.setMinimizeToTray) {
+      window.api.setMinimizeToTray(useDeviceStore.getState().minimizeToTray);
+    }
+
     const handleMotoEvent = (_event: any, payload: any) => {
        if (!payload) return;
        

@@ -12,9 +12,14 @@ contextBridge.exposeInMainWorld('api', {
   },
   
   // Legacy stubs (keep to prevent type errors from old React code)
-  onDeviceConnected: (callback) => ipcRenderer.on('device-connected', (_event, value) => callback(value)),
-  onDeviceDisconnected: (callback) => ipcRenderer.on('device-disconnected', () => callback()),
-  onStateUpdate: (callback) => ipcRenderer.on('state-update', (_event, value) => callback(value)),
-  sendOpcode: (opcode, payload) => ipcRenderer.send('send-opcode', { opcode, payload }),
+  onDeviceConnected: (callback: any) => ipcRenderer.on('device-connected', (_event, value) => callback(value)),
+  onDeviceDisconnected: (callback: any) => ipcRenderer.on('device-disconnected', () => callback()),
+  onStateUpdate: (callback: any) => ipcRenderer.on('state-update', (_event, value) => callback(value)),
+  sendOpcode: (opcode: any, payload: any) => ipcRenderer.send('send-opcode', { opcode, payload }),
   triggerScan: () => ipcRenderer.send('trigger-scan'),
+
+  // Tray Integration
+  setMinimizeToTray: (enabled: boolean) => ipcRenderer.send('set-minimize-to-tray', enabled),
+  updateTrayTooltip: (text: string) => ipcRenderer.send('update-tray-tooltip', text),
+  updateTrayMenu: (data: any) => ipcRenderer.send('update-tray-menu', data),
 });

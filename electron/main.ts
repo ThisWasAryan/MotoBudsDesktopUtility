@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, Tray, Menu } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { spawn } from 'child_process';
@@ -11,6 +11,12 @@ process.env.VITE_PUBLIC = process.env.VITE_DEV_SERVER_URL
   : path.join(process.env.APP_ROOT, 'dist');
 
 let mainWindow: BrowserWindow | null = null;
+let tray: Tray | null = null;
+let minimizeToTray = false;
+let isQuitting = false;
+let trayData = { battery: { left: null, right: null, case: null, inCaseL: false, inCaseR: false }, ancMode: 0, inEarL: false, inEarR: false };
+let pythonDaemon: any = null;
+
 
 app.commandLine.appendSwitch('enable-web-bluetooth', 'true');
 app.commandLine.appendSwitch('enable-experimental-web-platform-features', 'true');
@@ -39,6 +45,13 @@ function createWindow() {
     mainWindow?.show();
   });
 
+  mainWindow.on('close', (event) => {
+    if (minimizeToTray && !isQuitting) {
+      event.preventDefault();
+      mainWindow?.hide();
+    }
+  });
+
   if (process.env.VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
   } else {
@@ -49,6 +62,69 @@ function createWindow() {
 app.whenReady().then(() => {
   createWindow();
 
+  ipcMain.on('set-minimize-to-tray', (event, enabled) => {
+    minimizeToTray = enabled;
+  });
+
+  ipcMain.on('update-tray-tooltip', (event, text) => {
+    if (tray) tray.setToolTip(text);
+  });
+
+  ipcMain.on('update-tray-menu', (event, data) => {
+    trayData = data;
+    buildTrayMenu();
+  });
+
+  function buildTrayMenu() {
+    if (!tray) return;
+
+    const b = trayData.battery;
+    const parts = [
+      `L: ${b.left ?? '--'}%`,
+      `R: ${b.right ?? '--'}%`
+    ];
+    if ((b.inCaseL || b.inCaseR) && b.case !== null) {
+      parts.push(`Case: ${b.case}%`);
+    }
+    let batteryText = parts.join(' | ');
+
+    const ancMode = trayData.ancMode;
+    const contextMenu = Menu.buildFromTemplate([
+      { label: batteryText, enabled: false },
+      { type: 'separator' },
+      { label: 'Noise Cancellation', type: 'radio', checked: ancMode === 1, click: () => sendMotoCommand({ op: 'anc', mode: 1 }) },
+      { label: 'Transparency', type: 'radio', checked: ancMode === 2, click: () => sendMotoCommand({ op: 'anc', mode: 2 }) },
+      { label: 'Adaptive', type: 'radio', checked: ancMode === 3, click: () => sendMotoCommand({ op: 'anc', mode: 3 }) },
+      { label: 'Off', type: 'radio', checked: ancMode === 0, click: () => sendMotoCommand({ op: 'anc', mode: 0 }) },
+      { type: 'separator' },
+      { label: 'Open MotoBudsController', click: () => mainWindow?.show() },
+      { label: 'Quit', click: () => { isQuitting = true; app.quit(); } }
+    ]);
+    tray.setContextMenu(contextMenu);
+  }
+
+  const iconPath = app.isPackaged ? path.join(process.resourcesPath, 'build/icon.png') : path.join(process.env.APP_ROOT!, 'build/icon.png');
+  tray = new Tray(iconPath);
+  tray.setToolTip('Moto Buds');
+  buildTrayMenu();
+
+  tray.on('click', () => {
+    if (mainWindow?.isVisible()) {
+      mainWindow.hide();
+    } else {
+      mainWindow?.show();
+    }
+  });
+
+  function sendMotoCommand(cmdObj: any) {
+    if (pythonDaemon) {
+       try {
+          pythonDaemon.stdin.write(JSON.stringify(cmdObj) + '\n');
+       } catch (e) {}
+    }
+  }
+
+
   if (process.platform === 'linux') {
      try {
         spawn('bluetoothctl', ['trust', '54:84:50:92:78:AE'], { stdio: 'ignore' });
@@ -56,8 +132,6 @@ app.whenReady().then(() => {
         console.error("Failed to trust device", e);
      }
   }
-
-  let pythonDaemon: any = null;
 
   ipcMain.handle('start-daemon', async (event) => {
     return new Promise((resolve) => {
@@ -134,6 +208,10 @@ app.whenReady().then(() => {
       createWindow();
     }
   });
+});
+
+app.on('before-quit', () => {
+  isQuitting = true;
 });
 
 app.on('window-all-closed', () => {
