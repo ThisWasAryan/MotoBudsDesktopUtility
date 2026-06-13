@@ -2,12 +2,13 @@ const { spawn } = require('child_process');
 const path = require('path');
 
 // 1. Start mock server
-const mockServer = spawn('python3', [path.join(__dirname, '../backend/mock_earbuds.py')]);
+const pythonCmd = process.platform === 'win32' ? 'python' : 'python3';
+const mockServer = spawn(pythonCmd, [path.join(__dirname, '../backend/mock_earbuds.py')]);
 mockServer.stdout.on('data', d => console.log('Mock Server:', d.toString().trim()));
 
 setTimeout(() => {
     // 2. Start daemon
-    const daemon = spawn('python3', [path.join(__dirname, '../backend/moto_control.py'), '--daemon', '--mac', '127.0.0.1', '--port', '5001']);
+    const daemon = spawn(pythonCmd, [path.join(__dirname, '../backend/moto_control.py'), '--daemon', '--mac', '127.0.0.1', '--port', '5001']);
     
     daemon.stdout.on('data', d => {
         const lines = d.toString().split('\n').filter(l => l.trim().length > 0);

@@ -265,7 +265,8 @@ def main():
         print(json.dumps({"type": "status", "status": "connected"}), flush=True)
         
         import subprocess
-        subprocess.Popen("killall -q mpris-proxy ; sleep 0.5 ; mpris-proxy &", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        if sys.platform == "linux":
+            subprocess.Popen("killall -q mpris-proxy ; sleep 0.5 ; mpris-proxy &", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
         
         import threading
@@ -351,7 +352,8 @@ def main():
                         reconnected = True
                         print(json.dumps({"type": "status", "status": "connected"}), flush=True)
                         import subprocess
-                        subprocess.Popen("killall -q mpris-proxy ; sleep 0.5 ; mpris-proxy &", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                        if sys.platform == "linux":
+                            subprocess.Popen("killall -q mpris-proxy ; sleep 0.5 ; mpris-proxy &", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                         break
                         
                 if not reconnected:

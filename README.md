@@ -140,7 +140,7 @@ Pre-packaged standalone binaries for **Debian-based systems** (`.deb`) and **oth
 
 > **⚠️ Connection Warning:** Please ensure your earbuds are natively connected to your OS via your Bluetooth manager **before** pressing the "Connect" button on the first screen. If you connect them *after* reaching the connection screen, you may experience slight connectivity issues. If this happens, simply disconnect and reconnect the earbuds from your OS Bluetooth manager.
 
-> **🖥️ Windows Status:** We are actively investigating a Windows release. However, the current backend relies heavily on the Linux BlueZ Bluetooth stack. A Windows port requires a significantly different architecture and will take some time.
+> **🖥️ Windows Status:** We are actively porting to Windows! The Windows build features a zero-dependency bundled Python interpreter. A new **Developer Mode** toggle has been added to the connection screen, allowing you to simulate earbud connections on a Windows Virtual Machine using a mock backend server without requiring physical Bluetooth passthrough.
 
 ## Architecture: How It Works
 

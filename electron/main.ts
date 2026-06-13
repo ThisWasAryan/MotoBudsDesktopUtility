@@ -16,6 +16,7 @@ let minimizeToTray = false;
 let isQuitting = false;
 let trayData = { battery: { left: null, right: null, case: null, inCaseL: false, inCaseR: false }, ancMode: 0, inEarL: false, inEarR: false };
 let pythonDaemon: any = null;
+let mockServer: any = null;
 
 
 app.commandLine.appendSwitch('enable-web-bluetooth', 'true');
@@ -133,18 +134,35 @@ app.whenReady().then(() => {
      }
   }
 
-  ipcMain.handle('start-daemon', async (event) => {
+  ipcMain.handle('start-daemon', async (event, devMode?: boolean) => {
     return new Promise((resolve) => {
       if (pythonDaemon) {
         resolve({ status: 'success', message: 'Daemon already running' });
         return;
       }
       
-      const pythonPath = app.isPackaged ? 'python3' : path.join(process.env.APP_ROOT!, '.venv/bin/python');
+      const isWin = process.platform === 'win32';
+      const bundledPythonDir = app.isPackaged 
+        ? path.join(process.resourcesPath, 'backend', 'win-python') 
+        : path.join(process.env.APP_ROOT!, 'backend', 'win-python');
+      
+      const pythonPath = app.isPackaged 
+        ? (isWin ? path.join(bundledPythonDir, 'python.exe') : 'python3')
+        : path.join(process.env.APP_ROOT!, isWin ? '.venv\\Scripts\\python.exe' : '.venv/bin/python');
+      
       const scriptPath = app.isPackaged ? path.join(process.resourcesPath, 'backend/moto_control.py') : path.join(process.env.APP_ROOT!, 'backend/moto_control.py');
       const cwdPath = app.isPackaged ? process.resourcesPath : process.env.APP_ROOT;
       
-      pythonDaemon = spawn(pythonPath, [scriptPath, '--daemon', '--json'], { cwd: cwdPath });
+      const args = [scriptPath, '--daemon', '--json'];
+      if (devMode) {
+         args.push('--mac', '127.0.0.1', '--port', '5001');
+         if (!mockServer) {
+            const mockPath = app.isPackaged ? path.join(process.resourcesPath, 'backend/mock_earbuds.py') : path.join(process.env.APP_ROOT!, 'backend/mock_earbuds.py');
+            mockServer = spawn(pythonPath, [mockPath], { cwd: cwdPath });
+         }
+      }
+
+      pythonDaemon = spawn(pythonPath, args, { cwd: cwdPath });
       
       pythonDaemon.stdout.on('data', (data: Buffer) => {
          const str = data.toString();
@@ -217,8 +235,12 @@ app.on('before-quit', () => {
 app.on('window-all-closed', () => {
   // Kill daemon if running
   try {
-     const { execSync } = require('child_process');
-     execSync('pkill -f moto_control.py.*--daemon');
+     if (pythonDaemon) {
+         pythonDaemon.kill();
+     }
+     if (mockServer) {
+         mockServer.kill();
+     }
   } catch(e) {}
   
   if (process.platform !== 'darwin') {

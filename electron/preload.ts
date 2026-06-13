@@ -3,7 +3,7 @@ import { contextBridge, ipcRenderer } from 'electron';
 contextBridge.exposeInMainWorld('api', {
   // New Python Backend bridge
   motoCommand: (cmdObj: any) => ipcRenderer.invoke('moto-command', cmdObj),
-  startDaemon: () => ipcRenderer.invoke('start-daemon'),
+  startDaemon: (devMode?: boolean) => ipcRenderer.invoke('start-daemon', devMode),
   onMotoEvent: (callback: (event: any, payload: any) => void) => {
     ipcRenderer.on('moto-event', callback);
   },

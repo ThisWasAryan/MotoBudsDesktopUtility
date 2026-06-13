@@ -1,7 +1,7 @@
 {
   "name": "motobudsdesktoputility",
   "private": true,
-  "version": "2.1.0",
+  "version": "1.0.0",
   "author": "ThisWasAryan <aryanrajviiid12@gmail.com>",
   "main": "dist-electron/main.js",
   "type": "module",
@@ -10,6 +10,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "test": "node tests/test_daemon.cjs && python3 backend/test_integration.py",
     "dist:win": "tsc -b && vite build && electron-builder --win -c.extraMetadata.main=dist-electron/main.js",
     "dist:linux": "tsc -b && vite build && electron-builder --linux -c.extraMetadata.main=dist-electron/main.js"
   },
