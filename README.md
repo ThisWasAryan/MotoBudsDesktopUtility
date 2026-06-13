@@ -35,12 +35,6 @@ Access noise control modes, open the application, or quit directly from the tray
 </tr>
 </table>
 
-
-
-🚧 For the latest experimental features, previews, and development updates, see the [dev branch](https://github.com/ThisWasAryan/MotoBudsDesktopUtility/tree/dev).
-<br> <sub><i>Development branches may contain unfinished features and require building from source. Prebuilt binaries are not provided.</i></sub>
-
-
 ## Application Preview
 
 <p align="center">
@@ -146,7 +140,7 @@ Pre-packaged standalone binaries for **Debian-based systems** (`.deb`) and **oth
 
 > **⚠️ Connection Warning:** Please ensure your earbuds are natively connected to your OS via your Bluetooth manager **before** pressing the "Connect" button on the first screen. If you connect them *after* reaching the connection screen, you may experience slight connectivity issues. If this happens, simply disconnect and reconnect the earbuds from your OS Bluetooth manager.
 
-> **🖥️ Windows Version:** The Windows version of this application, complete with portable `.exe` and setup installers, is maintained on a separate branch. Please visit the **[dev-windows branch](https://github.com/ThisWasAryan/MotoBudsDesktopUtility/tree/dev-windows)** for the Windows codebase and Windows-specific build instructions.
+> **🖥️ Windows Version:** The Windows codebase is maintained on a separate branch. Windows setup executables and portable `.exe` binaries are provided directly in the **[Releases](https://github.com/ThisWasAryan/MotoBudsDesktopUtility/releases)** panel. Please visit the **[dev-windows branch](https://github.com/ThisWasAryan/MotoBudsDesktopUtility/tree/dev-windows)** to view the Windows-specific source code and build instructions.
 
 ## Architecture: How It Works
 
