@@ -1,6 +1,6 @@
-# Moto Buds Desktop Utility for Linux (`main` branch)
+# Moto Buds Desktop Utility for Linux 
 
-> **⚠️ OS NOTICE:** This `main` branch is strictly for the native **Linux** version of the Moto Buds Desktop Utility. If you are looking for the **Windows** version, please switch to the [dev-windows branch](https://github.com/ThisWasAryan/MotoBudsDesktopUtility/tree/dev-windows) for Windows-specific features, setup executables, and build instructions.
+> **⚠️ OS NOTICE:** This `main` branch is strictly for the native **Linux** version of the Moto Buds Desktop Utility. If you are looking for the **Windows** version, please switch to the [dev-windows branch](https://github.com/ThisWasAryan/MotoBudsDesktopUtility/tree/dev-windows) for Windows-specific Files and build instructions.
 
 An open-source, fully-featured desktop utility for configuring and controlling Motorola Moto Buds on Linux. This project successfully reverse-engineers the proprietary Bluetooth RFCOMM communication protocol used by the official Android application and implements a beautiful, premium skeuomorphic desktop user interface using React and Electron.
 
