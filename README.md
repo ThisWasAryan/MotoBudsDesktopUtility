@@ -137,10 +137,6 @@ MotoBudsDesktopUtility provides pre-compiled binaries that include absolutely ev
    - `MotoBudsDesktopUtility X.X.X.exe` (Portable: Runs instantly without installation).
 3. **Run the application**: Make sure your Moto Buds are connected to your Windows Bluetooth settings before clicking "Connect" in the app!
 
-## Developer Mode (Virtual Testing)
-
-If you do not have physical Moto Buds connected to your PC or are testing the app in a Virtual Machine, you can toggle the **Developer Mode (Simulate Earbuds)** checkbox on the connection screen. This boots up a local mocked Bluetooth server that feeds the application dummy battery states and packet responses, allowing you to click around and test the UI natively.
-
 ## Building from Source
 
 If you wish to build the Windows application from source or contribute to the project:

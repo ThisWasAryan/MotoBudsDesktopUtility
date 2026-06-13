@@ -37,7 +37,6 @@ function App() {
   const [connectionSuccess, setConnectionSuccess] = useState(false);
   const [logs, setLogs] = useState<string[]>([]);
   const [statusMsg, setStatusMsg] = useState('Connect your earbuds to begin');
-  const [devMode, setDevMode] = useState(false);
 
   const parseAndInjectPDU = (hexStr: string) => {
     try {
@@ -71,7 +70,7 @@ function App() {
     setStatusMsg('Connecting...');
 
     try {
-      const daemonRes = await window.api.startDaemon(devMode);
+      const daemonRes = await window.api.startDaemon();
       if (daemonRes.status === 'success') {
         setConnectionSuccess(true);
         setStatusMsg('Syncing device state...');
@@ -188,11 +187,6 @@ function App() {
           {connectionSuccess ? <Check size={18} /> : null}
           <span>{connectionSuccess ? 'Connected' : isInitializing ? 'Connecting' : 'Connect'}</span>
         </button>
-
-        <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-2)', fontSize: '13px' }}>
-          <input type="checkbox" id="devMode" checked={devMode} onChange={(e) => setDevMode(e.target.checked)} disabled={isInitializing} />
-          <label htmlFor="devMode" style={{ cursor: 'pointer' }}>Developer Mode (Simulate Earbuds)</label>
-        </div>
 
         {logs.length > 0 && (
           <div className="terminal-logs" style={{ marginTop: '24px', width: '320px', textAlign: 'left', fontFamily: 'monospace', fontSize: '11px', color: 'var(--text-3)', background: 'rgba(0,0,0,0.3)', padding: '12px', borderRadius: '8px' }}>

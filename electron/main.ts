@@ -17,7 +17,6 @@ let minimizeToTray = false;
 let isQuitting = false;
 let trayData = { battery: { left: null, right: null, case: null, inCaseL: false, inCaseR: false }, ancMode: 0, inEarL: false, inEarR: false };
 let pythonDaemon: any = null;
-let mockServer: any = null;
 
 
 app.commandLine.appendSwitch('enable-web-bluetooth', 'true');
@@ -138,7 +137,7 @@ app.whenReady().then(() => {
      }
   }
 
-  ipcMain.handle('start-daemon', async (event, devMode?: boolean) => {
+  ipcMain.handle('start-daemon', async (event) => {
     return new Promise((resolve) => {
       if (pythonDaemon) {
         resolve({ status: 'success', message: 'Daemon already running' });
@@ -158,13 +157,6 @@ app.whenReady().then(() => {
       const cwdPath = app.isPackaged ? process.resourcesPath : process.env.APP_ROOT;
       
       const args = [scriptPath, '--daemon', '--json'];
-      if (devMode) {
-         args.push('--mac', '127.0.0.1', '--port', '5001');
-         if (!mockServer) {
-            const mockPath = app.isPackaged ? path.join(process.resourcesPath, 'backend/mock_earbuds.py') : path.join(process.env.APP_ROOT!, 'backend/mock_earbuds.py');
-            mockServer = spawn(pythonPath, [mockPath], { cwd: cwdPath });
-         }
-      }
 
       pythonDaemon = spawn(pythonPath, args, { cwd: cwdPath });
       
@@ -241,9 +233,6 @@ app.on('window-all-closed', () => {
   try {
      if (pythonDaemon) {
          pythonDaemon.kill();
-     }
-     if (mockServer) {
-         mockServer.kill();
      }
   } catch(e) {}
   
