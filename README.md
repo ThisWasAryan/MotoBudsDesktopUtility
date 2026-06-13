@@ -1,12 +1,14 @@
-# Moto Buds Desktop Utility for Linux
+# Moto Buds Desktop Utility for Linux (`main` branch)
+
+> **⚠️ OS NOTICE:** This `main` branch is strictly for the native **Linux** version of the Moto Buds Desktop Utility. If you are looking for the **Windows** version, please switch to the [dev-windows branch](https://github.com/ThisWasAryan/MotoBudsDesktopUtility/tree/dev-windows) for Windows-specific features, setup executables, and build instructions.
 
 An open-source, fully-featured desktop utility for configuring and controlling Motorola Moto Buds on Linux. This project successfully reverse-engineers the proprietary Bluetooth RFCOMM communication protocol used by the official Android application and implements a beautiful, premium skeuomorphic desktop user interface using React and Electron.
 
-**What's New in the Latest Overhaul:** We have added a persistent background **System Tray** for quick access to battery and ANC controls. We also completely rewrote the UI layout to feature a dual-pane aesthetic, vastly improved connection reliability through daemon-level adapter bouncing, and achieved complete 100% feature parity with the official Android application (excluding Adaptive ANC). **Every single feature has been rigorously tested and is confirmed to be fully working on native Linux!**
+**What's New in Version 2.1:** We have officially released **v2.1.0**, which introduces a persistent background **System Tray** for quick access to battery and ANC controls. We also completely rewrote the UI layout to feature a dual-pane aesthetic, vastly improved connection reliability through daemon-level adapter bouncing, and achieved complete 100% feature parity with the official Android application (excluding Adaptive ANC). **Every single feature has been rigorously tested and is confirmed to be fully working on native Linux!**
 
-## 🚧 Unreleased Feature: System Tray Integration
+## 🚀 System Tray Integration (New in v2.1)
 
-MotoBudsController now includes an upcoming system tray integration that allows the application to continue running in the background after the main window is closed. Users can quickly view battery information, switch noise control modes, and reopen the full application directly from the tray.
+MotoBudsController now includes full system tray integration that allows the application to continue running in the background after the main window is closed. Users can quickly view battery information, switch noise control modes, and reopen the full application directly from the tray.
 
 ### Background Operation Setting
 
@@ -35,7 +37,7 @@ Access noise control modes, open the application, or quit directly from the tray
 
 
 
-🚧 For the latest features, previews, and development updates, see the [dev branch](https://github.com/ThisWasAryan/MotoBudsDesktopUtility/blob/dev/README.md#-unreleased-feature-system-tray-integration).
+🚧 For the latest experimental features, previews, and development updates, see the [dev branch](https://github.com/ThisWasAryan/MotoBudsDesktopUtility/tree/dev).
 <br> <sub><i>Development branches may contain unfinished features and require building from source. Prebuilt binaries are not provided.</i></sub>
 
 
@@ -144,7 +146,7 @@ Pre-packaged standalone binaries for **Debian-based systems** (`.deb`) and **oth
 
 > **⚠️ Connection Warning:** Please ensure your earbuds are natively connected to your OS via your Bluetooth manager **before** pressing the "Connect" button on the first screen. If you connect them *after* reaching the connection screen, you may experience slight connectivity issues. If this happens, simply disconnect and reconnect the earbuds from your OS Bluetooth manager.
 
-> **🖥️ Windows Status:** We are actively investigating a Windows release. However, the current backend relies heavily on the Linux BlueZ Bluetooth stack. A Windows port requires a significantly different architecture and will take some time.
+> **🖥️ Windows Version:** The Windows version of this application, complete with portable `.exe` and setup installers, is maintained on a separate branch. Please visit the **[dev-windows branch](https://github.com/ThisWasAryan/MotoBudsDesktopUtility/tree/dev-windows)** for the Windows codebase and Windows-specific build instructions.
 
 ## Architecture: How It Works
 
