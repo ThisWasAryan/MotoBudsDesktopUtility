@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('api', {
+  isWindows: process.platform === 'win32',
   // New Python Backend bridge
   motoCommand: (cmdObj: any) => ipcRenderer.invoke('moto-command', cmdObj),
   startDaemon: (devMode?: boolean) => ipcRenderer.invoke('start-daemon', devMode),

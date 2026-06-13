@@ -16,6 +16,7 @@ import budsWithCase from './assets/buds_with_case.png';
 declare global {
   interface Window {
     api: {
+      isWindows?: boolean;
       motoCommand: (args: any) => Promise<{ status: string, message?: string, data?: any, raw?: string }>;
       startDaemon: (devMode?: boolean) => Promise<{ status: string, message?: string }>;
       onMotoEvent: (callback: any) => void;

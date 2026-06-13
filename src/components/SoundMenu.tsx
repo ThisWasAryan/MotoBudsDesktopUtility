@@ -7,8 +7,11 @@ export const SoundMenu = () => {
   const { name, gameMode, setGameMode, volBoost, setVolBoost, hiRes, setHiRes, setCurrentView } = useDeviceStore();
   
   const [conflictDialog, setConflictDialog] = useState<'game' | 'hires' | null>(null);
+  
+  const isWindows = window.api?.isWindows;
 
   const handleToggleHiRes = () => {
+    if (isWindows) return;
     if (!hiRes && gameMode) {
       setConflictDialog('hires');
     } else {
@@ -66,19 +69,26 @@ export const SoundMenu = () => {
           )}
 
           {/* Hi-Res Mode */}
-          <div className="setting-row">
-            <div className="setting-info">
-              <div className={`setting-icon ${hiRes ? 'accent' : ''}`}>
-                <Activity size={18} />
+          <div 
+            title={isWindows ? "Windows Bluetooth audio stacks generally do not support application-controlled codec switching. This feature is currently unavailable on Windows." : undefined}
+          >
+            <div 
+              className="setting-row"
+              style={{ opacity: isWindows ? 0.5 : 1, pointerEvents: isWindows ? 'none' : 'auto' }}
+            >
+              <div className="setting-info">
+                <div className={`setting-icon ${hiRes ? 'accent' : ''}`}>
+                  <Activity size={18} />
+                </div>
+                <div className="setting-text">
+                  <span className="setting-title">Hi-Res Audio</span>
+                  <span className="setting-desc">LDAC high-resolution codec</span>
+                </div>
               </div>
-              <div className="setting-text">
-                <span className="setting-title">Hi-Res Audio</span>
-                <span className="setting-desc">LDAC high-resolution codec</span>
-              </div>
+              <button className={`toggle ${hiRes ? 'on' : 'off'}`} onClick={handleToggleHiRes} disabled={isWindows}>
+                <div className="toggle-thumb" />
+              </button>
             </div>
-            <button className={`toggle ${hiRes ? 'on' : 'off'}`} onClick={handleToggleHiRes}>
-              <div className="toggle-thumb" />
-            </button>
           </div>
 
           {/* Gaming Mode */}

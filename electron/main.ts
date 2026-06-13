@@ -1,5 +1,6 @@
-import { app, BrowserWindow, ipcMain, Tray, Menu } from 'electron';
+import { app, BrowserWindow, ipcMain, Tray, Menu, Notification, shell } from 'electron';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { spawn } from 'child_process';
 
@@ -26,6 +27,7 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1250,
     height: 950,
+    useContentSize: true,
     titleBarStyle: 'hiddenInset',
     backgroundColor: '#0F0F11',
     show: false,
@@ -50,6 +52,34 @@ function createWindow() {
     if (minimizeToTray && !isQuitting) {
       event.preventDefault();
       mainWindow?.hide();
+      
+      if (process.platform === 'win32') {
+         const flagPath = path.join(app.getPath('userData'), 'tray_notification_shown.json');
+         if (!fs.existsSync(flagPath)) {
+            try {
+               fs.writeFileSync(flagPath, '{"shown":true}');
+               const notification = new Notification({
+                  title: 'Moto Buds Utility',
+                  body: 'MotoBudsDesktopUtility is now running in the system tray.\n\nTo keep the icon visible:\nSettings → Personalization → Taskbar → Other system tray icons → MotoBudsDesktopUtility',
+                  actions: [
+                     { type: 'button', text: 'Open Taskbar Settings' },
+                     { type: 'button', text: 'Exit Application' }
+                  ]
+               });
+               notification.on('action', (event, index) => {
+                  if (index === 0) {
+                     shell.openExternal('ms-settings:taskbar');
+                  } else if (index === 1) {
+                     isQuitting = true;
+                     app.quit();
+                  }
+               });
+               notification.show();
+            } catch (e) {
+               console.error("Failed to show tray notification", e);
+            }
+         }
+      }
     }
   });
 
