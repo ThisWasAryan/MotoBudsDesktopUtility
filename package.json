@@ -48,7 +48,7 @@
     "nan": "^2.22.0"
   },
   "build": {
-    "appId": "com.antigravity.motobuds",
+    "appId": "com.thiswasaryan.motobuds",
     "productName": "MotoBudsDesktopUtility",
     "copyright": "Aryan Raj",
     "icon": "build/icon.png",
