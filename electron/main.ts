@@ -55,23 +55,29 @@ function createWindow() {
       
       if (process.platform === 'win32') {
          const flagPath = path.join(app.getPath('userData'), 'tray_notification_shown.json');
-         if (!fs.existsSync(flagPath)) {
+         let shouldShow = true;
+         if (fs.existsSync(flagPath)) {
             try {
-               fs.writeFileSync(flagPath, '{"shown":true}');
+               const data = JSON.parse(fs.readFileSync(flagPath, 'utf8'));
+               if (data.shown) shouldShow = false;
+            } catch (e) {}
+         }
+         
+         if (shouldShow) {
+            try {
                const notification = new Notification({
                   title: 'Moto Buds Utility',
                   body: 'MotoBudsDesktopUtility is now running in the system tray.\n\nTo keep the icon visible:\nSettings → Personalization → Taskbar → Other system tray icons → MotoBudsDesktopUtility',
                   actions: [
                      { type: 'button', text: 'Open Taskbar Settings' },
-                     { type: 'button', text: 'Exit Application' }
+                     { type: 'button', text: 'Don\'t remind me again' }
                   ]
                });
                notification.on('action', (event, index) => {
                   if (index === 0) {
                      shell.openExternal('ms-settings:taskbar');
                   } else if (index === 1) {
-                     isQuitting = true;
-                     app.quit();
+                     fs.writeFileSync(flagPath, '{"shown":true}');
                   }
                });
                notification.show();
@@ -91,6 +97,9 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  if (process.platform === 'win32') {
+    app.setAppUserModelId('com.thiswasaryan.motobuds');
+  }
   createWindow();
 
   ipcMain.on('set-minimize-to-tray', (event, enabled) => {

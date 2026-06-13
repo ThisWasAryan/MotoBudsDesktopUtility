@@ -55,6 +55,11 @@
     "directories": {
       "output": "builds"
     },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": "always"
+    },
     "win": {
       "target": [
         "nsis",
