@@ -3,7 +3,7 @@ import { Ear, Headphones, BellRing, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const MoreMenu = () => {
-  const { modelId, inEarFeatureEnabled, setInEarFeature, setCurrentView } = useDeviceStore();
+  const { modelId, inEarFeatureEnabled, setInEarFeature, setCurrentView, minimizeToTray, setMinimizeToTray } = useDeviceStore();
 
   return (
     <motion.div 
@@ -31,6 +31,22 @@ export const MoreMenu = () => {
             </div>
           </div>
           <button className={`toggle ${inEarFeatureEnabled ? 'on' : 'off'}`} onClick={() => setInEarFeature(!inEarFeatureEnabled)}>
+            <div className="toggle-thumb" />
+          </button>
+        </div>
+
+        {/* Minimize to Tray */}
+        <div className="setting-row">
+          <div className="setting-info">
+            <div className={`setting-icon ${minimizeToTray ? 'accent' : ''}`}>
+              <Ear size={18} />
+            </div>
+            <div className="setting-text">
+              <span className="setting-title">Minimize to System Tray</span>
+              <span className="setting-desc">Keep running in background when closed</span>
+            </div>
+          </div>
+          <button className={`toggle ${minimizeToTray ? 'on' : 'off'}`} onClick={() => setMinimizeToTray(!minimizeToTray)}>
             <div className="toggle-thumb" />
           </button>
         </div>

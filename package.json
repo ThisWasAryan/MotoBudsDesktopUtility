@@ -1,7 +1,7 @@
 {
   "name": "motobudsdesktoputility",
   "private": true,
-  "version": "2.0.0",
+  "version": "2.1.0",
   "author": "ThisWasAryan <aryanrajviiid12@gmail.com>",
   "main": "dist-electron/main.js",
   "type": "module",
@@ -47,6 +47,7 @@
   "build": {
     "appId": "com.antigravity.motobuds",
     "productName": "Moto Buds Utility",
+    "icon": "build/icon.png",
     "directories": {
       "output": "builds"
     },
@@ -61,7 +62,8 @@
         "AppImage",
         "deb"
       ],
-      "category": "AudioVideo"
+      "category": "AudioVideo",
+      "icon": "build/icon.png"
     },
     "deb": {
       "depends": [
@@ -70,7 +72,8 @@
       ]
     },
     "extraResources": [
-      "backend/**/*"
+      "backend/**/*",
+      "build/icon.png"
     ],
     "files": [
       "dist/**/*",

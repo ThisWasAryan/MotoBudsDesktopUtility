@@ -2,7 +2,38 @@
 
 An open-source, fully-featured desktop utility for configuring and controlling Motorola Moto Buds on Linux. This project successfully reverse-engineers the proprietary Bluetooth RFCOMM communication protocol used by the official Android application and implements a beautiful, premium skeuomorphic desktop user interface using React and Electron.
 
-**What's New in the Latest Overhaul:** We have completely rewritten the UI layout to feature a dual-pane aesthetic, vastly improved connection reliability through daemon-level adapter bouncing, and achieved complete 100% feature parity with the official Android application (excluding Adaptive ANC). **Every single feature has been rigorously tested and is confirmed to be fully working on native Linux!**
+**What's New in the Latest Overhaul:** We have added a persistent background **System Tray** for quick access to battery and ANC controls. We also completely rewrote the UI layout to feature a dual-pane aesthetic, vastly improved connection reliability through daemon-level adapter bouncing, and achieved complete 100% feature parity with the official Android application (excluding Adaptive ANC). **Every single feature has been rigorously tested and is confirmed to be fully working on native Linux!**
+
+## 🚧 Unreleased Feature: System Tray Integration
+
+MotoBudsController now includes an upcoming system tray integration that allows the application to continue running in the background after the main window is closed. Users can quickly view battery information, switch noise control modes, and reopen the full application directly from the tray.
+
+### Background Operation Setting
+
+<img width="719" height="64" alt="SystemTraySettings" src="https://github.com/user-attachments/assets/dd92a7c8-d561-44f5-b5ae-36e5e35eb88b" />
+
+Enable background operation by allowing the application to minimize to the system tray when closed.
+
+### Tray Features
+
+<table>
+<tr>
+<td align="center" valign="top" width="50%">
+  <b>Battery Monitoring</b>
+<img width="480" height="132" alt="TrayHoverCROPPED" src="https://github.com/user-attachments/assets/ad003afa-3a5f-4812-962c-e0f5988d0220" />
+  Hover over the tray icon to instantly view earbud battery levels.
+<img width="480" height="132" alt="TrayHover+BatCaseCROPPED" src="https://github.com/user-attachments/assets/272d2f41-4cf7-44d6-99db-642f2c918298" />
+ When the earbuds are placed in the charging case, case battery information is automatically displayed as well.
+</td>
+<td align="center" valign="top" width="50%">
+<img width="504" height="293" alt="TrayOPENCROPPED" src="https://github.com/user-attachments/assets/0194e664-6d4b-43a9-8cac-4238ae009035" />
+<br><b>Quick Controls</b><br>
+Access noise control modes, open the application, or quit directly from the tray menu.
+</td>
+</tr>
+</table>
+
+
 
 🚧 For the latest features, previews, and development updates, see the [dev branch](https://github.com/ThisWasAryan/MotoBudsDesktopUtility/blob/dev/README.md#-unreleased-feature-system-tray-integration).
 <br> <sub><i>Development branches may contain unfinished features and require building from source. Prebuilt binaries are not provided.</i></sub>
@@ -89,6 +120,7 @@ The following functionalities are confirmed to be **100% working**:
 * **Trust Protocol Integration**: We have implemented a native D-Bus command sequence that makes the Linux host device automatically trust the earbuds. This ensures that tap gestures and in-ear detection function flawlessly without manual Bluetooth pairing intervention or trust command-line hacking.
 * **Custom 10-Band Equalizer (With Presets)**: A full implementation of the `0x0306` equalizer protocol. Uses a custom 173-byte payload to offer precise floating-point gain control across 10 frequency bands. You can seamlessly switch between pre-configured custom presets (Flat, Bass Boost, Treble Boost, etc.) or dial in your own Custom EQ.
 * **Hi-Res Audio (LDAC) Negotiation**: Successfully implemented codec negotiation directly from the desktop client, entirely replicating the functionality that was previously restricted to the Android app. Our backend gracefully survives the deliberate Bluetooth protocol disconnect triggered by the earbuds, and forcefully re-routes the Linux PipeWire A2DP stack to accept the new LDAC sample rates. Handles mutual exclusivity with Game Mode out of the box.
+* **System Tray Integration**: Quickly access battery levels, toggle Noise Control, and manage connections directly from your Linux system tray/panel, ensuring the app remains accessible without cluttering your workspace.
 * **In-Ear Detection**: Accurately detects whether the earphones are physically inside the ear and seamlessly auto-pauses/resumes system media.
 * **Fit Test (Improved Diagnostics)**: Accurately tests the seal quality and provides distinct, independent pass/fail results for the left and right earbuds using dedicated visual indicators. It utilizes a state machine to track the `1024` and `1025` response codes from the earbuds during the diagnostic sweep.
 * **Find My Device**: Individually ring your left or right misplaced earbuds with safety checks (prevents ringing if the earbud is physically detected inside your ear to prevent hearing damage).
