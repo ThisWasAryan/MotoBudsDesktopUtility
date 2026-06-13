@@ -24,6 +24,10 @@ declare global {
       setMinimizeToTray?: (enabled: boolean) => void;
       updateTrayTooltip?: (text: string) => void;
       updateTrayMenu?: (data: any) => void;
+      onTrayDialog?: (callback: () => void) => void;
+      hideWindow?: () => void;
+      openTaskbarSettings?: () => void;
+      disableTrayNotification?: () => void;
     };
   }
 }
@@ -38,6 +42,7 @@ function App() {
   const [logs, setLogs] = useState<string[]>([]);
   const [statusMsg, setStatusMsg] = useState('Connect your earbuds to begin');
   const [devMode, setDevMode] = useState(false);
+  const [showTrayDialog, setShowTrayDialog] = useState(false);
 
   const parseAndInjectPDU = (hexStr: string) => {
     try {
@@ -106,6 +111,12 @@ function App() {
     // Sync initial settings with main process
     if (window.api && window.api.setMinimizeToTray) {
       window.api.setMinimizeToTray(useDeviceStore.getState().minimizeToTray);
+    }
+
+    if (window.api && window.api.onTrayDialog) {
+      window.api.onTrayDialog(() => {
+        setShowTrayDialog(true);
+      });
     }
 
     const handleMotoEvent = (_event: any, payload: any) => {
@@ -228,6 +239,61 @@ function App() {
           {rightPanelContent()}
         </AnimatePresence>
       </div>
+
+      <AnimatePresence>
+        {showTrayDialog && (
+          <div className="dialog-overlay" style={{ zIndex: 9999 }}>
+            <motion.div 
+              className="dialog-card"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.15 }}
+            >
+              <h3 className="dialog-title" style={{ fontSize: '18px', marginBottom: '12px', color: 'var(--text-1)' }}>App Minimized to Tray</h3>
+              <p className="dialog-body" style={{ fontSize: '14px', color: 'var(--text-2)', marginBottom: '16px', lineHeight: '1.5' }}>
+                MotoBudsDesktopUtility is now running in the system tray. To keep the icon visible:<br/><br/>
+                <strong>Settings → Personalization → Taskbar → Other system tray icons</strong>
+              </p>
+              
+              <div className="dialog-actions" style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '24px' }}>
+                <button 
+                  className="dialog-btn secondary"
+                  onClick={() => {
+                    if (window.api?.openTaskbarSettings) window.api.openTaskbarSettings();
+                    setShowTrayDialog(false);
+                    if (window.api?.hideWindow) window.api.hideWindow();
+                  }}
+                  style={{ background: 'var(--surface-3)', border: 'none', padding: '8px 16px', borderRadius: '6px', color: 'var(--text-1)', cursor: 'pointer', fontSize: '13px' }}
+                >
+                  Open Taskbar Settings
+                </button>
+                <button 
+                  className="dialog-btn secondary"
+                  onClick={() => {
+                    setShowTrayDialog(false);
+                    if (window.api?.hideWindow) window.api.hideWindow();
+                  }}
+                  style={{ background: 'var(--surface-3)', border: 'none', padding: '8px 16px', borderRadius: '6px', color: 'var(--text-1)', cursor: 'pointer', fontSize: '13px' }}
+                >
+                  Got It
+                </button>
+                <button 
+                  className="dialog-btn primary"
+                  onClick={() => {
+                    if (window.api?.disableTrayNotification) window.api.disableTrayNotification();
+                    setShowTrayDialog(false);
+                    if (window.api?.hideWindow) window.api.hideWindow();
+                  }}
+                  style={{ background: 'var(--accent)', border: 'none', padding: '8px 16px', borderRadius: '6px', color: '#000', cursor: 'pointer', fontSize: '13px', fontWeight: 500 }}
+                >
+                  Don't remind me again
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Tray, Menu, Notification, shell } from 'electron';
+import { app, BrowserWindow, ipcMain, Tray, Menu, shell } from 'electron';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -64,28 +64,12 @@ function createWindow() {
          }
          
          if (shouldShow) {
-            try {
-               const notification = new Notification({
-                  title: 'Moto Buds Utility',
-                  body: 'MotoBudsDesktopUtility is now running in the system tray.\n\nTo keep the icon visible:\nSettings → Personalization → Taskbar → Other system tray icons → MotoBudsDesktopUtility',
-                  actions: [
-                     { type: 'button', text: 'Open Taskbar Settings' },
-                     { type: 'button', text: 'Don\'t remind me again' }
-                  ]
-               });
-               notification.on('action', (event, index) => {
-                  if (index === 0) {
-                     shell.openExternal('ms-settings:taskbar');
-                  } else if (index === 1) {
-                     fs.writeFileSync(flagPath, '{"shown":true}');
-                  }
-               });
-               notification.show();
-            } catch (e) {
-               console.error("Failed to show tray notification", e);
-            }
+            mainWindow?.webContents.send('show-tray-dialog');
+            return;
          }
       }
+      
+      mainWindow?.hide();
     }
   });
 
@@ -104,6 +88,23 @@ app.whenReady().then(() => {
 
   ipcMain.on('set-minimize-to-tray', (event, enabled) => {
     minimizeToTray = enabled;
+  });
+
+  ipcMain.on('hide-window', () => {
+    mainWindow?.hide();
+  });
+
+  ipcMain.on('open-taskbar-settings', () => {
+    shell.openExternal('ms-settings:taskbar');
+  });
+
+  ipcMain.on('disable-tray-notification', () => {
+    const flagPath = path.join(app.getPath('userData'), 'tray_notification_shown.json');
+    try {
+      fs.writeFileSync(flagPath, '{"shown":true}');
+    } catch (e) {
+      console.error("Failed to write tray notification flag", e);
+    }
   });
 
   ipcMain.on('update-tray-tooltip', (event, text) => {
