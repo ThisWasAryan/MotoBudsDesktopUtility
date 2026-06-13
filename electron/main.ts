@@ -94,7 +94,6 @@ app.whenReady().then(() => {
       { type: 'separator' },
       { label: 'Noise Cancellation', type: 'radio', checked: ancMode === 1, click: () => sendMotoCommand({ op: 'anc', mode: 1 }) },
       { label: 'Transparency', type: 'radio', checked: ancMode === 2, click: () => sendMotoCommand({ op: 'anc', mode: 2 }) },
-      { label: 'Adaptive', type: 'radio', checked: ancMode === 3, click: () => sendMotoCommand({ op: 'anc', mode: 3 }) },
       { label: 'Off', type: 'radio', checked: ancMode === 0, click: () => sendMotoCommand({ op: 'anc', mode: 0 }) },
       { type: 'separator' },
       { label: 'Open MotoBudsController', click: () => mainWindow?.show() },
