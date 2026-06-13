@@ -72,7 +72,8 @@
       ]
     },
     "extraResources": [
-      "backend/**/*"
+      "backend/**/*",
+      "build/icon.png"
     ],
     "files": [
       "dist/**/*",
