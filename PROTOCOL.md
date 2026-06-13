@@ -40,7 +40,7 @@ There are **zero** protocol differences between variants. All models utilize a u
 * **BudsFeatureManager (C2266c):** Responsible for parsing `buds_features.json` and exposing Boolean flags to enable or disable features based on `model_id`.
 
 ## Bluetooth Layer
-* **Transport:** Both BLE and Classic Bluetooth RFCOMM are supported. 
+* **Transport:** Both BLE and Classic Bluetooth RFCOMM are supported. On Linux, RFCOMM requires DBus/PyBluez interactions. On Windows, it natively uses `AF_BTH` Winsock sockets via Python, bypassing any need for complex driver layers. 
 * **Routing:** `C4430d` negotiates the active connection. Wait for connection intent, bind service, and manage the I/O streams. The application uses a standard custom profile UUID `192d0100-4899-11ee-be56-0242ac120002` (and similar variants like `18290100...`) to connect and identify models.
 * **Linux Trust Protocol**: In order for certain features to correctly activate on Linux (specifically **Tap Gestures** and **In-Ear Detection**), the host machine must fully *trust* the earbuds. A simple OS pairing is not enough. The `bluetoothctl trust <MAC>` command must be executed against the device MAC address to grant it extended permissions to emit system-level input events over Bluetooth. Without this, the earbuds will reject or ignore gesture configuration payloads and in-ear detection will stall.
 

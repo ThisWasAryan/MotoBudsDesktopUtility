@@ -4,9 +4,9 @@ An open-source, fully-featured desktop utility for configuring and controlling M
 
 **What's New in the Latest Overhaul:** We have added a persistent background **System Tray** for quick access to battery and ANC controls. We also completely rewrote the UI layout to feature a dual-pane aesthetic, vastly improved connection reliability through daemon-level adapter bouncing, and achieved complete 100% feature parity with the official Android application (excluding Adaptive ANC). **Every single feature has been rigorously tested and is confirmed to be fully working on native Linux!**
 
-## 🚧 Unreleased Feature: System Tray Integration
+## System Tray Integration
 
-MotoBudsController now includes an upcoming system tray integration that allows the application to continue running in the background after the main window is closed. Users can quickly view battery information, switch noise control modes, and reopen the full application directly from the tray.
+MotoBudsDesktopUtility includes a system tray integration that allows the application to continue running in the background after the main window is closed. Users can quickly view battery information, switch noise control modes, and reopen the full application directly from the tray.
 
 ### Background Operation Setting
 
@@ -140,7 +140,7 @@ Pre-packaged standalone binaries for **Debian-based systems** (`.deb`) and **oth
 
 > **⚠️ Connection Warning:** Please ensure your earbuds are natively connected to your OS via your Bluetooth manager **before** pressing the "Connect" button on the first screen. If you connect them *after* reaching the connection screen, you may experience slight connectivity issues. If this happens, simply disconnect and reconnect the earbuds from your OS Bluetooth manager.
 
-> **🖥️ Windows Status:** We are actively porting to Windows! The Windows build features a zero-dependency bundled Python interpreter. A new **Developer Mode** toggle has been added to the connection screen, allowing you to simulate earbud connections on a Windows Virtual Machine using a mock backend server without requiring physical Bluetooth passthrough.
+> **🖥️ Windows Status:** MotoBudsDesktopUtility has been fully ported to Windows! The Windows build is a zero-dependency portable `.exe` and Installer featuring a bundled Python environment that connects seamlessly to your earbuds over native `AF_BTH` sockets. We also include a built-in Developer Mode to simulate connections without requiring physical Bluetooth passthrough.
 
 ## Architecture: How It Works
 
