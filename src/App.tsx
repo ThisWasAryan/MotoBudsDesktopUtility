@@ -181,38 +181,98 @@ function App() {
     };
   }, []);
 
+  const trayDialogOverlay = (
+    <AnimatePresence>
+      {showTrayDialog && (
+        <div className="dialog-overlay" style={{ zIndex: 9999 }}>
+          <motion.div 
+            className="dialog-card"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.15 }}
+          >
+            <h3 className="dialog-title" style={{ fontSize: '18px', marginBottom: '12px', color: 'var(--text-1)' }}>App Minimized to Tray</h3>
+            <p className="dialog-body" style={{ fontSize: '14px', color: 'var(--text-2)', marginBottom: '16px', lineHeight: '1.5' }}>
+              MotoBudsDesktopUtility is now running in the system tray. To keep the icon visible:<br/><br/>
+              <strong>Settings → Personalization → Taskbar → Other system tray icons</strong>
+            </p>
+            
+            <div className="dialog-actions" style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '24px' }}>
+              <button 
+                className="dialog-btn secondary"
+                onClick={() => {
+                  if (window.api?.openTaskbarSettings) window.api.openTaskbarSettings();
+                  setShowTrayDialog(false);
+                  if (window.api?.hideWindow) window.api.hideWindow();
+                }}
+                style={{ background: 'var(--surface-3)', border: 'none', padding: '8px 16px', borderRadius: '6px', color: 'var(--text-1)', cursor: 'pointer', fontSize: '13px' }}
+              >
+                Open Taskbar Settings
+              </button>
+              <button 
+                className="dialog-btn secondary"
+                onClick={() => {
+                  setShowTrayDialog(false);
+                  if (window.api?.hideWindow) window.api.hideWindow();
+                }}
+                style={{ background: 'var(--surface-3)', border: 'none', padding: '8px 16px', borderRadius: '6px', color: 'var(--text-1)', cursor: 'pointer', fontSize: '13px' }}
+              >
+                Got It
+              </button>
+              <button 
+                className="dialog-btn primary"
+                onClick={() => {
+                  if (window.api?.disableTrayNotification) window.api.disableTrayNotification();
+                  setShowTrayDialog(false);
+                  if (window.api?.hideWindow) window.api.hideWindow();
+                }}
+                style={{ background: 'var(--accent)', border: 'none', padding: '8px 16px', borderRadius: '6px', color: '#000', cursor: 'pointer', fontSize: '13px', fontWeight: 500 }}
+              >
+                Don't remind me again
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
+  );
+
   /* ─── Connection Screen ─── */
   if (!connected) {
     return (
-      <div className="connect-screen">
-        <img src={budsWithCase} alt="Moto Buds" className="connect-hero-image" />
-        <h1 className="connect-title">Moto Buds</h1>
-        <p className="connect-subtitle">{statusMsg}</p>
-        
-        <button 
-          className={`connect-btn ${connectionSuccess ? 'success' : ''}`} 
-          onClick={connectDevice} 
-          disabled={isInitializing || connectionSuccess}
-          style={connectionSuccess ? { backgroundColor: 'var(--success)', borderColor: 'var(--success)', color: '#000' } : {}}
-        >
-          {isInitializing && !connectionSuccess ? <Loader2 size={18} className="spinner" /> : null}
-          {connectionSuccess ? <Check size={18} /> : null}
-          <span>{connectionSuccess ? 'Connected' : isInitializing ? 'Connecting' : 'Connect'}</span>
-        </button>
+      <>
+        <div className="connect-screen">
+          <img src={budsWithCase} alt="Moto Buds" className="connect-hero-image" />
+          <h1 className="connect-title">Moto Buds</h1>
+          <p className="connect-subtitle">{statusMsg}</p>
+          
+          <button 
+            className={`connect-btn ${connectionSuccess ? 'success' : ''}`} 
+            onClick={connectDevice} 
+            disabled={isInitializing || connectionSuccess}
+            style={connectionSuccess ? { backgroundColor: 'var(--success)', borderColor: 'var(--success)', color: '#000' } : {}}
+          >
+            {isInitializing && !connectionSuccess ? <Loader2 size={18} className="spinner" /> : null}
+            {connectionSuccess ? <Check size={18} /> : null}
+            <span>{connectionSuccess ? 'Connected' : isInitializing ? 'Connecting' : 'Connect'}</span>
+          </button>
 
-        <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-2)', fontSize: '13px' }}>
-          <input type="checkbox" id="devMode" checked={devMode} onChange={(e) => setDevMode(e.target.checked)} disabled={isInitializing} />
-          <label htmlFor="devMode" style={{ cursor: 'pointer' }}>Developer Mode (Simulate Earbuds)</label>
-        </div>
-
-        {logs.length > 0 && (
-          <div className="terminal-logs" style={{ marginTop: '24px', width: '320px', textAlign: 'left', fontFamily: 'monospace', fontSize: '11px', color: 'var(--text-3)', background: 'rgba(0,0,0,0.3)', padding: '12px', borderRadius: '8px' }}>
-            {logs.map((log, i) => (
-              <div key={i}>{log}</div>
-            ))}
+          <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-2)', fontSize: '13px' }}>
+            <input type="checkbox" id="devMode" checked={devMode} onChange={(e) => setDevMode(e.target.checked)} disabled={isInitializing} />
+            <label htmlFor="devMode" style={{ cursor: 'pointer' }}>Developer Mode (Simulate Earbuds)</label>
           </div>
-        )}
-      </div>
+
+          {logs.length > 0 && (
+            <div className="terminal-logs" style={{ marginTop: '24px', width: '320px', textAlign: 'left', fontFamily: 'monospace', fontSize: '11px', color: 'var(--text-3)', background: 'rgba(0,0,0,0.3)', padding: '12px', borderRadius: '8px' }}>
+              {logs.map((log, i) => (
+                <div key={i}>{log}</div>
+              ))}
+            </div>
+          )}
+        </div>
+        {trayDialogOverlay}
+      </>
     );
   }
 
@@ -230,71 +290,19 @@ function App() {
   };
 
   return (
-    <div className="app-layout">
-      <div className="left-panel">
-        <MainDashboard />
+    <>
+      <div className="app-layout">
+        <div className="left-panel">
+          <MainDashboard />
+        </div>
+        <div className="right-panel">
+          <AnimatePresence mode="wait">
+            {rightPanelContent()}
+          </AnimatePresence>
+        </div>
       </div>
-      <div className="right-panel">
-        <AnimatePresence mode="wait">
-          {rightPanelContent()}
-        </AnimatePresence>
-      </div>
-
-      <AnimatePresence>
-        {showTrayDialog && (
-          <div className="dialog-overlay" style={{ zIndex: 9999 }}>
-            <motion.div 
-              className="dialog-card"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.15 }}
-            >
-              <h3 className="dialog-title" style={{ fontSize: '18px', marginBottom: '12px', color: 'var(--text-1)' }}>App Minimized to Tray</h3>
-              <p className="dialog-body" style={{ fontSize: '14px', color: 'var(--text-2)', marginBottom: '16px', lineHeight: '1.5' }}>
-                MotoBudsDesktopUtility is now running in the system tray. To keep the icon visible:<br/><br/>
-                <strong>Settings → Personalization → Taskbar → Other system tray icons</strong>
-              </p>
-              
-              <div className="dialog-actions" style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '24px' }}>
-                <button 
-                  className="dialog-btn secondary"
-                  onClick={() => {
-                    if (window.api?.openTaskbarSettings) window.api.openTaskbarSettings();
-                    setShowTrayDialog(false);
-                    if (window.api?.hideWindow) window.api.hideWindow();
-                  }}
-                  style={{ background: 'var(--surface-3)', border: 'none', padding: '8px 16px', borderRadius: '6px', color: 'var(--text-1)', cursor: 'pointer', fontSize: '13px' }}
-                >
-                  Open Taskbar Settings
-                </button>
-                <button 
-                  className="dialog-btn secondary"
-                  onClick={() => {
-                    setShowTrayDialog(false);
-                    if (window.api?.hideWindow) window.api.hideWindow();
-                  }}
-                  style={{ background: 'var(--surface-3)', border: 'none', padding: '8px 16px', borderRadius: '6px', color: 'var(--text-1)', cursor: 'pointer', fontSize: '13px' }}
-                >
-                  Got It
-                </button>
-                <button 
-                  className="dialog-btn primary"
-                  onClick={() => {
-                    if (window.api?.disableTrayNotification) window.api.disableTrayNotification();
-                    setShowTrayDialog(false);
-                    if (window.api?.hideWindow) window.api.hideWindow();
-                  }}
-                  style={{ background: 'var(--accent)', border: 'none', padding: '8px 16px', borderRadius: '6px', color: '#000', cursor: 'pointer', fontSize: '13px', fontWeight: 500 }}
-                >
-                  Don't remind me again
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-    </div>
+      {trayDialogOverlay}
+    </>
   );
 }
 
