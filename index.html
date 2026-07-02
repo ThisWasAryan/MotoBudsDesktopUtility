@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#080b10">
+    <meta name="color-scheme" content="dark">
+    <meta name="description" content="Control Moto Buds from Windows and Linux. Noise cancellation, equalizer, gestures, battery telemetry and more in one open source desktop utility.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Moto Buds Desktop Utility">
+    <meta property="og:description" content="Your Moto Buds, fully unlocked on desktop. Open source for Windows and Linux.">
+    <meta property="og:url" content="https://thiswasaryan.github.io/MotoBudsDesktopUtility/">
+    <meta property="og:image" content="https://thiswasaryan.github.io/MotoBudsDesktopUtility/assets/brand/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <title>Moto Buds Desktop Utility | Control your earbuds from desktop</title>
+    <link rel="icon" href="assets/brand/icon.png" type="image/png">
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header" data-header>
+      <div class="nav-shell">
+        <a class="brand" href="#top" aria-label="Moto Buds Desktop Utility home">
+          <span class="brand-mark" aria-hidden="true">
+            <img src="assets/brand/icon.png" alt="" width="36" height="36">
+          </span>
+          <span>Moto Buds <small>Desktop Utility</small></span>
+        </a>
+
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav" data-nav-toggle>
+          <span class="sr-only">Open navigation</span>
+          <span></span><span></span>
+        </button>
+
+        <nav class="nav-links" id="primary-nav" aria-label="Primary navigation" data-nav>
+          <a href="#features">Features</a>
+          <a href="#showcase">Screenshots</a>
+          <a href="#open-source">Open source</a>
+          <a class="nav-github" href="https://github.com/ThisWasAryan/MotoBudsDesktopUtility" target="_blank" rel="noreferrer">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .8a11.4 11.4 0 0 0-3.6 22.2c.6.1.8-.2.8-.5v-2.2c-3.4.7-4.1-1.5-4.1-1.5-.5-1.4-1.3-1.8-1.3-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.6.1-3.2 0 0 1-.3 3.3 1.2a11.2 11.2 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.7 1.6.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.6.8.5A11.4 11.4 0 0 0 12 .8Z"/></svg>
+            <span>GitHub</span>
+            <span class="star-count" data-star-count aria-label="GitHub stars">Star</span>
+          </a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero" id="top" aria-labelledby="hero-title">
+        <div class="hero-noise" aria-hidden="true"></div>
+        <div class="hero-grid" aria-hidden="true"></div>
+        <div class="shell hero-layout">
+          <div class="hero-copy">
+            <div class="eyebrow"><span></span> Open source for Windows &amp; Linux</div>
+            <h1 id="hero-title">Your Moto Buds. <br><em>Fully unlocked</em> on desktop.</h1>
+            <p class="hero-lede">Tune sound, switch noise control, remap gestures, and monitor every battery without reaching for your phone.</p>
+
+            <div class="hero-actions">
+              <a class="button button-primary" href="download.html">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 5-5m-5 5-5-5M5 20h14"/></svg>
+                Download free
+                <span class="button-version" data-version>v2.1.0</span>
+              </a>
+              <a class="button button-secondary" href="https://github.com/ThisWasAryan/MotoBudsDesktopUtility" target="_blank" rel="noreferrer">
+                <svg class="github-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .8a11.4 11.4 0 0 0-3.6 22.2c.6.1.8-.2.8-.5v-2.2c-3.4.7-4.1-1.5-4.1-1.5-.5-1.4-1.3-1.8-1.3-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.6.1-3.2 0 0 1-.3 3.3 1.2a11.2 11.2 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.7 1.6.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.6.8.5A11.4 11.4 0 0 0 12 .8Z"/></svg>
+                Star on GitHub
+              </a>
+            </div>
+
+            <ul class="hero-facts" aria-label="Project details">
+              <li><span class="fact-dot"></span><strong data-version>v2.1.0</strong> stable</li>
+              <li>GPLv3 licensed</li>
+              <li>No account required</li>
+            </ul>
+          </div>
+
+          <div class="hero-visual" data-parallax>
+            <div class="product-plinth" aria-hidden="true"><span>MOTO</span><span>BUDS</span></div>
+            <picture class="hero-product">
+              <source srcset="assets/product/buds_with_case.webp" type="image/webp">
+              <img src="assets/product/buds_with_case.png" width="1000" height="1000" alt="Moto Buds earbuds beside their charging case">
+            </picture>
+            <div class="product-note product-note-top" aria-hidden="true"><span>01</span> Desktop control</div>
+            <div class="product-note product-note-bottom" aria-hidden="true"><span>02</span> No cloud required</div>
+          </div>
+        </div>
+        <a class="scroll-cue" href="#features" aria-label="Scroll to features"><span></span>Explore</a>
+      </section>
+
+      <div class="proof-strip" aria-label="Compatibility">
+        <div class="shell proof-inner">
+          <span>Built for the earbuds you already own</span>
+          <ul>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5.5 10.5 4v7.2H3V5.5Zm8.4-1.7L21 2v9.2h-9.6V3.8ZM3 12.1h7.5V20L3 18.6v-6.5Zm8.4 0H21V22l-9.6-1.8v-8.1Z"/></svg>Windows 10 &amp; 11</li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c-2.3 0-4 1.7-4 4v2.5c0 1.4-1 2.5-2.2 2.5H5.5C4.7 11 4 11.7 4 12.5v2c0 .8.7 1.5 1.5 1.5h.3c.7 0 1.2.6 1.2 1.2v.3c0 .7.6 1.3 1.3 1.3h7.4c.7 0 1.3-.6 1.3-1.3v-.3c0-.6.5-1.2 1.2-1.2h.3c.8 0 1.5-.7 1.5-1.5v-2c0-.8-.7-1.5-1.5-1.5h-.3c-1.2 0-2.2-1.1-2.2-2.5V6c0-2.3-1.7-4-4-4Zm-1.8 5c.4 0 .8.3.8.8s-.4.7-.8.7-.7-.3-.7-.7.3-.8.7-.8Zm3.6 0c.4 0 .7.3.7.8s-.3.7-.7.7-.8-.3-.8-.7.3-.8.8-.8Z"/></svg>Modern Linux</li>
+            <li><strong>100%</strong> open source</li>
+          </ul>
+        </div>
+      </div>
+
+      <section class="section features" id="features" aria-labelledby="features-title">
+        <div class="shell">
+          <div class="section-heading reveal">
+            <div><p class="kicker">One utility. Total control.</p><h2 id="features-title">Everything your earbuds can do, <br><span>now on your desktop.</span></h2></div>
+            <p>See what each control does before you install the utility.</p>
+          </div>
+
+          <div class="feature-grid">
+            <article class="feature-card feature-card-wide noise-card reveal" data-feature-link tabindex="0" data-feature-shot="sound">
+              <div class="feature-number">01</div>
+              <div class="feature-copy"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="M4 12h2m12 0h2M6.3 6.3l1.4 1.4m8.6 8.6 1.4 1.4m0-11.4-1.4 1.4M7.7 16.3l-1.4 1.4M12 4v2m0 12v2"/></svg></span><h3>Active Noise Control</h3><p>Select Off, Transparency, or Active Noise Cancellation. The interface waits for confirmation from the earbuds before showing the new mode.</p></div>
+              <picture class="anc-demo-img">
+                <img src="assets/screenshots/anc_slider.png" alt="ANC slider">
+              </picture>
+            </article>
+
+            <article class="feature-card battery-card reveal" data-feature-link tabindex="0" data-feature-shot="overview">
+              <div class="feature-number">02</div>
+              <div class="feature-copy"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="M7 7h10v14H7zM10 3h4v4M9.5 11h5M12 8.5v5"/></svg></span><h3>Battery Monitoring</h3><p>Check the left earbud, right earbud, and charging case separately. Charging and in ear indicators update with the device.</p></div>
+              <div class="battery-orbits" aria-hidden="true"><span><strong>80</strong>%<small>L</small></span><span><strong>76</strong>%<small>R</small></span><span><strong>92</strong>%<small>CASE</small></span></div>
+            </article>
+
+            <article class="feature-card eq-card reveal" data-feature-link tabindex="0" data-feature-shot="equalizer">
+              <div class="feature-number">03</div>
+              <div class="feature-copy"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="M4 5v14M10 5v14M16 5v14M22 5v14M2 9h4m2 6h4m2-7h4m2 5h4"/></svg></span><h3>10 Band Equalizer</h3><p>Choose a built in sound preset or adjust ten frequency bands to create a custom profile.</p></div>
+              <div class="eq-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            </article>
+
+            <article class="feature-card gesture-card reveal" data-feature-link tabindex="0" data-feature-shot="gestures">
+              <div class="feature-number">04</div>
+              <div class="feature-copy"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="M8 11V7a2 2 0 0 1 4 0v3-5a2 2 0 0 1 4 0v5-2a2 2 0 0 1 4 0v7a7 7 0 0 1-7 7h-1a7 7 0 0 1-5.7-3L3 14.5A2 2 0 0 1 6 12l2 2"/></svg></span><h3>Gesture Controls</h3><p>Set double tap, triple tap, and press and hold actions independently for the left and right earbuds.</p></div>
+              <div class="gesture-visual" aria-hidden="true"><picture><source srcset="assets/product/right_bud.webp" type="image/webp"><img src="assets/product/right_bud.png" alt=""></picture><span class="tap-ring"></span><span class="tap-ring ring-two"></span></div>
+            </article>
+
+            <article class="feature-card compact reveal" data-feature-link tabindex="0" data-feature-shot="sound">
+              <div class="feature-number">05</div>
+              <div class="feature-copy"><span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><h3>Hi Res Audio</h3><p>Enable the LDAC codec on Linux for higher resolution Bluetooth audio. The utility handles the required reconnection automatically.</p></div>
+              <div class="hires-visual" aria-hidden="true"><span>LDAC</span></div>
+              <span class="feature-tag">Linux only</span>
+            </article>
+
+            <article class="feature-card compact reveal" data-feature-link tabindex="0" data-feature-shot="sound">
+              <div class="feature-number">06</div>
+              <div class="feature-copy"><span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4M8 10v4M15 13h.01M18 11h.01"/></svg></span><h3>Game Mode</h3><p>Reduce Bluetooth audio latency for games and video. Game Mode and Hi Res Audio remain mutually exclusive.</p></div>
+              <div class="game-visual" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="6" width="20" height="12" rx="4"/><path d="M6 12h4M8 10v4M15 13h.01M18 11h.01"/></svg></div>
+              <span class="feature-tag">Low latency</span>
+            </article>
+
+            <article class="feature-card compact reveal" data-feature-link tabindex="0" data-feature-shot="sound">
+              <div class="feature-number">07</div>
+              <div class="feature-copy"><span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></span><h3>Volume Booster</h3><p>Enable the earbuds built in volume boost when the normal system output level is not enough.</p></div>
+              <div class="volume-visual" aria-hidden="true"><div class="volume-bar"><i></i><i></i><i></i><i class="boosted"></i></div></div>
+              <span class="feature-tag">One click toggle</span>
+            </article>
+
+            <article class="feature-card compact reveal" data-feature-link tabindex="0" data-feature-shot="find">
+              <div class="feature-number">08</div>
+              <div class="feature-copy"><span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></span><h3>Find My Device</h3><p>Ring the left or right earbud separately. A safety check prevents ringing an earbud that is detected inside your ear.</p></div>
+              <div class="find-visual" aria-hidden="true"><div class="ping-ring"></div><div class="ping-dot"></div></div>
+              <span class="feature-tag">Left and right controls</span>
+            </article>
+
+            <article class="feature-card compact reveal" data-feature-link tabindex="0" data-feature-shot="fit">
+              <div class="feature-number">09</div>
+              <div class="feature-copy"><span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span><h3>Ear Tip Fit Test</h3><p>Run an acoustic seal test and receive a separate pass or fail result for each earbud.</p></div>
+              <div class="fit-visual" aria-hidden="true"><span class="fit-check">✓ Good fit</span></div>
+              <span class="feature-tag">Independent results</span>
+            </article>
+
+            <article class="feature-card compact reveal" data-feature-link tabindex="0" data-feature-section="tray">
+              <div class="feature-number">10</div>
+              <div class="feature-copy"><span class="card-icon"><svg viewBox="0 0 24 24"><path d="M4 5h16v12H4zM8 21h8m-4-4v4M7 9h3m4 0h3M7 13h10"/></svg></span><h3>System Tray Controls</h3><p>Keep the utility running in the background. Check battery levels and change noise control from the tray.</p></div>
+              <span class="feature-tag">Windows and Linux</span>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section showcase" id="showcase" aria-labelledby="showcase-title">
+        <div class="shell">
+          <div class="showcase-heading reveal">
+            <p class="kicker">Inside the utility</p>
+            <h2 id="showcase-title">Familiar in seconds. <br><span>Powerful for years.</span></h2>
+            <p>A focused interface that keeps every control easy to find.</p>
+          </div>
+
+          <div class="showcase-layout reveal">
+            <div class="showcase-tabs" role="tablist" aria-label="Application screenshots">
+              <button role="tab" aria-selected="true" aria-controls="showcase-panel" id="tab-overview" data-shot="overview"><span>01</span>Overview</button>
+              <button role="tab" aria-selected="false" aria-controls="showcase-panel" id="tab-sound" data-shot="sound" tabindex="-1"><span>02</span>Sound</button>
+              <button role="tab" aria-selected="false" aria-controls="showcase-panel" id="tab-equalizer" data-shot="equalizer" tabindex="-1"><span>03</span>Equalizer</button>
+              <button role="tab" aria-selected="false" aria-controls="showcase-panel" id="tab-gestures" data-shot="gestures" tabindex="-1"><span>04</span>Gestures</button>
+              <button role="tab" aria-selected="false" aria-controls="showcase-panel" id="tab-find" data-shot="find" tabindex="-1"><span>05</span>Find device</button>
+              <button role="tab" aria-selected="false" aria-controls="showcase-panel" id="tab-fit" data-shot="fit" tabindex="-1"><span>06</span>Fit test</button>
+              <button role="tab" aria-selected="false" aria-controls="showcase-panel" id="tab-settings" data-shot="settings" tabindex="-1"><span>07</span>Settings</button>
+            </div>
+
+            <div class="showcase-panel" id="showcase-panel" role="tabpanel" aria-labelledby="tab-overview" tabindex="0">
+              <div class="showcase-window">
+                <div class="window-bar"><div class="window-dots"><i></i><i></i><i></i></div><span data-shot-label>Device overview</span><span class="window-status"><i></i> Live device state</span></div>
+                <picture data-shot-picture>
+                  <source srcset="assets/screenshots/overview.webp" type="image/webp" data-shot-source>
+                  <img src="assets/screenshots/overview.png" width="1252" height="923" alt="Moto Buds dashboard with battery and noise control information" data-shot-image>
+                </picture>
+              </div>
+              <div class="showcase-caption"><span data-shot-index>01 / 07</span><div><h3 data-shot-title>Device status at a glance</h3><p data-shot-copy>Check each battery, current noise control mode, charging state, and enabled sound features from the main dashboard.</p></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section tray-section" id="tray" aria-labelledby="tray-title">
+        <div class="shell tray-layout">
+          <div class="tray-copy reveal">
+            <p class="kicker">Quietly running. Always ready.</p>
+            <h2 id="tray-title">Control without <br><span>opening a window.</span></h2>
+            <p>Keep the utility in your system tray and check batteries or change noise control without interrupting your work.</p>
+            <ul class="check-list">
+              <li><span>01</span>Battery levels on hover</li>
+              <li><span>02</span>Noise control from the tray menu</li>
+              <li><span>03</span>Background operation when closed</li>
+            </ul>
+          </div>
+
+          <div class="tray-stage reveal">
+            <div class="tray-card tray-card-menu">
+              <div class="tray-card-label">Quick controls</div>
+              <picture><source srcset="assets/tray/tray-menu.webp" type="image/webp"><img src="assets/tray/tray-menu.png" width="504" height="293" alt="System tray menu with noise control shortcuts"></picture>
+            </div>
+            <div class="tray-card tray-card-hover">
+              <div class="tray-card-label">Live battery telemetry</div>
+              <picture><source srcset="assets/tray/tray-case.webp" type="image/webp"><img src="assets/tray/tray-case.png" width="480" height="132" alt="System tray tooltip showing earbuds and charging case battery levels"></picture>
+            </div>
+            <picture class="tray-product"><source srcset="assets/product/case_closed.webp" type="image/webp"><img src="assets/product/case_closed.png" width="1000" height="1000" alt="Moto Buds charging case"></picture>
+          </div>
+        </div>
+      </section>
+
+      <section class="section open-source" id="open-source" aria-labelledby="source-title">
+        <div class="shell source-grid">
+          <div class="source-copy reveal">
+            <p class="kicker">Open by design</p>
+            <h2 id="source-title">No black boxes. <br><span>Just your earbuds.</span></h2>
+            <p>Moto Buds Desktop Utility is a community project licensed under GPLv3. Its contributors studied the Bluetooth protocol so desktop users can access controls that were previously limited to the phone app.</p>
+            <div class="source-actions">
+              <a class="text-link" href="https://github.com/ThisWasAryan/MotoBudsDesktopUtility" target="_blank" rel="noreferrer">Browse the source <span>↗</span></a>
+              <a class="text-link" href="https://github.com/ThisWasAryan/MotoBudsDesktopUtility/blob/main/PROTOCOL.md" target="_blank" rel="noreferrer">Read the protocol <span>↗</span></a>
+            </div>
+          </div>
+
+          <div class="protocol-panel reveal" aria-label="How a command reaches the earbuds">
+            <div class="protocol-header">
+              <div class="window-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+              <span>HOW A COMMAND TRAVELS</span>
+              <strong><i></i> LOCAL ONLY</strong>
+            </div>
+            <div class="protocol-flow">
+              <div class="protocol-step">
+                <span class="protocol-index">01</span>
+                <div><strong>You choose a control</strong><p>The Electron interface sends a small command to the local service.</p></div>
+                <code>anc&nbsp; mode: 1</code>
+              </div>
+              <div class="protocol-connector" aria-hidden="true"><i></i></div>
+              <div class="protocol-step">
+                <span class="protocol-index">02</span>
+                <div><strong>The packet is built locally</strong><p>The Python service adds the protocol opcode, payload, and CRC32 check.</p></div>
+                <code>RFCOMM&nbsp; CH 16</code>
+              </div>
+              <div class="protocol-connector" aria-hidden="true"><i></i></div>
+              <div class="protocol-step protocol-step-confirmed">
+                <span class="protocol-index">03</span>
+                <div><strong>The earbuds confirm the change</strong><p>The screen updates after the hardware response arrives, so it reflects the real device state.</p></div>
+                <code>ACK&nbsp; CONFIRMED</code>
+              </div>
+            </div>
+            <div class="protocol-footer"><span>No cloud</span><span>No account</span><span>Protocol documented</span><span>GPLv3</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="final-cta" aria-labelledby="cta-title">
+        <div class="cta-glow" aria-hidden="true"></div>
+        <div class="shell cta-inner reveal">
+          <picture><source srcset="assets/product/buds_front.webp" type="image/webp"><img src="assets/product/buds_front.png" width="1000" height="1000" alt="Front view of Moto Buds earbuds"></picture>
+          <div>
+            <p class="kicker">Ready when you are</p>
+            <h2 id="cta-title">Give your Moto Buds <br><span>a proper desktop.</span></h2>
+            <p>Free, open source, and built for the hardware you already own.</p>
+            <a class="button button-primary" href="download.html">Choose your download <span aria-hidden="true">→</span></a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="shell footer-grid">
+        <div class="footer-brand">
+          <a class="brand" href="#top"><span class="brand-mark"><img src="assets/brand/icon.png" alt="" width="36" height="36"></span><span>Moto Buds <small>Desktop Utility</small></span></a>
+          <p>An independent, open source desktop companion for Motorola Moto Buds.</p>
+        </div>
+        <div class="footer-links"><strong>Project</strong><a href="https://github.com/ThisWasAryan/MotoBudsDesktopUtility" target="_blank" rel="noreferrer">Source code</a><a href="https://github.com/ThisWasAryan/MotoBudsDesktopUtility/releases/latest" target="_blank" rel="noreferrer">Latest release</a><a href="https://github.com/ThisWasAryan/MotoBudsDesktopUtility/issues" target="_blank" rel="noreferrer">Report an issue</a></div>
+        <div class="footer-links"><strong>Resources</strong><a href="https://github.com/ThisWasAryan/MotoBudsDesktopUtility/blob/main/README.md" target="_blank" rel="noreferrer">Documentation</a><a href="https://github.com/ThisWasAryan/MotoBudsDesktopUtility/blob/main/CONTRIBUTING.md" target="_blank" rel="noreferrer">Contribute</a><a href="https://youtu.be/_nepY64ECYo" target="_blank" rel="noreferrer">Video walkthrough</a></div>
+      </div>
+      <div class="shell footer-bottom">
+        <p>© <span data-year></span> Aryan Raj · Released under <a href="https://github.com/ThisWasAryan/MotoBudsDesktopUtility/blob/main/LICENSE" target="_blank" rel="noreferrer">GPLv3</a></p>
+        <p>Moto Buds and Motorola are trademarks of their respective owners. This project is not affiliated with or endorsed by Motorola.</p>
+      </div>
+    </footer>
+
+  </body>
+</html>

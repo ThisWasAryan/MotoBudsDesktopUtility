@@ -1,0 +1,8 @@
+node_modules/
+backend/
+builds/
+dist/
+dist-electron/
+releases/
+*.log
+
