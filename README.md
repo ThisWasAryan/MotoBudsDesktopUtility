@@ -8,12 +8,7 @@ This branch (`gh-pages`) contains the source code for the official landing page 
 - **Deployment**: The contents of this branch are served via GitHub Pages. 
 - **Separation of Concerns**: Please note that the actual source code for the Electron desktop application resides on the `main` branch. This `gh-pages` branch is completely independent and should not contain application code.
 
-## Development
+## Live Preview
 
-The website is a static HTML/CSS/JS project. You can run it locally by starting a simple HTTP server in the root directory:
-
-```bash
-python3 -m http.server 8000
-```
-
-Then navigate to `http://localhost:8000` in your web browser.
+You can view the live deployed website here:
+[https://thiswasaryan.github.io/MotoBudsDesktopUtility/](https://thiswasaryan.github.io/MotoBudsDesktopUtility/)
